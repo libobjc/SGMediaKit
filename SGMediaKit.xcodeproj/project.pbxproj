@@ -34,6 +34,11 @@
 		9CA476651DE5333100B1B0D1 /* SGPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA4764B1DE5333100B1B0D1 /* SGPlayer.m */; };
 		9CA476661DE5333100B1B0D1 /* SGPlayerDefine.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA4764C1DE5333100B1B0D1 /* SGPlayerDefine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9CA476671DE5333100B1B0D1 /* SGPlayerDefine.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA4764D1DE5333100B1B0D1 /* SGPlayerDefine.m */; };
+		9CA476721DE53CAB00B1B0D1 /* GPUImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CA476711DE53CAB00B1B0D1 /* GPUImage.framework */; };
+		9CA476761DE53D3300B1B0D1 /* SGVideoCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476741DE53D3300B1B0D1 /* SGVideoCapture.h */; };
+		9CA476771DE53D3300B1B0D1 /* SGVideoCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA476751DE53D3300B1B0D1 /* SGVideoCapture.m */; };
+		9CA476841DE5663000B1B0D1 /* SGVideoCaptureView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476821DE5663000B1B0D1 /* SGVideoCaptureView.h */; };
+		9CA476851DE5663000B1B0D1 /* SGVideoCaptureView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA476831DE5663000B1B0D1 /* SGVideoCaptureView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -66,6 +71,11 @@
 		9CA4764B1DE5333100B1B0D1 /* SGPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPlayer.m; sourceTree = "<group>"; };
 		9CA4764C1DE5333100B1B0D1 /* SGPlayerDefine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPlayerDefine.h; sourceTree = "<group>"; };
 		9CA4764D1DE5333100B1B0D1 /* SGPlayerDefine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPlayerDefine.m; sourceTree = "<group>"; };
+		9CA476711DE53CAB00B1B0D1 /* GPUImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GPUImage.framework; path = "/Users/Single/Desktop/SGDemo/SGVendors/GPUImage-master/framework/../build/Debug-iphoneos/GPUImage.framework"; sourceTree = "<absolute>"; };
+		9CA476741DE53D3300B1B0D1 /* SGVideoCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoCapture.h; sourceTree = "<group>"; };
+		9CA476751DE53D3300B1B0D1 /* SGVideoCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoCapture.m; sourceTree = "<group>"; };
+		9CA476821DE5663000B1B0D1 /* SGVideoCaptureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoCaptureView.h; sourceTree = "<group>"; };
+		9CA476831DE5663000B1B0D1 /* SGVideoCaptureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoCaptureView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -73,6 +83,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CA476721DE53CAB00B1B0D1 /* GPUImage.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +95,7 @@
 			children = (
 				9CA476271DE531FE00B1B0D1 /* SGMediaKit */,
 				9CA476261DE531FE00B1B0D1 /* Products */,
+				9CA476701DE53CAB00B1B0D1 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -100,6 +112,7 @@
 			children = (
 				9CA476281DE531FE00B1B0D1 /* SGMediaKit.h */,
 				9CA476291DE531FE00B1B0D1 /* Info.plist */,
+				9CA476731DE53D1E00B1B0D1 /* SGCapture */,
 				9CA476301DE5333100B1B0D1 /* SGPlayer */,
 			);
 			path = SGMediaKit;
@@ -162,6 +175,25 @@
 			path = SGAVGLView;
 			sourceTree = "<group>";
 		};
+		9CA476701DE53CAB00B1B0D1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9CA476711DE53CAB00B1B0D1 /* GPUImage.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9CA476731DE53D1E00B1B0D1 /* SGCapture */ = {
+			isa = PBXGroup;
+			children = (
+				9CA476741DE53D3300B1B0D1 /* SGVideoCapture.h */,
+				9CA476751DE53D3300B1B0D1 /* SGVideoCapture.m */,
+				9CA476821DE5663000B1B0D1 /* SGVideoCaptureView.h */,
+				9CA476831DE5663000B1B0D1 /* SGVideoCaptureView.m */,
+			);
+			path = SGCapture;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -172,7 +204,9 @@
 				9CA4762A1DE531FE00B1B0D1 /* SGMediaKit.h in Headers */,
 				9CA476641DE5333100B1B0D1 /* SGPlayer.h in Headers */,
 				9CA476661DE5333100B1B0D1 /* SGPlayerDefine.h in Headers */,
+				9CA476841DE5663000B1B0D1 /* SGVideoCaptureView.h in Headers */,
 				9CA476621DE5333100B1B0D1 /* SGPlayer+Extension.h in Headers */,
+				9CA476761DE53D3300B1B0D1 /* SGVideoCapture.h in Headers */,
 				9CA4765F1DE5333100B1B0D1 /* SGNotification.h in Headers */,
 				9CA476591DE5333100B1B0D1 /* SGAVGLView.h in Headers */,
 				9CA4765B1DE5333100B1B0D1 /* SGAVPlayer.h in Headers */,
@@ -259,6 +293,8 @@
 				9CA476601DE5333100B1B0D1 /* SGNotification.m in Sources */,
 				9CA476671DE5333100B1B0D1 /* SGPlayerDefine.m in Sources */,
 				9CA4764F1DE5333100B1B0D1 /* SGAVGLMatrix.m in Sources */,
+				9CA476851DE5663000B1B0D1 /* SGVideoCaptureView.m in Sources */,
+				9CA476771DE53D3300B1B0D1 /* SGVideoCapture.m in Sources */,
 				9CA4765E1DE5333100B1B0D1 /* SGAVView.m in Sources */,
 				9CA476651DE5333100B1B0D1 /* SGPlayer.m in Sources */,
 				9CA476581DE5333100B1B0D1 /* SGAVGLTexture.m in Sources */,
@@ -427,6 +463,7 @@
 				9CA4762F1DE531FE00B1B0D1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
