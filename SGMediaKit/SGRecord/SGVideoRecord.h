@@ -13,6 +13,6 @@
 @property (nonatomic, strong, readonly) UIView * view;
 
 - (void)startRecording;
-- (void)stopRecording;
+- (void)finishRecordingWithCompletionHandler:(void (^)(NSURL * videoURL))handler;
 
 @end

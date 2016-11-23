@@ -9,11 +9,14 @@
 #import "SGVideoRecord.h"
 #import "SGVideoCapture.h";
 #import "SGVideoCaptureFilter.h"
+#import "SGVideoCaptureWriter.h"
 
 @interface SGVideoRecord () <SGVideoCaptureDelegate>
 
 @property (nonatomic, strong) SGVideoCapture * videoCapture;
 @property (nonatomic, strong) GPUImageFilter * filter;
+@property (nonatomic, strong) GPUImageMovieWriter * videoWriter;
+@property (nonatomic, copy) NSURL * videoURL;
 
 @end
 
@@ -22,19 +25,36 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        
+        [self setupVideoWriter];
     }
     return self;
 }
 
-- (void)startRecording
+- (void)setupVideoWriter
 {
+    [self.filter removeTarget:self.videoWriter];
     
+    self.videoURL = [NSURL fileURLWithPath:[NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/%ld.mp4", (NSInteger)[NSDate date].timeIntervalSince1970]]];
+    self.videoWriter = [SGVideoCaptureWriter defaultWriterWithURL:self.videoURL size:CGSizeMake(380, 640)];
+    self.videoCapture.videoCamera.audioEncodingTarget = self.videoWriter;
+    [self.filter addTarget:self.videoWriter];
 }
 
-- (void)stopRecording
+- (void)startRecording
 {
-    
+    [self.videoWriter startRecording];
+}
+
+- (void)finishRecordingWithCompletionHandler:(void (^)(NSURL *))handler
+{
+    [self.videoWriter finishRecordingWithCompletionHandler:^{
+        if (handler) {
+            handler(self.videoURL);
+        }
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self setupVideoWriter];
+        });
+    }];
 }
 
 - (GPUImageFilter *)filterInVideoCapture:(SGVideoCapture *)videoCapture
