@@ -13,17 +13,25 @@
 @class SGVideoCapture;
 
 @protocol SGVideoCaptureDelegate <NSObject>
+
 @optional;
+- (void)videoCaptureWillStartRunning:(SGVideoCapture *)videoCapture;
+- (void)videoCaptureDidStartRunning:(SGVideoCapture *)videoCapture;
+- (void)videoCaptureWillStopRunning:(SGVideoCapture *)videoCapture;
+- (void)videoCaptureDidStopRunning:(SGVideoCapture *)videoCapture;
 - (GPUImageFilter *)filterInVideoCapture:(SGVideoCapture *)videoCapture;
+
 @end
 
 @interface SGVideoCapture : NSObject
 
-@property (nonatomic, weak) id <SGVideoCaptureDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL running;
+@property (nonatomic, strong, readonly) GPUImageVideoCamera * videoCamera;
+@property (nonatomic, weak) id <SGVideoCaptureDelegate> delegate;
 @property (nonatomic, strong, readonly) SGVideoCaptureView * view;
 
 - (void)reloadFilter;
+
 - (void)startRunning;
 - (void)stopRunning;
 

@@ -11,7 +11,6 @@
 @interface SGVideoCapture ()
 
 @property (nonatomic, assign) BOOL running;
-
 @property (nonatomic, strong) GPUImageVideoCamera * videoCamera;
 @property (nonatomic, strong) GPUImageFilter * filter;
 
@@ -37,14 +36,26 @@
 - (void)startRunning
 {
     [self reloadFilter];
+    if ([self.delegate respondsToSelector:@selector(videoCaptureWillStartRunning:)]) {
+        [self.delegate videoCaptureWillStartRunning:self];
+    }
     self.running = YES;
     [self.videoCamera startCameraCapture];
+    if ([self.delegate respondsToSelector:@selector(videoCaptureDidStartRunning:)]) {
+        [self.delegate videoCaptureDidStartRunning:self];
+    }
 }
 
 - (void)stopRunning
 {
+    if ([self.delegate respondsToSelector:@selector(videoCaptureWillStopRunning:)]) {
+        [self.delegate videoCaptureWillStopRunning:self];
+    }
     self.running = NO;
     [self.videoCamera stopCameraCapture];
+    if ([self.delegate respondsToSelector:@selector(videoCaptureDidStopRunning:)]) {
+        [self.delegate videoCaptureDidStopRunning:self];
+    }
 }
 
 - (GPUImageVideoCamera *)videoCamera
