@@ -10,6 +10,8 @@
 
 @interface SGVideoRecord : NSObject
 
++ (NSURL *)videoSaveDirectory;
+
 @property (nonatomic, strong, readonly) UIView * view;
 
 - (void)startRecording;

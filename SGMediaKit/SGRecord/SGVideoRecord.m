@@ -22,6 +22,20 @@
 
 @implementation SGVideoRecord
 
++ (NSURL *)videoSaveDirectory
+{
+    static NSURL * url = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSString * path = [[NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:@"SGMediaKitFile/SGMediaRecordFile"];
+        if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+            [[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:YES attributes:nil error:nil];
+        }
+        url = [NSURL fileURLWithPath:path isDirectory:YES];
+    });
+    return url;
+}
+
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -34,7 +48,9 @@
 {
     [self.filter removeTarget:self.videoWriter];
     
-    self.videoURL = [NSURL fileURLWithPath:[NSHomeDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"Documents/%ld.mp4", (NSInteger)[NSDate date].timeIntervalSince1970]]];
+    NSString * fileName = [NSString stringWithFormat:@"%ld.mp4", (NSInteger)[NSDate date].timeIntervalSince1970];
+    NSString * filePath = [[self.class videoSaveDirectory].relativePath stringByAppendingPathComponent:fileName];
+    self.videoURL = [NSURL fileURLWithPath:filePath isDirectory:NO];
     self.videoWriter = [SGVideoCaptureWriter defaultWriterWithURL:self.videoURL size:CGSizeMake(380, 640)];
     self.videoCapture.videoCamera.audioEncodingTarget = self.videoWriter;
     [self.filter addTarget:self.videoWriter];
@@ -76,6 +92,9 @@
 {
     if (!_filter) {
         _filter = [SGVideoCaptureFilter defaultFilter];
+        if (self.videoWriter) {
+            [_filter addTarget:self.videoWriter];
+        }
     }
     return _filter;
 }
