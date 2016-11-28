@@ -61,9 +61,12 @@ typedef NS_ENUM(NSUInteger, SGFocusMode) {
 - (BOOL)setCameraPosition:(SGCameraPosition)cameraPosition error:(NSError **)error;
 
 @property (nonatomic, assign, readonly) BOOL torch;   // default is off
+@property (nonatomic, assign, readonly) BOOL torchEnable;
 - (BOOL)setTorch:(BOOL)torch error:(NSError **)error;
 
 @property (nonatomic, assign, readonly) SGFocusMode focusMode;
+@property (nonatomic, assign, readonly) BOOL focusModeAutomaticEnable;
+@property (nonatomic, assign, readonly) BOOL focusModeManualEnable;
 - (BOOL)setFocusMode:(SGFocusMode)focusMode error:(NSError **)error;
 - (BOOL)setFocusPointOfInterest:(CGPoint)focusPointOfInterest error:(NSError **)error;
 

@@ -230,6 +230,11 @@
     return self.videoCamera.inputCamera.torchMode;
 }
 
+- (BOOL)torchEnable
+{
+    return self.videoCamera.inputCamera.torchAvailable;
+}
+
 - (BOOL)setTorch:(BOOL)torch error:(NSError *__autoreleasing *)error
 {
     if (!self.videoCamera.captureSession) {
@@ -279,6 +284,16 @@
         case AVCaptureFocusModeContinuousAutoFocus:
             return SGFocusModeAutomatic;
     }
+}
+
+- (BOOL)focusModeAutomaticEnable
+{
+    return [self.videoCamera.inputCamera isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus];
+}
+
+- (BOOL)focusModeManualEnable
+{
+    return [self.videoCamera.inputCamera isFocusModeSupported:AVCaptureFocusModeAutoFocus];
 }
 
 - (BOOL)setFocusMode:(SGFocusMode)focusMode error:(NSError **)error
