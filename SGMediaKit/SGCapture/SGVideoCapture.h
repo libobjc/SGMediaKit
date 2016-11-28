@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SGVideoConfiguration.h"
 
 typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
     SGVideoCaptureErrorCodeUnknown,
@@ -32,6 +33,11 @@ typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
 @end
 
 @interface SGVideoCapture : NSObject
+
++ (instancetype)new UNAVAILABLE_ATTRIBUTE;
+- (instancetype)init UNAVAILABLE_ATTRIBUTE;
+
+- (instancetype)initWithVideoConfiguration:(SGVideoConfiguration *)videoConfiguration NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, assign, readonly) BOOL running;
 @property (nonatomic, assign, readonly) BOOL recording;

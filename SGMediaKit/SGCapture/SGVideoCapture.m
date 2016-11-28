@@ -12,6 +12,8 @@
 
 @interface SGVideoCapture ()
 
+@property (nonatomic, strong) SGVideoConfiguration * videoConfiguration;
+
 @property (nonatomic, assign) BOOL running;
 @property (nonatomic, assign) BOOL recording;
 @property (nonatomic, strong) GPUImageVideoCamera * videoCamera;
@@ -23,6 +25,14 @@
 @end
 
 @implementation SGVideoCapture
+
+- (instancetype)initWithVideoConfiguration:(SGVideoConfiguration *)videoConfiguration
+{
+    if (self = [super init]) {
+        self.videoConfiguration = videoConfiguration;
+    }
+    return self;
+}
 
 - (void)reloadFilter
 {
