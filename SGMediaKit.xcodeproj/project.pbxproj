@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		9CA2D90B1DEBC59500AEC8A9 /* SGVideoCapturePreview.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA2D9091DEBC59500AEC8A9 /* SGVideoCapturePreview.h */; };
 		9CA2D90C1DEBC59500AEC8A9 /* SGVideoCapturePreview.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA2D90A1DEBC59500AEC8A9 /* SGVideoCapturePreview.m */; };
-		9CA2D90F1DEBE34800AEC8A9 /* SGVideoConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA2D90D1DEBE34800AEC8A9 /* SGVideoConfiguration.h */; };
+		9CA2D90F1DEBE34800AEC8A9 /* SGVideoConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA2D90D1DEBE34800AEC8A9 /* SGVideoConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9CA2D9101DEBE34800AEC8A9 /* SGVideoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA2D90E1DEBE34800AEC8A9 /* SGVideoConfiguration.m */; };
 		9CA2D9131DEBE35700AEC8A9 /* SGAudioConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA2D9111DEBE35700AEC8A9 /* SGAudioConfiguration.h */; };
 		9CA2D9141DEBE35700AEC8A9 /* SGAudioConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA2D9121DEBE35700AEC8A9 /* SGAudioConfiguration.m */; };
@@ -217,6 +217,7 @@
 				9CA476641DE5333100B1B0D1 /* SGPlayer.h in Headers */,
 				9CA476661DE5333100B1B0D1 /* SGPlayerDefine.h in Headers */,
 				9CA2D90B1DEBC59500AEC8A9 /* SGVideoCapturePreview.h in Headers */,
+				9CA2D90F1DEBE34800AEC8A9 /* SGVideoConfiguration.h in Headers */,
 				9CA476761DE53D3300B1B0D1 /* SGVideoCapture.h in Headers */,
 				9CA476621DE5333100B1B0D1 /* SGPlayer+Extension.h in Headers */,
 				9CA4765F1DE5333100B1B0D1 /* SGNotification.h in Headers */,
@@ -229,7 +230,6 @@
 				9CA4765D1DE5333100B1B0D1 /* SGAVView.h in Headers */,
 				9CA2D9131DEBE35700AEC8A9 /* SGAudioConfiguration.h in Headers */,
 				9CA476501DE5333100B1B0D1 /* SGAVGLModel.h in Headers */,
-				9CA2D90F1DEBE34800AEC8A9 /* SGVideoConfiguration.h in Headers */,
 				9CA4764E1DE5333100B1B0D1 /* SGAVGLMatrix.h in Headers */,
 				9CA476561DE5333100B1B0D1 /* SGAVGLShader.h in Headers */,
 			);

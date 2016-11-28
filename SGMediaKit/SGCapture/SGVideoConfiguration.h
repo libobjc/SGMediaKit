@@ -10,4 +10,6 @@
 
 @interface SGVideoConfiguration : NSObject
 
++ (instancetype)defaultVideoConfiguration;
+
 @end

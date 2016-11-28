@@ -10,4 +10,9 @@
 
 @implementation SGVideoConfiguration
 
++ (instancetype)defaultVideoConfiguration
+{
+    return [[self alloc] init];
+}
+
 @end
