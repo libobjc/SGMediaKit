@@ -195,16 +195,39 @@
     return _preview;
 }
 
-- (void)setCameraPosition:(AVCaptureDevicePosition)cameraPosition
+- (SGCameraPosition)cameraPosition
 {
-    if (cameraPosition != self.videoCamera.cameraPosition) {
-        [self.videoCamera rotateCamera];
+    switch (self.videoCamera.cameraPosition) {
+        case AVCaptureDevicePositionUnspecified:
+        case AVCaptureDevicePositionFront:
+            return SGCameraPositionFront;
+        case AVCaptureDevicePositionBack:
+            return SGCameraPositionBack;
     }
 }
 
-- (AVCaptureDevicePosition)cameraPosition
+- (BOOL)setCameraPosition:(SGCameraPosition)cameraPosition error:(NSError **)error
 {
-    return self.videoCamera.cameraPosition;
+    AVCaptureDevicePosition * position;
+    switch (cameraPosition) {
+        case SGCameraPositionFront:
+            position = AVCaptureDevicePositionFront;
+            break;
+        case SGCameraPositionBack:
+            position = AVCaptureDevicePositionBack;
+            break;
+    }
+    
+    if (position != self.videoCamera.cameraPosition) {
+        [self.videoCamera rotateCamera];
+    }
+    
+    return YES;
+}
+
+- (BOOL)torch
+{
+    return self.videoCamera.inputCamera.torchMode;
 }
 
 - (BOOL)setTorch:(BOOL)torch error:(NSError *__autoreleasing *)error
@@ -227,10 +250,14 @@
                     self.videoCamera.inputCamera.torchMode = AVCaptureTorchModeOff;
                 }
                 [self.videoCamera.inputCamera unlockForConfiguration];
+            } else {
+                err = [NSError errorWithDomain:@"获取摄像头配置信息失败" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
             }
         } else {
             err = [NSError errorWithDomain:@"当前摄像头无法开启闪光灯" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
         }
+    } else {
+        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
     }
     [session commitConfiguration];
     
@@ -242,9 +269,97 @@
     return YES;
 }
 
-- (BOOL)torch
+- (SGFocusMode)focusMode
 {
-    return self.videoCamera.inputCamera.torchMode;
+    switch (self.videoCamera.inputCamera.focusMode) {
+        case AVCaptureFocusModeLocked:
+        case AVCaptureFocusModeAutoFocus:
+            return SGFocusModeManual;
+            break;
+        case AVCaptureFocusModeContinuousAutoFocus:
+            return SGFocusModeAutomatic;
+    }
+}
+
+- (BOOL)setFocusMode:(SGFocusMode)focusMode error:(NSError **)error
+{
+    if (!self.videoCamera.captureSession) {
+        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        * error = err;
+        return NO;
+    }
+    
+    NSError * err;
+    if (self.videoCamera.inputCamera) {
+        
+        AVCaptureFocusMode * mode;
+        switch (focusMode) {
+            case SGFocusModeAutomatic:
+                mode = AVCaptureFocusModeContinuousAutoFocus;
+                break;
+            case SGFocusModeManual:
+                mode = AVCaptureFocusModeAutoFocus;
+                break;
+        }
+        
+        if ([self.videoCamera.inputCamera isFocusModeSupported:mode]) {
+            if ([self.videoCamera.inputCamera lockForConfiguration:&err]) {
+                self.videoCamera.inputCamera.focusMode = mode;
+                [self.videoCamera.inputCamera unlockForConfiguration];
+            } else {
+                err = [NSError errorWithDomain:@"锁定摄像头配置信息失败" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+            }
+        } else {
+            err = [NSError errorWithDomain:@"当前摄像头无法使用此对焦模式" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        }
+        
+    } else {
+        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+    }
+    
+    if (err) {
+        * error = err;
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (BOOL)setFocusPointOfInterest:(CGPoint)focusPointOfInterest error:(NSError *__autoreleasing *)error
+{
+    if (!self.videoCamera.captureSession) {
+        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        * error = err;
+        return NO;
+    }
+    
+    NSError * err;
+    if (self.videoCamera.inputCamera) {
+        if ([self.videoCamera.inputCamera isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+            if (self.focusMode == SGFocusModeManual) {
+                if([self.videoCamera.inputCamera lockForConfiguration:&err]) {
+                    self.videoCamera.inputCamera.focusMode = AVCaptureFocusModeAutoFocus;
+                    self.videoCamera.inputCamera.focusPointOfInterest = focusPointOfInterest;
+                    [self.videoCamera.inputCamera unlockForConfiguration];
+                } else {
+                    err = [NSError errorWithDomain:@"锁定摄像头配置信息失败" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+                }
+            } else {
+                err = [NSError errorWithDomain:@"仅手动对焦模式可使用此方法" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+            }
+        } else {
+            err = [NSError errorWithDomain:@"当前摄像头无法使用此对焦模式" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        }
+    } else {
+        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+    }
+    
+    if (err) {
+        * error = err;
+        return NO;
+    }
+    
+    return YES;
 }
 
 @end

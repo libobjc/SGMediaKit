@@ -15,6 +15,16 @@ typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
     SGVideoCaptureErrorCodeRecording,
 };
 
+typedef NS_ENUM(NSUInteger, SGCameraPosition) {
+    SGCameraPositionFront,
+    SGCameraPositionBack,
+};
+
+typedef NS_ENUM(NSUInteger, SGFocusMode) {
+    SGFocusModeAutomatic,
+    SGFocusModeManual,
+};
+
 @class SGVideoCapture;
 
 @protocol SGVideoCaptureDelegate <NSObject>
@@ -47,9 +57,15 @@ typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
 @property (nonatomic, weak) id <SGVideoCaptureDelegate> delegate;
 @property (nonatomic, strong, readonly) UIView * view;
 
-@property (nonatomic, assign) AVCaptureDevicePosition cameraPosition;   // default is Front
+@property (nonatomic, assign, readonly) SGCameraPosition cameraPosition;   // default is Front
+- (BOOL)setCameraPosition:(SGCameraPosition)cameraPosition error:(NSError **)error;
+
 @property (nonatomic, assign, readonly) BOOL torch;   // default is off
 - (BOOL)setTorch:(BOOL)torch error:(NSError **)error;
+
+@property (nonatomic, assign, readonly) SGFocusMode focusMode;
+- (BOOL)setFocusMode:(SGFocusMode)focusMode error:(NSError **)error;
+- (BOOL)setFocusPointOfInterest:(CGPoint)focusPointOfInterest error:(NSError **)error;
 
 - (void)startRunning;
 - (void)stopRunning;
