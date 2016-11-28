@@ -23,6 +23,11 @@ typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
 - (void)videoCaptureDidStartRunning:(SGVideoCapture *)videoCapture;
 - (void)videoCaptureWillStopRunning:(SGVideoCapture *)videoCapture;
 - (void)videoCaptureDidStopRunning:(SGVideoCapture *)videoCapture;
+- (void)videoCaptureWillStartRecording:(SGVideoCapture *)videoCapture fileURL:(NSURL *)fileURL;
+- (void)videoCaptureDidStartRecording:(SGVideoCapture *)videoCapture fileURL:(NSURL *)fileURL;
+- (void)videoCaptureWillFinishRecording:(SGVideoCapture *)videoCapture fileURL:(NSURL *)fileURL;
+- (void)videoCaptureDidFinishRecording:(SGVideoCapture *)videoCapture fileURL:(NSURL *)fileURL;
+- (void)videoCapture:(SGVideoCapture *)videoCapture outputPixelBuffer:(CVPixelBufferRef)pixelBuffer;
 
 @end
 

@@ -31,6 +31,22 @@
     [self.filter addTarget:self.preview.gpuImageView];
     [self tryAddWriterToFilter];
     [self.videoCamera addTarget:self.filter];
+    
+    __weak typeof(self) weakSelf = self;
+    [self.filter setFrameProcessingCompletionBlock:^(GPUImageOutput * output, CMTime time) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf frameProcessingHandler:output time:time];
+    }];
+}
+
+- (void)frameProcessingHandler:(GPUImageOutput *)output time:(CMTime)time
+{
+    @autoreleasepool {
+        CVPixelBufferRef pixelBuffer = output.framebufferForOutput.pixelBuffer;
+        if (pixelBuffer && self.delegate && [self.delegate respondsToSelector:@selector(videoCapture:outputPixelBuffer:)]) {
+            [self.delegate videoCapture:self outputPixelBuffer:pixelBuffer];
+        }
+    }
 }
 
 - (void)startRunning
@@ -77,20 +93,32 @@
     
     self.fileURL = fileURL;
     [self setupWriter];
+    if ([self.delegate respondsToSelector:@selector(videoCaptureWillStartRecording:fileURL:)]) {
+        [self.delegate videoCaptureWillStartRecording:self fileURL:fileURL];
+    }
     self.recording = YES;
     [self.writer startRecording];
+    if ([self.delegate respondsToSelector:@selector(videoCaptureDidStartRecording:fileURL:)]) {
+        [self.delegate videoCaptureDidStartRecording:self fileURL:fileURL];
+    }
     return YES;
 }
 
 - (void)finishRecordingWithCompletionHandler:(void (^)(NSURL *, NSError *))completionHandler
 {
     if (self.recording) {
+        if ([self.delegate respondsToSelector:@selector(videoCaptureWillFinishRecording:fileURL:)]) {
+            [self.delegate videoCaptureWillFinishRecording:self fileURL:self.fileURL];
+        }
         self.recording = NO;
         __weak typeof(self) weakSelf = self;
         [self.writer finishRecordingWithCompletionHandler:^{
             __strong typeof(weakSelf) strongSelf = weakSelf;
             if (completionHandler) {
                 completionHandler(strongSelf.fileURL, nil);
+            }
+            if ([strongSelf.delegate respondsToSelector:@selector(videoCaptureDidFinishRecording:fileURL:)]) {
+                [strongSelf.delegate videoCaptureDidFinishRecording:strongSelf fileURL:strongSelf.fileURL];
             }
             strongSelf.fileURL = nil;
             [self cleanWriter];
