@@ -33,6 +33,8 @@ typedef NS_ENUM(NSUInteger, SGFocusMode) {
 - (void)videoCapture:(SGVideoCapture *)videoCapture needForceFinishRecordingForFileURL:(NSURL *)fileURL;
 
 @optional;
+- (void)videoCapture:(SGVideoCapture *)videoCapture outputPixelBuffer:(CVPixelBufferRef)pixelBuffer;
+
 - (void)videoCaptureWillStartRunning:(SGVideoCapture *)videoCapture;
 - (void)videoCaptureDidStartRunning:(SGVideoCapture *)videoCapture;
 - (void)videoCaptureWillStopRunning:(SGVideoCapture *)videoCapture;
@@ -44,8 +46,6 @@ typedef NS_ENUM(NSUInteger, SGFocusMode) {
 - (void)videoCapture:(SGVideoCapture *)videoCapture didFinishRecordingToFileURL:(NSURL *)fileURL;
 - (void)videoCapture:(SGVideoCapture *)videoCapture willCancelRecordingToFileURL:(NSURL *)fileURL;
 - (void)videoCapture:(SGVideoCapture *)videoCapture didCancelRecordingToFileURL:(NSURL *)fileURL;
-
-- (void)videoCapture:(SGVideoCapture *)videoCapture outputPixelBuffer:(CVPixelBufferRef)pixelBuffer;
 
 @end
 
