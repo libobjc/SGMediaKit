@@ -103,13 +103,13 @@
     
     self.fileURL = fileURL;
     [self setupWriter];
-    if ([self.delegate respondsToSelector:@selector(videoCaptureWillStartRecording:fileURL:)]) {
-        [self.delegate videoCaptureWillStartRecording:self fileURL:fileURL];
+    if ([self.delegate respondsToSelector:@selector(videoCapture:willStartRecordingfToFileURL:)]) {
+        [self.delegate videoCapture:self willStartRecordingfToFileURL:fileURL];
     }
     self.recording = YES;
     [self.writer startRecording];
     if ([self.delegate respondsToSelector:@selector(videoCaptureDidStartRecording:fileURL:)]) {
-        [self.delegate videoCaptureDidStartRecording:self fileURL:fileURL];
+        [self.delegate videoCapture:self didStartRecordingToFileURL:fileURL];
     }
     return YES;
 }
@@ -117,8 +117,8 @@
 - (void)finishRecordingWithCompletionHandler:(void (^)(NSURL *, NSError *))completionHandler
 {
     if (self.recording) {
-        if ([self.delegate respondsToSelector:@selector(videoCaptureWillFinishRecording:fileURL:)]) {
-            [self.delegate videoCaptureWillFinishRecording:self fileURL:self.fileURL];
+        if ([self.delegate respondsToSelector:@selector(videoCapture:willFinishRecordingToFileURL:)]) {
+            [self.delegate videoCapture:self willFinishRecordingToFileURL:self.fileURL];
         }
         self.recording = NO;
         __weak typeof(self) weakSelf = self;
@@ -127,8 +127,8 @@
             if (completionHandler) {
                 completionHandler(strongSelf.fileURL, nil);
             }
-            if ([strongSelf.delegate respondsToSelector:@selector(videoCaptureDidFinishRecording:fileURL:)]) {
-                [strongSelf.delegate videoCaptureDidFinishRecording:strongSelf fileURL:strongSelf.fileURL];
+            if ([strongSelf.delegate respondsToSelector:@selector(videoCapture:didFinishRecordingToFileURL:)]) {
+                [strongSelf.delegate videoCapture:self didFinishRecordingToFileURL:self.fileURL];
             }
             strongSelf.fileURL = nil;
             [self cleanWriter];
