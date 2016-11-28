@@ -20,6 +20,7 @@
 @property (nonatomic, strong) GPUImageFilter * filter;
 @property (nonatomic, strong) GPUImageMovieWriter * writer;
 @property (nonatomic, copy) NSURL * fileURL;
+@property (nonatomic, copy) void(^recordingFinishedHandler)(NSURL * fileURL, NSError * error);
 @property (nonatomic, strong) SGVideoCapturePreview * preview;
 
 @end
@@ -31,9 +32,33 @@
     if (self = [super init]) {
         self.videoConfiguration = videoConfiguration;
 
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadOrientation) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     }
     return self;
+}
+
+- (void)didEnterBackground:(NSNotification *)notification
+{
+    if (self.running) {
+        [self.videoCamera pauseCameraCapture];
+    }
+    if (self.recording) {
+        if ([self.delegate respondsToSelector:@selector(videoCapture:needForceFinishRecordingForFileURL:)]) {
+            [self.delegate videoCapture:self needForceFinishRecordingForFileURL:self.fileURL];
+        }
+        if (self.recording) {
+            [self finishRecording];
+        }
+    }
+}
+
+- (void)willEnterForeground:(NSNotification *)notification
+{
+    if (self.running) {
+        [self.videoCamera resumeCameraCapture];
+    }
 }
 
 - (void)reloadOrientation
@@ -99,7 +124,7 @@
     }
 }
 
-- (BOOL)startRecordingWithFileURL:(NSURL *)fileURL error:(NSError *__autoreleasing *)error
+- (BOOL)startRecordingWithFileURL:(NSURL *)fileURL error:(NSError **)error finishedHandler:(void (^)(NSURL *, NSError *))finishedHandler
 {
     if (self.recording) {
         NSError * err = [NSError errorWithDomain:@"已经在在录制" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
@@ -113,6 +138,7 @@
     }
     
     self.fileURL = fileURL;
+    self.recordingFinishedHandler = finishedHandler;
     [self setupWriter];
     if ([self.delegate respondsToSelector:@selector(videoCapture:willStartRecordingfToFileURL:)]) {
         [self.delegate videoCapture:self willStartRecordingfToFileURL:fileURL];
@@ -125,7 +151,7 @@
     return YES;
 }
 
-- (void)finishRecordingWithCompletionHandler:(void (^)(NSURL *, NSError *))completionHandler
+- (void)finishRecording
 {
     if (self.recording) {
         if ([self.delegate respondsToSelector:@selector(videoCapture:willFinishRecordingToFileURL:)]) {
@@ -135,21 +161,39 @@
         __weak typeof(self) weakSelf = self;
         [self.writer finishRecordingWithCompletionHandler:^{
             __strong typeof(weakSelf) strongSelf = weakSelf;
-            if (completionHandler) {
-                completionHandler(strongSelf.fileURL, nil);
-            }
             if ([strongSelf.delegate respondsToSelector:@selector(videoCapture:didFinishRecordingToFileURL:)]) {
                 [strongSelf.delegate videoCapture:self didFinishRecordingToFileURL:self.fileURL];
             }
+            if (self.recordingFinishedHandler) {
+                self.recordingFinishedHandler(strongSelf.fileURL, nil);
+            }
             [strongSelf reloadOrientation];
             strongSelf.fileURL = nil;
+            strongSelf.recordingFinishedHandler = nil;
             [self cleanWriter];
         }];
-    } else {
-        if (completionHandler) {
-            NSError * error = [NSError errorWithDomain:@"没有开始录制" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
-            completionHandler(nil, error);
+    }
+}
+
+- (void)cancelRecording
+{
+    if (self.recording) {
+        if ([self.delegate respondsToSelector:@selector(videoCapture:willCancelRecordingToFileURL:)]) {
+            [self.delegate videoCapture:self willCancelRecordingToFileURL:self.fileURL];
         }
+        self.recording = NO;
+        [self.writer cancelRecording];
+        if ([self.delegate respondsToSelector:@selector(videoCapture:didCancelRecordingToFileURL:)]) {
+            [self.delegate videoCapture:self didCancelRecordingToFileURL:self.fileURL];
+        }
+        if (self.recordingFinishedHandler) {
+            NSError * error = [NSError errorWithDomain:@"主动取消" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
+            self.recordingFinishedHandler(self.fileURL, error);
+        }
+        [self reloadOrientation];
+        self.fileURL = nil;
+        self.recordingFinishedHandler = nil;
+        [self cleanWriter];
     }
 }
 

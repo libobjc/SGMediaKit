@@ -29,8 +29,10 @@ typedef NS_ENUM(NSUInteger, SGFocusMode) {
 
 @protocol SGVideoCaptureDelegate <NSObject>
 
-@optional;
+@required;
+- (void)videoCapture:(SGVideoCapture *)videoCapture needForceFinishRecordingForFileURL:(NSURL *)fileURL;
 
+@optional;
 - (void)videoCaptureWillStartRunning:(SGVideoCapture *)videoCapture;
 - (void)videoCaptureDidStartRunning:(SGVideoCapture *)videoCapture;
 - (void)videoCaptureWillStopRunning:(SGVideoCapture *)videoCapture;
@@ -40,6 +42,8 @@ typedef NS_ENUM(NSUInteger, SGFocusMode) {
 - (void)videoCapture:(SGVideoCapture *)videoCapture didStartRecordingToFileURL:(NSURL *)fileURL;
 - (void)videoCapture:(SGVideoCapture *)videoCapture willFinishRecordingToFileURL:(NSURL *)fileURL;
 - (void)videoCapture:(SGVideoCapture *)videoCapture didFinishRecordingToFileURL:(NSURL *)fileURL;
+- (void)videoCapture:(SGVideoCapture *)videoCapture willCancelRecordingToFileURL:(NSURL *)fileURL;
+- (void)videoCapture:(SGVideoCapture *)videoCapture didCancelRecordingToFileURL:(NSURL *)fileURL;
 
 - (void)videoCapture:(SGVideoCapture *)videoCapture outputPixelBuffer:(CVPixelBufferRef)pixelBuffer;
 
@@ -74,7 +78,8 @@ typedef NS_ENUM(NSUInteger, SGFocusMode) {
 - (void)startRunning;
 - (void)stopRunning;
 
-- (BOOL)startRecordingWithFileURL:(NSURL *)fileURL error:(NSError **)error;
-- (void)finishRecordingWithCompletionHandler:(void (^)(NSURL * fileURL, NSError * error))completionHandler;
+- (BOOL)startRecordingWithFileURL:(NSURL *)fileURL error:(NSError **)error finishedHandler:(void (^)(NSURL * fileURL, NSError * error))finishedHandler;
+- (void)finishRecording;
+- (void)cancelRecording;
 
 @end
