@@ -56,6 +56,7 @@ typedef NS_ENUM(NSUInteger, SGFocusMode) {
 @property (nonatomic, assign, readonly) BOOL recording;
 @property (nonatomic, weak) id <SGVideoCaptureDelegate> delegate;
 @property (nonatomic, strong, readonly) UIView * view;
+@property (nonatomic, assign) BOOL mirror;
 
 @property (nonatomic, assign, readonly) SGCameraPosition cameraPosition;   // default is Front
 - (BOOL)setCameraPosition:(SGCameraPosition)cameraPosition error:(NSError **)error;

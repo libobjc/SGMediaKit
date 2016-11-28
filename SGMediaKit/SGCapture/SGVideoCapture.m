@@ -195,6 +195,14 @@
     return _preview;
 }
 
+- (void)setMirror:(BOOL)mirror
+{
+    if (_mirror != mirror) {
+        _mirror = mirror;
+        self.videoCamera.horizontallyMirrorFrontFacingCamera = mirror;
+    }
+}
+
 - (SGCameraPosition)cameraPosition
 {
     switch (self.videoCamera.cameraPosition) {
