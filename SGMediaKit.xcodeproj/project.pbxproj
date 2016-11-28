@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9CA2D90B1DEBC59500AEC8A9 /* SGVideoCapturePreview.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA2D9091DEBC59500AEC8A9 /* SGVideoCapturePreview.h */; };
+		9CA2D90C1DEBC59500AEC8A9 /* SGVideoCapturePreview.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA2D90A1DEBC59500AEC8A9 /* SGVideoCapturePreview.m */; };
 		9CA4762A1DE531FE00B1B0D1 /* SGMediaKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476281DE531FE00B1B0D1 /* SGMediaKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9CA4764E1DE5333100B1B0D1 /* SGAVGLMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476341DE5333100B1B0D1 /* SGAVGLMatrix.h */; };
 		9CA4764F1DE5333100B1B0D1 /* SGAVGLMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA476351DE5333100B1B0D1 /* SGAVGLMatrix.m */; };
@@ -35,19 +37,13 @@
 		9CA476661DE5333100B1B0D1 /* SGPlayerDefine.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA4764C1DE5333100B1B0D1 /* SGPlayerDefine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9CA476671DE5333100B1B0D1 /* SGPlayerDefine.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA4764D1DE5333100B1B0D1 /* SGPlayerDefine.m */; };
 		9CA476721DE53CAB00B1B0D1 /* GPUImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CA476711DE53CAB00B1B0D1 /* GPUImage.framework */; };
-		9CA476761DE53D3300B1B0D1 /* SGVideoCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476741DE53D3300B1B0D1 /* SGVideoCapture.h */; };
+		9CA476761DE53D3300B1B0D1 /* SGVideoCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476741DE53D3300B1B0D1 /* SGVideoCapture.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9CA476771DE53D3300B1B0D1 /* SGVideoCapture.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA476751DE53D3300B1B0D1 /* SGVideoCapture.m */; };
-		9CA476841DE5663000B1B0D1 /* SGVideoCaptureView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476821DE5663000B1B0D1 /* SGVideoCaptureView.h */; };
-		9CA476851DE5663000B1B0D1 /* SGVideoCaptureView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA476831DE5663000B1B0D1 /* SGVideoCaptureView.m */; };
-		9CA476881DE56AB400B1B0D1 /* SGVideoCaptureFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476861DE56AB400B1B0D1 /* SGVideoCaptureFilter.h */; };
-		9CA476891DE56AB400B1B0D1 /* SGVideoCaptureFilter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA476871DE56AB400B1B0D1 /* SGVideoCaptureFilter.m */; };
-		9CA4768C1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA4768A1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.h */; };
-		9CA4768D1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA4768B1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.m */; };
-		9CA476911DE5742000B1B0D1 /* SGVideoRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA4768F1DE5742000B1B0D1 /* SGVideoRecord.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9CA476921DE5742000B1B0D1 /* SGVideoRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA476901DE5742000B1B0D1 /* SGVideoRecord.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9CA2D9091DEBC59500AEC8A9 /* SGVideoCapturePreview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoCapturePreview.h; sourceTree = "<group>"; };
+		9CA2D90A1DEBC59500AEC8A9 /* SGVideoCapturePreview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoCapturePreview.m; sourceTree = "<group>"; };
 		9CA476251DE531FE00B1B0D1 /* SGMediaKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SGMediaKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CA476281DE531FE00B1B0D1 /* SGMediaKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SGMediaKit.h; sourceTree = "<group>"; };
 		9CA476291DE531FE00B1B0D1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -80,14 +76,6 @@
 		9CA476711DE53CAB00B1B0D1 /* GPUImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GPUImage.framework; path = "/Users/Single/Desktop/SGDemo/SGVendors/GPUImage-master/framework/../build/Debug-iphoneos/GPUImage.framework"; sourceTree = "<absolute>"; };
 		9CA476741DE53D3300B1B0D1 /* SGVideoCapture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoCapture.h; sourceTree = "<group>"; };
 		9CA476751DE53D3300B1B0D1 /* SGVideoCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoCapture.m; sourceTree = "<group>"; };
-		9CA476821DE5663000B1B0D1 /* SGVideoCaptureView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoCaptureView.h; sourceTree = "<group>"; };
-		9CA476831DE5663000B1B0D1 /* SGVideoCaptureView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoCaptureView.m; sourceTree = "<group>"; };
-		9CA476861DE56AB400B1B0D1 /* SGVideoCaptureFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoCaptureFilter.h; sourceTree = "<group>"; };
-		9CA476871DE56AB400B1B0D1 /* SGVideoCaptureFilter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoCaptureFilter.m; sourceTree = "<group>"; };
-		9CA4768A1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoCaptureWriter.h; sourceTree = "<group>"; };
-		9CA4768B1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoCaptureWriter.m; sourceTree = "<group>"; };
-		9CA4768F1DE5742000B1B0D1 /* SGVideoRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoRecord.h; sourceTree = "<group>"; };
-		9CA476901DE5742000B1B0D1 /* SGVideoRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoRecord.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,7 +112,6 @@
 			children = (
 				9CA476281DE531FE00B1B0D1 /* SGMediaKit.h */,
 				9CA476291DE531FE00B1B0D1 /* Info.plist */,
-				9CA4768E1DE5740D00B1B0D1 /* SGRecord */,
 				9CA476731DE53D1E00B1B0D1 /* SGCapture */,
 				9CA476301DE5333100B1B0D1 /* SGPlayer */,
 			);
@@ -201,23 +188,10 @@
 			children = (
 				9CA476741DE53D3300B1B0D1 /* SGVideoCapture.h */,
 				9CA476751DE53D3300B1B0D1 /* SGVideoCapture.m */,
-				9CA476821DE5663000B1B0D1 /* SGVideoCaptureView.h */,
-				9CA476831DE5663000B1B0D1 /* SGVideoCaptureView.m */,
-				9CA476861DE56AB400B1B0D1 /* SGVideoCaptureFilter.h */,
-				9CA476871DE56AB400B1B0D1 /* SGVideoCaptureFilter.m */,
-				9CA4768A1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.h */,
-				9CA4768B1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.m */,
+				9CA2D9091DEBC59500AEC8A9 /* SGVideoCapturePreview.h */,
+				9CA2D90A1DEBC59500AEC8A9 /* SGVideoCapturePreview.m */,
 			);
 			path = SGCapture;
-			sourceTree = "<group>";
-		};
-		9CA4768E1DE5740D00B1B0D1 /* SGRecord */ = {
-			isa = PBXGroup;
-			children = (
-				9CA4768F1DE5742000B1B0D1 /* SGVideoRecord.h */,
-				9CA476901DE5742000B1B0D1 /* SGVideoRecord.m */,
-			);
-			path = SGRecord;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -230,12 +204,9 @@
 				9CA4762A1DE531FE00B1B0D1 /* SGMediaKit.h in Headers */,
 				9CA476641DE5333100B1B0D1 /* SGPlayer.h in Headers */,
 				9CA476661DE5333100B1B0D1 /* SGPlayerDefine.h in Headers */,
-				9CA476881DE56AB400B1B0D1 /* SGVideoCaptureFilter.h in Headers */,
-				9CA476911DE5742000B1B0D1 /* SGVideoRecord.h in Headers */,
-				9CA476841DE5663000B1B0D1 /* SGVideoCaptureView.h in Headers */,
-				9CA4768C1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.h in Headers */,
-				9CA476621DE5333100B1B0D1 /* SGPlayer+Extension.h in Headers */,
+				9CA2D90B1DEBC59500AEC8A9 /* SGVideoCapturePreview.h in Headers */,
 				9CA476761DE53D3300B1B0D1 /* SGVideoCapture.h in Headers */,
+				9CA476621DE5333100B1B0D1 /* SGPlayer+Extension.h in Headers */,
 				9CA4765F1DE5333100B1B0D1 /* SGNotification.h in Headers */,
 				9CA476591DE5333100B1B0D1 /* SGAVGLView.h in Headers */,
 				9CA4765B1DE5333100B1B0D1 /* SGAVPlayer.h in Headers */,
@@ -322,13 +293,9 @@
 				9CA476601DE5333100B1B0D1 /* SGNotification.m in Sources */,
 				9CA476671DE5333100B1B0D1 /* SGPlayerDefine.m in Sources */,
 				9CA4764F1DE5333100B1B0D1 /* SGAVGLMatrix.m in Sources */,
-				9CA4768D1DE56B3E00B1B0D1 /* SGVideoCaptureWriter.m in Sources */,
-				9CA476851DE5663000B1B0D1 /* SGVideoCaptureView.m in Sources */,
 				9CA476771DE53D3300B1B0D1 /* SGVideoCapture.m in Sources */,
 				9CA4765E1DE5333100B1B0D1 /* SGAVView.m in Sources */,
-				9CA476921DE5742000B1B0D1 /* SGVideoRecord.m in Sources */,
 				9CA476651DE5333100B1B0D1 /* SGPlayer.m in Sources */,
-				9CA476891DE56AB400B1B0D1 /* SGVideoCaptureFilter.m in Sources */,
 				9CA476581DE5333100B1B0D1 /* SGAVGLTexture.m in Sources */,
 				9CA476531DE5333100B1B0D1 /* SGAVGLProgram.m in Sources */,
 				9CA476511DE5333100B1B0D1 /* SGAVGLModel.m in Sources */,
@@ -336,6 +303,7 @@
 				9CA4765C1DE5333100B1B0D1 /* SGAVPlayer.m in Sources */,
 				9CA476631DE5333100B1B0D1 /* SGPlayer+Extension.m in Sources */,
 				9CA476551DE5333100B1B0D1 /* SGAVGLSensors.m in Sources */,
+				9CA2D90C1DEBC59500AEC8A9 /* SGVideoCapturePreview.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

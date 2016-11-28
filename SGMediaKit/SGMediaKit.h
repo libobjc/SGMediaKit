@@ -15,4 +15,4 @@ FOUNDATION_EXPORT const unsigned char SGMediaKitVersionString[];        // versi
 #import <SGMediaKit/SGPlayer.h>
 #import <SGMediaKit/SGPlayer+Extension.h>
 #import <SGMediaKit/SGPlayerDefine.h>
-#import <SGMediaKit/SGVideoRecord.h>
+#import <SGMediaKit/SGVideoCapture.h>

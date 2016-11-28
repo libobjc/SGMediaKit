@@ -10,7 +10,7 @@
 
 @class GPUImageView;
 
-@interface SGVideoCaptureView : UIView
+@interface SGVideoCapturePreview : UIView
 
 @property (nonatomic, strong, readonly) GPUImageView * gpuImageView;
 

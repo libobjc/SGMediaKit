@@ -6,16 +6,16 @@
 //  Copyright © 2016 single. All rights reserved.
 //
 
-#import "SGVideoCaptureView.h"
+#import "SGVideoCapturePreview.h"
 #import <GPUImage/GPUImageFramework.h>
 
-@interface SGVideoCaptureView ()
+@interface SGVideoCapturePreview ()
 
 @property (nonatomic, strong) GPUImageView * gpuImageView;
 
 @end
 
-@implementation SGVideoCaptureView
+@implementation SGVideoCapturePreview
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
 {

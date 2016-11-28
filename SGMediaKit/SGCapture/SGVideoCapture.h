@@ -7,8 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <GPUImage/GPUImageFramework.h>
-#import "SGVideoCaptureView.h"
+
+typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
+    SGVideoCaptureErrorCodeUnknown,
+    SGVideoCaptureErrorCodeRunning,
+    SGVideoCaptureErrorCodeRecording,
+};
 
 @class SGVideoCapture;
 
@@ -19,20 +23,20 @@
 - (void)videoCaptureDidStartRunning:(SGVideoCapture *)videoCapture;
 - (void)videoCaptureWillStopRunning:(SGVideoCapture *)videoCapture;
 - (void)videoCaptureDidStopRunning:(SGVideoCapture *)videoCapture;
-- (GPUImageFilter *)filterInVideoCapture:(SGVideoCapture *)videoCapture;
 
 @end
 
 @interface SGVideoCapture : NSObject
 
 @property (nonatomic, assign, readonly) BOOL running;
-@property (nonatomic, strong, readonly) GPUImageVideoCamera * videoCamera;
+@property (nonatomic, assign, readonly) BOOL recording;
 @property (nonatomic, weak) id <SGVideoCaptureDelegate> delegate;
-@property (nonatomic, strong, readonly) SGVideoCaptureView * view;
-
-- (void)reloadFilter;
+@property (nonatomic, strong, readonly) UIView * view;
 
 - (void)startRunning;
 - (void)stopRunning;
+
+- (BOOL)startRecordingWithFileURL:(NSURL *)fileURL error:(NSError **)error;
+- (void)finishRecordingWithCompletionHandler:(void (^)(NSURL * fileURL, NSError * error))completionHandler;
 
 @end
