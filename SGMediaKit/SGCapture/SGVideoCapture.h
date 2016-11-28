@@ -47,6 +47,8 @@ typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
 @property (nonatomic, weak) id <SGVideoCaptureDelegate> delegate;
 @property (nonatomic, strong, readonly) UIView * view;
 
+@property (nonatomic, assign) AVCaptureDevicePosition cameraPosition;   // default is Front;
+
 - (void)startRunning;
 - (void)stopRunning;
 

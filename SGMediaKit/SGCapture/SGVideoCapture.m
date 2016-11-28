@@ -195,4 +195,16 @@
     return _preview;
 }
 
+- (void)setCameraPosition:(AVCaptureDevicePosition)cameraPosition
+{
+    if (cameraPosition != self.videoCamera.cameraPosition) {
+        [self.videoCamera rotateCamera];
+    }
+}
+
+- (AVCaptureDevicePosition)cameraPosition
+{
+    return self.videoCamera.cameraPosition;
+}
+
 @end
