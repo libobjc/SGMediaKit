@@ -207,4 +207,44 @@
     return self.videoCamera.cameraPosition;
 }
 
+- (BOOL)setTorch:(BOOL)torch error:(NSError *__autoreleasing *)error
+{
+    if (!self.videoCamera.captureSession) {
+        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        * error = err;
+        return NO;
+    }
+    
+    NSError * err;
+    AVCaptureSession * session = self.videoCamera.captureSession;
+    [session beginConfiguration];
+    if (self.videoCamera.inputCamera) {
+        if (self.videoCamera.inputCamera.torchAvailable) {
+            if ([self.videoCamera.inputCamera lockForConfiguration:&err]) {
+                if (torch) {
+                    self.videoCamera.inputCamera.torchMode = AVCaptureTorchModeOn;
+                } else {
+                    self.videoCamera.inputCamera.torchMode = AVCaptureTorchModeOff;
+                }
+                [self.videoCamera.inputCamera unlockForConfiguration];
+            }
+        } else {
+            err = [NSError errorWithDomain:@"当前摄像头无法开启闪光灯" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        }
+    }
+    [session commitConfiguration];
+    
+    if (err) {
+        * error = err;
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (BOOL)torch
+{
+    return self.videoCamera.inputCamera.torchMode;
+}
+
 @end
