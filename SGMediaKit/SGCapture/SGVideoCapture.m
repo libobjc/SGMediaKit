@@ -136,6 +136,19 @@
         * error = err;
         return NO;
     }
+    if ([[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
+        NSError * err = [NSError errorWithDomain:@"文件已经存在" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
+        * error = err;
+        return NO;
+    }
+    static NSString * key = @"*&^%$#@!single";
+    NSString * tempPath = [fileURL.path stringByAppendingPathComponent:key];
+    NSString * pathDirectory = [tempPath stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@/%@", fileURL.lastPathComponent, key] withString:@""];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:pathDirectory]) {
+        NSError * err = [NSError errorWithDomain:@"目标文件夹不存在" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
+        * error = err;
+        return NO;
+    }
     
     self.fileURL = fileURL;
     self.recordingFinishedHandler = finishedHandler;
