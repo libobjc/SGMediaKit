@@ -30,8 +30,19 @@
 {
     if (self = [super init]) {
         self.videoConfiguration = videoConfiguration;
+
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadOrientation) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
     }
     return self;
+}
+
+- (void)reloadOrientation
+{
+    UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
+    
+    if (self.videoCamera.outputImageOrientation != orientation && !self.recording) {
+        self.videoCamera.outputImageOrientation = orientation;
+    }
 }
 
 - (void)reloadFilter
@@ -130,6 +141,7 @@
             if ([strongSelf.delegate respondsToSelector:@selector(videoCapture:didFinishRecordingToFileURL:)]) {
                 [strongSelf.delegate videoCapture:self didFinishRecordingToFileURL:self.fileURL];
             }
+            [strongSelf reloadOrientation];
             strongSelf.fileURL = nil;
             [self cleanWriter];
         }];
@@ -143,7 +155,17 @@
 
 - (void)setupWriter
 {
-    self.writer = [[GPUImageMovieWriter alloc] initWithMovieURL:self.fileURL size:CGSizeMake(100, 100)];
+    CGSize size = CGSizeMake(720, 1280);
+    switch ([UIApplication sharedApplication].statusBarOrientation) {
+        case UIInterfaceOrientationLandscapeRight:
+        case UIInterfaceOrientationLandscapeLeft:
+            size = CGSizeMake(size.height, size.width);
+            break;
+        default:
+            break;
+    }
+    
+    self.writer = [[GPUImageMovieWriter alloc] initWithMovieURL:self.fileURL size:size];
     self.writer.encodingLiveVideo = YES;
     self.writer.shouldPassthroughAudio = YES;
     self.videoCamera.audioEncodingTarget = self.writer;
@@ -172,7 +194,7 @@
 - (GPUImageVideoCamera *)videoCamera
 {
     if(!_videoCamera) {
-        _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset640x480 cameraPosition:AVCaptureDevicePositionFront];
+        _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionFront];
         _videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
         _videoCamera.horizontallyMirrorFrontFacingCamera = NO;
         NSString * filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"SGVideoCaptureTemp.mp4"];
