@@ -171,7 +171,7 @@
     }
     self.recording = YES;
     [self.writer startRecording];
-    if ([self.delegate respondsToSelector:@selector(videoCaptureDidStartRecording:fileURL:)]) {
+    if ([self.delegate respondsToSelector:@selector(videoCapture:didStartRecordingToFileURL:)]) {
         [self.delegate videoCapture:self didStartRecordingToFileURL:fileURL];
     }
     return YES;
@@ -295,7 +295,7 @@
 
 - (BOOL)setCameraPosition:(SGCameraPosition)cameraPosition error:(NSError **)error
 {
-    AVCaptureDevicePosition * position;
+    AVCaptureDevicePosition position;
     switch (cameraPosition) {
         case SGCameraPositionFront:
             position = AVCaptureDevicePositionFront;
@@ -308,7 +308,6 @@
     if (position != self.videoCamera.cameraPosition) {
         [self.videoCamera rotateCamera];
     }
-    NSLog(@"%@", self.videoCamera.inputCamera);
     
     return YES;
 }
@@ -374,14 +373,11 @@
     }
 }
 
-- (BOOL)focusModeAutomaticEnable
+- (BOOL)focusModeEnable
 {
-    return [self.videoCamera.inputCamera isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus];
-}
-
-- (BOOL)focusModeManualEnable
-{
-    return [self.videoCamera.inputCamera isFocusModeSupported:AVCaptureFocusModeAutoFocus];
+    BOOL manual = [self.videoCamera.inputCamera isFocusModeSupported:AVCaptureFocusModeAutoFocus];
+    BOOL automatic = [self.videoCamera.inputCamera isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus];
+    return manual && automatic;
 }
 
 - (BOOL)setFocusMode:(SGFocusMode)focusMode error:(NSError **)error
@@ -395,7 +391,7 @@
     NSError * err;
     if (self.videoCamera.inputCamera) {
         
-        AVCaptureFocusMode * mode;
+        AVCaptureFocusMode mode;
         switch (focusMode) {
             case SGFocusModeAutomatic:
                 mode = AVCaptureFocusModeContinuousAutoFocus;
@@ -455,6 +451,106 @@
         }
     } else {
         err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+    }
+    
+    if (err) {
+        * error = err;
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (SGExposureMode)exposureMode
+{
+    switch (self.videoCamera.inputCamera.exposureMode) {
+        case AVCaptureExposureModeLocked:
+        case AVCaptureExposureModeAutoExpose:
+        case AVCaptureExposureModeCustom:
+            return SGExposureModeManual;
+        case AVCaptureExposureModeContinuousAutoExposure:
+            return SGExposureModeAutomatic;
+    }
+}
+
+- (BOOL)exposureModeEnable
+{
+    BOOL manual = [self.videoCamera.inputCamera isExposureModeSupported:AVCaptureExposureModeAutoExpose];
+    BOOL automatic = [self.videoCamera.inputCamera isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure];
+    return manual && automatic;
+}
+
+- (BOOL)setExposureMode:(SGExposureMode)exposureMode error:(NSError *__autoreleasing *)error
+{
+    if (!self.videoCamera.captureSession) {
+        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        * error = err;
+        return NO;
+    }
+    
+    NSError * err;
+    if (self.videoCamera.inputCamera) {
+        
+        AVCaptureExposureMode mode;
+        switch (exposureMode) {
+            case SGExposureModeAutomatic:
+                mode = AVCaptureExposureModeContinuousAutoExposure;
+                break;
+            case SGExposureModeManual:
+                mode = AVCaptureExposureModeAutoExpose;
+                break;
+        }
+        
+        if ([self.videoCamera.inputCamera isExposureModeSupported:mode]) {
+            if ([self.videoCamera.inputCamera lockForConfiguration:&err]) {
+                self.videoCamera.inputCamera.exposureMode = mode;
+                [self.videoCamera.inputCamera unlockForConfiguration];
+            } else {
+                err = [NSError errorWithDomain:@"锁定摄像头配置信息失败" code:SGVideoCaptureErrorCodeLockCameraFailure userInfo:nil];
+            }
+        } else {
+            err = [NSError errorWithDomain:@"当前摄像头无法使用此对焦模式" code:SGVideoCaptureErrorCodeExposureDisable userInfo:nil];
+        }
+        
+    } else {
+        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+    }
+    
+    if (err) {
+        * error = err;
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (BOOL)setExposurePointOfInterest:(CGPoint)exposurePointOfInterest error:(NSError *__autoreleasing *)error
+{
+    if (!self.videoCamera.captureSession) {
+        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        * error = err;
+        return NO;
+    }
+    
+    NSError * err;
+    if (self.videoCamera.inputCamera) {
+        if ([self.videoCamera.inputCamera isExposureModeSupported:AVCaptureFocusModeAutoFocus]) {
+            if (self.exposureMode == SGFocusModeManual) {
+                if([self.videoCamera.inputCamera lockForConfiguration:&err]) {
+                    self.videoCamera.inputCamera.exposureMode = AVCaptureExposureModeAutoExpose;
+                    self.videoCamera.inputCamera.exposurePointOfInterest = exposurePointOfInterest;
+                    [self.videoCamera.inputCamera unlockForConfiguration];
+                } else {
+                    err = [NSError errorWithDomain:@"锁定摄像头配置信息失败" code:SGVideoCaptureErrorCodeLockCameraFailure userInfo:nil];
+                }
+            } else {
+                err = [NSError errorWithDomain:@"仅手动曝光模式可使用此方法" code:SGVideoCaptureErrorCodeExposureModeUnsupported userInfo:nil];
+            }
+        } else {
+            err = [NSError errorWithDomain:@"当前摄像头无法使用此曝光模式" code:SGVideoCaptureErrorCodeExposureDisable userInfo:nil];
+        }
+    } else {
+        err = [NSError errorWithDomain:@"无摄像头输入源" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
     }
     
     if (err) {

@@ -16,6 +16,8 @@ typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
     SGVideoCaptureErrorCodeTorchDisable,
     SGVideoCaptureErrorCodeFocusDisable,
     SGVideoCaptureErrorCodeFocusModeUnsupported,
+    SGVideoCaptureErrorCodeExposureDisable,
+    SGVideoCaptureErrorCodeExposureModeUnsupported,
     SGVideoCaptureErrorCodeHasStartRecord = 0xFFFF,
     SGVideoCaptureErrorCodeFileURLInvalid,
     SGVideoCaptureErrorCodeFileExists,
@@ -31,6 +33,11 @@ typedef NS_ENUM(NSUInteger, SGCameraPosition) {
 typedef NS_ENUM(NSUInteger, SGFocusMode) {
     SGFocusModeAutomatic,
     SGFocusModeManual,
+};
+
+typedef NS_ENUM(NSUInteger, SGExposureMode) {
+    SGExposureModeAutomatic,
+    SGExposureModeManual,
 };
 
 @class SGVideoCapture;
@@ -78,12 +85,14 @@ typedef NS_ENUM(NSUInteger, SGFocusMode) {
 - (BOOL)setTorch:(BOOL)torch error:(NSError **)error;
 
 @property (nonatomic, assign, readonly) SGFocusMode focusMode;
-@property (nonatomic, assign, readonly) BOOL focusModeAutomaticEnable;
-@property (nonatomic, assign, readonly) BOOL focusModeManualEnable;
+@property (nonatomic, assign, readonly) BOOL focusModeEnable;
 - (BOOL)setFocusMode:(SGFocusMode)focusMode error:(NSError **)error;
 - (BOOL)setFocusPointOfInterest:(CGPoint)focusPointOfInterest error:(NSError **)error;
 
-@property (nonatomic, assign, readonly) AVCaptureExposureMode exposureMode;
+@property (nonatomic, assign, readonly) SGExposureMode exposureMode;
+@property (nonatomic, assign, readonly) BOOL exposureModeEnable;
+- (BOOL)setExposureMode:(SGExposureMode)exposureMode error:(NSError **)error;
+- (BOOL)setExposurePointOfInterest:(CGPoint)exposurePointOfInterest error:(NSError **)error;
 
 - (void)startRunning;
 - (void)stopRunning;
