@@ -31,12 +31,25 @@
 {
     if (self = [super init]) {
         self.videoConfiguration = videoConfiguration;
-
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadOrientation) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+        [self setup];
     }
     return self;
+}
+
+- (void)setup
+{
+    // video camera
+    self.videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionFront];
+    self.videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
+    self.videoCamera.horizontallyMirrorFrontFacingCamera = NO;
+    NSString * filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"SGVideoCaptureTemp.mp4"];
+    NSURL * url = [NSURL fileURLWithPath:filePath];
+    self.videoCamera.audioEncodingTarget = [[GPUImageMovieWriter alloc] initWithMovieURL:url size:CGSizeMake(1, 1)];
+    
+    // notification
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadOrientation) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 
 - (void)didEnterBackground:(NSNotification *)notification
@@ -248,19 +261,6 @@
     }
 }
 
-- (GPUImageVideoCamera *)videoCamera
-{
-    if(!_videoCamera) {
-        _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionFront];
-        _videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
-        _videoCamera.horizontallyMirrorFrontFacingCamera = NO;
-        NSString * filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"SGVideoCaptureTemp.mp4"];
-        NSURL * url = [NSURL fileURLWithPath:filePath];
-        _videoCamera.audioEncodingTarget = [[GPUImageMovieWriter alloc] initWithMovieURL:url size:CGSizeMake(1, 1)];
-    }
-    return _videoCamera;
-}
-
 - (UIView *)view
 {
     return self.preview;
@@ -308,6 +308,7 @@
     if (position != self.videoCamera.cameraPosition) {
         [self.videoCamera rotateCamera];
     }
+    NSLog(@"%@", self.videoCamera.inputCamera);
     
     return YES;
 }

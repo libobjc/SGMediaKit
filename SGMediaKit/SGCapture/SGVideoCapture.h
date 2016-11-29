@@ -83,6 +83,8 @@ typedef NS_ENUM(NSUInteger, SGFocusMode) {
 - (BOOL)setFocusMode:(SGFocusMode)focusMode error:(NSError **)error;
 - (BOOL)setFocusPointOfInterest:(CGPoint)focusPointOfInterest error:(NSError **)error;
 
+@property (nonatomic, assign, readonly) AVCaptureExposureMode exposureMode;
+
 - (void)startRunning;
 - (void)stopRunning;
 
