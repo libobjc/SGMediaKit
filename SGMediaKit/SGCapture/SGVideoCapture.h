@@ -9,6 +9,20 @@
 #import <UIKit/UIKit.h>
 #import "SGVideoConfiguration.h"
 
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameNone;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameCameraDisabled;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameLockCameraFailure;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameTorchDisable;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameFocusDisable;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameFocusModeUnsupported;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameExposureDisable;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameExposureModeUnsupported;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameHasStartRecord;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameFileURLInvalid;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameFileExists;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameFileDirectoryInexistence;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameRecordCanceled;
+
 typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
     SGVideoCaptureErrorCodeNone = 0x00,
     SGVideoCaptureErrorCodeCameraDisabled = 0xFF,
