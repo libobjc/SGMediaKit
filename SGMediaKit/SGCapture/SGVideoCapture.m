@@ -141,6 +141,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
         if ([self.delegate respondsToSelector:@selector(videoCaptureDidStartRunning:)]) {
             [self.delegate videoCaptureDidStartRunning:self];
         }
+        [self updateMetadataCallBack];
     }
 }
 
@@ -155,11 +156,18 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
         if ([self.delegate respondsToSelector:@selector(videoCaptureDidStopRunning:)]) {
             [self.delegate videoCaptureDidStopRunning:self];
         }
+        [self updateMetadataCallBack];
     }
 }
 
 - (BOOL)startRecordingWithFileURL:(NSURL *)fileURL error:(NSError **)error finishedHandler:(void (^)(NSURL *, NSError *))finishedHandler
 {
+    if (!self.videoCamera.captureSession) {
+        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        * error = err;
+        return NO;
+    }
+    
     if (self.recording) {
         NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameHasStartRecord code:SGVideoCaptureErrorCodeHasStartRecord userInfo:nil];
         * error = err;
@@ -195,6 +203,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     if ([self.delegate respondsToSelector:@selector(videoCapture:didStartRecordingToFileURL:)]) {
         [self.delegate videoCapture:self didStartRecordingToFileURL:fileURL];
     }
+    [self updateMetadataCallBack];
     return YES;
 }
 
@@ -218,6 +227,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
             strongSelf.fileURL = nil;
             strongSelf.recordingFinishedHandler = nil;
             [self cleanWriter];
+            [self updateMetadataCallBack];
         }];
     }
 }
@@ -241,6 +251,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
         self.fileURL = nil;
         self.recordingFinishedHandler = nil;
         [self cleanWriter];
+        [self updateMetadataCallBack];
     }
 }
 
@@ -308,6 +319,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     if (_mirror != mirror) {
         _mirror = mirror;
         self.videoCamera.horizontallyMirrorFrontFacingCamera = mirror;
+        [self updateMetadataCallBack];
     }
 }
 
