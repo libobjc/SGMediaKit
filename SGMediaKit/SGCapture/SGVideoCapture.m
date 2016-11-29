@@ -88,6 +88,13 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     }
 }
 
+- (void)updateMetadataCallBack
+{
+    if ([self.delegate respondsToSelector:@selector(videoCaptureUpdateMetadata:)]) {
+        [self.delegate videoCaptureUpdateMetadata:self];
+    }
+}
+
 - (void)reloadOrientation
 {
     UIInterfaceOrientation orientation = [[UIApplication sharedApplication] statusBarOrientation];
@@ -275,6 +282,14 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     }
 }
 
+- (void)setDelegate:(id<SGVideoCaptureDelegate>)delegate
+{
+    if (_delegate != delegate) {
+        _delegate = delegate;
+        [self updateMetadataCallBack];
+    }
+}
+
 - (UIView *)view
 {
     return self.preview;
@@ -321,6 +336,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     
     if (position != self.videoCamera.cameraPosition) {
         [self.videoCamera rotateCamera];
+        [self updateMetadataCallBack];
     }
     
     return YES;
@@ -356,6 +372,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
                     self.videoCamera.inputCamera.torchMode = AVCaptureTorchModeOff;
                 }
                 [self.videoCamera.inputCamera unlockForConfiguration];
+                [self updateMetadataCallBack];
             } else {
                 err = [NSError errorWithDomain:SGVideoCaptureErrorNameLockCameraFailure code:SGVideoCaptureErrorCodeLockCameraFailure userInfo:nil];
             }
@@ -419,6 +436,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
             if ([self.videoCamera.inputCamera lockForConfiguration:&err]) {
                 self.videoCamera.inputCamera.focusMode = mode;
                 [self.videoCamera.inputCamera unlockForConfiguration];
+                [self updateMetadataCallBack];
             } else {
                 err = [NSError errorWithDomain:SGVideoCaptureErrorNameLockCameraFailure code:SGVideoCaptureErrorCodeLockCameraFailure userInfo:nil];
             }
@@ -519,6 +537,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
             if ([self.videoCamera.inputCamera lockForConfiguration:&err]) {
                 self.videoCamera.inputCamera.exposureMode = mode;
                 [self.videoCamera.inputCamera unlockForConfiguration];
+                [self updateMetadataCallBack];
             } else {
                 err = [NSError errorWithDomain:SGVideoCaptureErrorNameLockCameraFailure code:SGVideoCaptureErrorCodeLockCameraFailure userInfo:nil];
             }
