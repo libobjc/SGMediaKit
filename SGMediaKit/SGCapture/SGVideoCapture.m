@@ -575,4 +575,9 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     return YES;
 }
 
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 @end
