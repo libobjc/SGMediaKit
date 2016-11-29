@@ -127,17 +127,17 @@
 - (BOOL)startRecordingWithFileURL:(NSURL *)fileURL error:(NSError **)error finishedHandler:(void (^)(NSURL *, NSError *))finishedHandler
 {
     if (self.recording) {
-        NSError * err = [NSError errorWithDomain:@"已经在在录制" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
+        NSError * err = [NSError errorWithDomain:@"已经在在录制" code:SGVideoCaptureErrorCodeHasStartRecord userInfo:nil];
         * error = err;
         return NO;
     }
     if (!fileURL.isFileURL) {
-        NSError * err = [NSError errorWithDomain:@"fileURL 不是可用的文件URL" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
+        NSError * err = [NSError errorWithDomain:@"fileURL 不是可用的文件URL" code:SGVideoCaptureErrorCodeFileURLInvalid userInfo:nil];
         * error = err;
         return NO;
     }
     if ([[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
-        NSError * err = [NSError errorWithDomain:@"文件已经存在" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
+        NSError * err = [NSError errorWithDomain:@"文件已经存在" code:SGVideoCaptureErrorCodeFileExists userInfo:nil];
         * error = err;
         return NO;
     }
@@ -145,7 +145,7 @@
     NSString * tempPath = [fileURL.path stringByAppendingPathComponent:key];
     NSString * pathDirectory = [tempPath stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@"%@/%@", fileURL.lastPathComponent, key] withString:@""];
     if (![[NSFileManager defaultManager] fileExistsAtPath:pathDirectory]) {
-        NSError * err = [NSError errorWithDomain:@"目标文件夹不存在" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
+        NSError * err = [NSError errorWithDomain:@"目标文件夹不存在" code:SGVideoCaptureErrorCodeFileDirectoryInexistence userInfo:nil];
         * error = err;
         return NO;
     }
@@ -200,7 +200,7 @@
             [self.delegate videoCapture:self didCancelRecordingToFileURL:self.fileURL];
         }
         if (self.recordingFinishedHandler) {
-            NSError * error = [NSError errorWithDomain:@"主动取消" code:SGVideoCaptureErrorCodeRecording userInfo:nil];
+            NSError * error = [NSError errorWithDomain:@"主动取消" code:SGVideoCaptureErrorCodeRecordCanceled userInfo:nil];
             self.recordingFinishedHandler(self.fileURL, error);
         }
         [self reloadOrientation];
@@ -325,7 +325,7 @@
 - (BOOL)setTorch:(BOOL)torch error:(NSError *__autoreleasing *)error
 {
     if (!self.videoCamera.captureSession) {
-        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
         * error = err;
         return NO;
     }
@@ -343,13 +343,13 @@
                 }
                 [self.videoCamera.inputCamera unlockForConfiguration];
             } else {
-                err = [NSError errorWithDomain:@"获取摄像头配置信息失败" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+                err = [NSError errorWithDomain:@"获取摄像头配置信息失败" code:SGVideoCaptureErrorCodeLockCameraFailure userInfo:nil];
             }
         } else {
-            err = [NSError errorWithDomain:@"当前摄像头无法开启闪光灯" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+            err = [NSError errorWithDomain:@"当前摄像头无法开启闪光灯" code:SGVideoCaptureErrorCodeTorchDisable userInfo:nil];
         }
     } else {
-        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
     }
     [session commitConfiguration];
     
@@ -386,7 +386,7 @@
 - (BOOL)setFocusMode:(SGFocusMode)focusMode error:(NSError **)error
 {
     if (!self.videoCamera.captureSession) {
-        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
         * error = err;
         return NO;
     }
@@ -409,14 +409,14 @@
                 self.videoCamera.inputCamera.focusMode = mode;
                 [self.videoCamera.inputCamera unlockForConfiguration];
             } else {
-                err = [NSError errorWithDomain:@"锁定摄像头配置信息失败" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+                err = [NSError errorWithDomain:@"锁定摄像头配置信息失败" code:SGVideoCaptureErrorCodeLockCameraFailure userInfo:nil];
             }
         } else {
-            err = [NSError errorWithDomain:@"当前摄像头无法使用此对焦模式" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+            err = [NSError errorWithDomain:@"当前摄像头无法使用此对焦模式" code:SGVideoCaptureErrorCodeFocusDisable userInfo:nil];
         }
         
     } else {
-        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
     }
     
     if (err) {
@@ -430,7 +430,7 @@
 - (BOOL)setFocusPointOfInterest:(CGPoint)focusPointOfInterest error:(NSError *__autoreleasing *)error
 {
     if (!self.videoCamera.captureSession) {
-        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        NSError * err = [NSError errorWithDomain:@"摄像头不可用" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
         * error = err;
         return NO;
     }
@@ -444,16 +444,16 @@
                     self.videoCamera.inputCamera.focusPointOfInterest = focusPointOfInterest;
                     [self.videoCamera.inputCamera unlockForConfiguration];
                 } else {
-                    err = [NSError errorWithDomain:@"锁定摄像头配置信息失败" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+                    err = [NSError errorWithDomain:@"锁定摄像头配置信息失败" code:SGVideoCaptureErrorCodeLockCameraFailure userInfo:nil];
                 }
             } else {
-                err = [NSError errorWithDomain:@"仅手动对焦模式可使用此方法" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+                err = [NSError errorWithDomain:@"仅手动对焦模式可使用此方法" code:SGVideoCaptureErrorCodeFocusModeUnsupported userInfo:nil];
             }
         } else {
-            err = [NSError errorWithDomain:@"当前摄像头无法使用此对焦模式" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+            err = [NSError errorWithDomain:@"当前摄像头无法使用此对焦模式" code:SGVideoCaptureErrorCodeFocusDisable userInfo:nil];
         }
     } else {
-        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeRunning userInfo:nil];
+        err = [NSError errorWithDomain:@"没有可用的摄像头输入源" code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
     }
     
     if (err) {

@@ -10,9 +10,17 @@
 #import "SGVideoConfiguration.h"
 
 typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
-    SGVideoCaptureErrorCodeUnknown,
-    SGVideoCaptureErrorCodeRunning,
-    SGVideoCaptureErrorCodeRecording,
+    SGVideoCaptureErrorCodeNone = 0x00,
+    SGVideoCaptureErrorCodeCameraDisabled = 0xFF,
+    SGVideoCaptureErrorCodeLockCameraFailure,
+    SGVideoCaptureErrorCodeTorchDisable,
+    SGVideoCaptureErrorCodeFocusDisable,
+    SGVideoCaptureErrorCodeFocusModeUnsupported,
+    SGVideoCaptureErrorCodeHasStartRecord = 0xFFFF,
+    SGVideoCaptureErrorCodeFileURLInvalid,
+    SGVideoCaptureErrorCodeFileExists,
+    SGVideoCaptureErrorCodeFileDirectoryInexistence,
+    SGVideoCaptureErrorCodeRecordCanceled,
 };
 
 typedef NS_ENUM(NSUInteger, SGCameraPosition) {
