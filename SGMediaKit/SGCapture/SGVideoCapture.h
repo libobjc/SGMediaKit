@@ -96,6 +96,7 @@ typedef NS_ENUM(NSUInteger, SGExposureMode) {
 @property (nonatomic, weak) id <SGVideoCaptureDelegate> delegate;
 @property (nonatomic, strong, readonly) UIView * view;
 @property (nonatomic, assign) BOOL mirror;
+@property (nonatomic, assign) BOOL autorotate;      // default is YES;
 
 @property (nonatomic, assign, readonly) SGCameraPosition cameraPosition;   // default is back. if device is unsupported back camera, it's will be front.
 @property (nonatomic, assign, readonly) BOOL cameraPositionFrontEnable;

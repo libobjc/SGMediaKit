@@ -77,6 +77,9 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 
 - (void)setup
 {
+    self.mirror = YES;
+    self.autorotate = YES;
+    
     // video camera
     AVCaptureDevicePosition position = AVCaptureDevicePositionBack;
     if (!self.cameraPositionBackEnable) {
@@ -86,7 +89,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     }
     self.videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:self.videoConfiguration.sessionPreset cameraPosition:position];
     self.videoCamera.outputImageOrientation = [UIApplication sharedApplication].statusBarOrientation;
-    self.videoCamera.horizontallyMirrorFrontFacingCamera = NO;
+    self.videoCamera.horizontallyMirrorFrontFacingCamera = self.mirror;
     NSString * filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"SGVideoCaptureTemp.mp4"];
     NSURL * url = [NSURL fileURLWithPath:filePath];
     self.videoCamera.audioEncodingTarget = [[GPUImageMovieWriter alloc] initWithMovieURL:url size:CGSizeMake(1, 1)];
@@ -94,7 +97,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     // notification
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadOrientation) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didChangeStatusBarOrientation:) name:UIApplicationDidChangeStatusBarOrientationNotification object:nil];
 }
 
 - (void)didEnterBackground:(NSNotification *)notification
@@ -119,10 +122,10 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     }
 }
 
-- (void)updateMetadataCallBack
+- (void)didChangeStatusBarOrientation:(NSNotification *)notification
 {
-    if ([self.delegate respondsToSelector:@selector(videoCaptureUpdateMetadata:)]) {
-        [self.delegate videoCaptureUpdateMetadata:self];
+    if (self.autorotate) {
+        [self reloadOrientation];
     }
 }
 
@@ -132,6 +135,13 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     
     if (self.videoCamera.outputImageOrientation != orientation && !self.recording) {
         self.videoCamera.outputImageOrientation = orientation;
+    }
+}
+
+- (void)updateMetadataCallBack
+{
+    if ([self.delegate respondsToSelector:@selector(videoCaptureUpdateMetadata:)]) {
+        [self.delegate videoCaptureUpdateMetadata:self];
     }
 }
 
