@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 
+
 @interface SGVideoConfiguration : NSObject
 
 + (instancetype)defaultVideoConfiguration;

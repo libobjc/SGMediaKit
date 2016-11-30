@@ -12,6 +12,7 @@
 
 NSString * const SGVideoCaptureErrorNameNone = @"no error";
 NSString * const SGVideoCaptureErrorNameCameraDisabled = @"摄像头不可用";
+NSString * const SGVideoCaptureErrorNmaeCameraPositionDisable = @"无法切换摄像头";
 NSString * const SGVideoCaptureErrorNameLockCameraFailure = @"锁定摄像头配置信息失败";
 NSString * const SGVideoCaptureErrorNameTorchDisable = @"当前摄像头无法开启闪光灯";
 NSString * const SGVideoCaptureErrorNameFocusDisable = @"当前摄像头无法使用此对焦模式";
@@ -163,7 +164,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 - (BOOL)startRecordingWithFileURL:(NSURL *)fileURL error:(NSError **)error finishedHandler:(void (^)(NSURL *, NSError *))finishedHandler
 {
     if (!self.videoCamera.captureSession) {
-        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
         * error = err;
         return NO;
     }
@@ -348,7 +349,13 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     
     if (position != self.videoCamera.cameraPosition) {
         [self.videoCamera rotateCamera];
-        [self updateMetadataCallBack];
+        if (position == self.videoCamera.cameraPosition) {
+            [self updateMetadataCallBack];
+        } else {
+            NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNmaeCameraPositionDisable code:SGVideoCaptureErrorCodeCameraPositionDisable userInfo:nil];
+            * error = err;
+            return NO;
+        }
     }
     
     return YES;
@@ -367,7 +374,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 - (BOOL)setTorch:(BOOL)torch error:(NSError *__autoreleasing *)error
 {
     if (!self.videoCamera.captureSession) {
-        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
         * error = err;
         return NO;
     }
@@ -392,7 +399,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
             err = [NSError errorWithDomain:SGVideoCaptureErrorNameTorchDisable code:SGVideoCaptureErrorCodeTorchDisable userInfo:nil];
         }
     } else {
-        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
     }
     [session commitConfiguration];
     
@@ -426,7 +433,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 - (BOOL)setFocusMode:(SGFocusMode)focusMode error:(NSError **)error
 {
     if (!self.videoCamera.captureSession) {
-        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
         * error = err;
         return NO;
     }
@@ -457,7 +464,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
         }
         
     } else {
-        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
     }
     
     if (err) {
@@ -471,7 +478,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 - (BOOL)setFocusPointOfInterest:(CGPoint)focusPointOfInterest error:(NSError *__autoreleasing *)error
 {
     if (!self.videoCamera.captureSession) {
-        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
         * error = err;
         return NO;
     }
@@ -494,7 +501,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
             err = [NSError errorWithDomain:SGVideoCaptureErrorNameFocusDisable code:SGVideoCaptureErrorCodeFocusDisable userInfo:nil];
         }
     } else {
-        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
     }
     
     if (err) {
@@ -527,7 +534,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 - (BOOL)setExposureMode:(SGExposureMode)exposureMode error:(NSError *__autoreleasing *)error
 {
     if (!self.videoCamera.captureSession) {
-        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
         * error = err;
         return NO;
     }
@@ -558,7 +565,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
         }
         
     } else {
-        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
     }
     
     if (err) {
@@ -572,7 +579,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 - (BOOL)setExposurePointOfInterest:(CGPoint)exposurePointOfInterest error:(NSError *__autoreleasing *)error
 {
     if (!self.videoCamera.captureSession) {
-        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
         * error = err;
         return NO;
     }
@@ -595,7 +602,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
             err = [NSError errorWithDomain:SGVideoCaptureErrorNameExposureDisable code:SGVideoCaptureErrorCodeExposureDisable userInfo:nil];
         }
     } else {
-        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisabled userInfo:nil];
+        err = [NSError errorWithDomain:SGVideoCaptureErrorNameCameraDisabled code:SGVideoCaptureErrorCodeCameraDisable userInfo:nil];
     }
     
     if (err) {

@@ -10,7 +10,8 @@
 #import "SGVideoConfiguration.h"
 
 FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameNone;
-FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameCameraDisabled;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameCameraDisable;
+FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNmaeCameraPositionDisable;
 FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameLockCameraFailure;
 FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameTorchDisable;
 FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameFocusDisable;
@@ -25,7 +26,8 @@ FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameRecordCanceled;
 
 typedef NS_ENUM(NSUInteger, SGVideoCaptureErrorCode) {
     SGVideoCaptureErrorCodeNone = 0x00,
-    SGVideoCaptureErrorCodeCameraDisabled = 0xFF,
+    SGVideoCaptureErrorCodeCameraDisable = 0xFF,
+    SGVideoCaptureErrorCodeCameraPositionDisable,
     SGVideoCaptureErrorCodeLockCameraFailure,
     SGVideoCaptureErrorCodeTorchDisable,
     SGVideoCaptureErrorCodeFocusDisable,
