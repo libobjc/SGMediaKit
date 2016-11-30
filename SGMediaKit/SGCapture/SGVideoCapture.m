@@ -84,7 +84,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
             position = AVCaptureDevicePositionFront;
         }
     }
-    self.videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:position];
+    self.videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:self.videoConfiguration.sessionPreset cameraPosition:AVCaptureDevicePositionBack];
     self.videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
     self.videoCamera.horizontallyMirrorFrontFacingCamera = NO;
     NSString * filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"SGVideoCaptureTemp.mp4"];
@@ -288,16 +288,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 
 - (void)setupWriter
 {
-    CGSize size = CGSizeMake(720, 1280);
-    switch ([UIApplication sharedApplication].statusBarOrientation) {
-        case UIInterfaceOrientationLandscapeRight:
-        case UIInterfaceOrientationLandscapeLeft:
-            size = CGSizeMake(size.height, size.width);
-            break;
-        default:
-            break;
-    }
-    
+    CGSize size =[self.videoConfiguration pixelsSize:self.videoCamera.outputImageOrientation];
     self.writer = [[GPUImageMovieWriter alloc] initWithMovieURL:self.fileURL size:size];
     self.writer.encodingLiveVideo = YES;
     self.videoCamera.audioEncodingTarget = self.writer;

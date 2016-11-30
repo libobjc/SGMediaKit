@@ -48,7 +48,7 @@
 {
     if(!_gpuImageView) {
         _gpuImageView = [[GPUImageView alloc] initWithFrame:self.bounds];
-        [_gpuImageView setFillMode:kGPUImageFillModePreserveAspectRatioAndFill];
+        [_gpuImageView setFillMode:kGPUImageFillModePreserveAspectRatio];
     }
     return _gpuImageView;
 }
