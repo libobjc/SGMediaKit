@@ -84,7 +84,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
             position = AVCaptureDevicePositionFront;
         }
     }
-    self.videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:self.videoConfiguration.sessionPreset cameraPosition:AVCaptureDevicePositionBack];
+    self.videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:self.videoConfiguration.sessionPreset cameraPosition:position];
     self.videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
     self.videoCamera.horizontallyMirrorFrontFacingCamera = NO;
     NSString * filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"SGVideoCaptureTemp.mp4"];
