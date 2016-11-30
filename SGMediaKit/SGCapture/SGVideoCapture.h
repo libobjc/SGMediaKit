@@ -84,6 +84,8 @@ typedef NS_ENUM(NSUInteger, SGExposureMode) {
 
 @interface SGVideoCapture : NSObject
 
++ (BOOL)canCapture;     // check whether the camera is available. if return NO, no camera available.
+
 + (instancetype)new UNAVAILABLE_ATTRIBUTE;
 - (instancetype)init UNAVAILABLE_ATTRIBUTE;
 

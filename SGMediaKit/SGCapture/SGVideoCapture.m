@@ -42,6 +42,30 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 
 @implementation SGVideoCapture
 
++ (BOOL)canCapture
+{
+    return [self cameraPositionFrontEnable] || [self cameraPositionBackEnable];
+}
+
++ (BOOL)cameraPositionFrontEnable
+{
+    return [self cammeraPositionEnableCheck:AVCaptureDevicePositionFront];
+}
+
++ (BOOL)cameraPositionBackEnable
+{
+    return [self cammeraPositionEnableCheck:AVCaptureDevicePositionBack];
+}
+
++ (BOOL)cammeraPositionEnableCheck:(AVCaptureDevicePosition)position
+{
+    NSArray * devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    for (AVCaptureDevice * device in devices) {
+        if ([device position] == position) return YES;
+    }
+    return NO;
+}
+
 - (instancetype)initWithVideoConfiguration:(SGVideoConfiguration *)videoConfiguration
 {
     if (self = [super init]) {
@@ -343,13 +367,12 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 
 - (BOOL)cameraPositionFrontEnable
 {
-    
-    return [self cammeraPositionEnableCheck:AVCaptureDevicePositionFront];
+    return [self.class cameraPositionFrontEnable];
 }
 
 - (BOOL)cameraPositionBackEnable
 {
-    return [self cammeraPositionEnableCheck:AVCaptureDevicePositionBack];
+    return [self.class cameraPositionBackEnable];
 }
 
 - (BOOL)cammeraPositionEnableCheck:(AVCaptureDevicePosition)position
