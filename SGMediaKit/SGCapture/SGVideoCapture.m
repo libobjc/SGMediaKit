@@ -54,7 +54,13 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 - (void)setup
 {
     // video camera
-    self.videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:AVCaptureDevicePositionFront];
+    AVCaptureDevicePosition position = AVCaptureDevicePositionBack;
+    if (!self.cameraPositionBackEnable) {
+        if (self.cameraPositionFrontEnable) {
+            position = AVCaptureDevicePositionFront;
+        }
+    }
+    self.videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:AVCaptureSessionPreset1280x720 cameraPosition:position];
     self.videoCamera.outputImageOrientation = UIInterfaceOrientationPortrait;
     self.videoCamera.horizontallyMirrorFrontFacingCamera = NO;
     NSString * filePath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject stringByAppendingPathComponent:@"SGVideoCaptureTemp.mp4"];
@@ -335,6 +341,30 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     }
 }
 
+- (BOOL)cameraPositionFrontEnable
+{
+    
+    return [self cammeraPositionEnableCheck:AVCaptureDevicePositionFront];
+}
+
+- (BOOL)cameraPositionBackEnable
+{
+    return [self cammeraPositionEnableCheck:AVCaptureDevicePositionBack];
+}
+
+- (BOOL)cammeraPositionEnableCheck:(AVCaptureDevicePosition)position
+{
+    NSArray * devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+    for (AVCaptureDevice * device in devices)
+    {
+        if ([device position] == position)
+        {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (BOOL)setCameraPosition:(SGCameraPosition)cameraPosition error:(NSError **)error
 {
     AVCaptureDevicePosition position;
@@ -345,6 +375,12 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
         case SGCameraPositionBack:
             position = AVCaptureDevicePositionBack;
             break;
+    }
+    
+    if (![self cammeraPositionEnableCheck:position]) {
+        NSError * err = [NSError errorWithDomain:SGVideoCaptureErrorNmaeCameraPositionDisable code:SGVideoCaptureErrorCodeCameraPositionDisable userInfo:nil];
+        * error = err;
+        return NO;
     }
     
     if (position != self.videoCamera.cameraPosition) {

@@ -95,7 +95,9 @@ typedef NS_ENUM(NSUInteger, SGExposureMode) {
 @property (nonatomic, strong, readonly) UIView * view;
 @property (nonatomic, assign) BOOL mirror;
 
-@property (nonatomic, assign, readonly) SGCameraPosition cameraPosition;   // default is Front
+@property (nonatomic, assign, readonly) SGCameraPosition cameraPosition;   // default is back. if device is unsupported back camera, it's will be front.
+@property (nonatomic, assign, readonly) BOOL cameraPositionFrontEnable;
+@property (nonatomic, assign, readonly) BOOL cameraPositionBackEnable;
 - (BOOL)setCameraPosition:(SGCameraPosition)cameraPosition error:(NSError **)error;
 
 @property (nonatomic, assign, readonly) BOOL torch;   // default is off
