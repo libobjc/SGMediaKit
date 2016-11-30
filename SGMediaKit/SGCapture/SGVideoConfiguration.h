@@ -12,12 +12,14 @@ typedef NS_ENUM(NSUInteger, SGVideoQuality) {
     SGVideoQualityLow,
     SGVideoQualityMedium,
     SGVideoQualityHigh,
+    SGVideoQualityUltra,
 };
 
 typedef NS_ENUM(NSUInteger, SGVideoSize) {
-    SGVideoSize540p,
-    SGVideoSize720p,
-    SGVideoSize1080p,
+    SGVideoSize640X480,
+    SGVideoSize960x540,
+    SGVideoSize1280x720,
+    SGVideoSize1920x1080,
 };
 
 @interface SGVideoConfiguration : NSObject
@@ -25,9 +27,9 @@ typedef NS_ENUM(NSUInteger, SGVideoSize) {
 + (instancetype)defaultVideoConfiguration;
 + (instancetype)defaultVideoConfigurationWithQuality:(SGVideoQuality)videoQuality;
 
-@property (nonatomic, assign) SGVideoSize size;
-@property (nonatomic, assign) NSUInteger frameRate;
-@property (nonatomic, assign) NSUInteger bitRate;
+@property (nonatomic, assign, readonly) SGVideoSize size;
+@property (nonatomic, assign, readonly) NSUInteger frameRate;
+@property (nonatomic, assign, readonly) NSUInteger bitRate;
 
 - (CGSize)pixelsSize:(UIInterfaceOrientation)orientation;
 - (NSString *)sessionPreset;
