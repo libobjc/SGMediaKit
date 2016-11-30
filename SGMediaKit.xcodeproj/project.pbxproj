@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9C982C2E1DEE88CF00ED9BBA /* SGLiveSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C982C2C1DEE88CF00ED9BBA /* SGLiveSession.h */; };
+		9C982C2F1DEE88CF00ED9BBA /* SGLiveSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C982C2D1DEE88CF00ED9BBA /* SGLiveSession.m */; };
 		9CA2D90B1DEBC59500AEC8A9 /* SGVideoCapturePreview.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA2D9091DEBC59500AEC8A9 /* SGVideoCapturePreview.h */; };
 		9CA2D90C1DEBC59500AEC8A9 /* SGVideoCapturePreview.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA2D90A1DEBC59500AEC8A9 /* SGVideoCapturePreview.m */; };
 		9CA2D90F1DEBE34800AEC8A9 /* SGVideoConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA2D90D1DEBE34800AEC8A9 /* SGVideoConfiguration.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -46,6 +48,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9C982C2C1DEE88CF00ED9BBA /* SGLiveSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGLiveSession.h; sourceTree = "<group>"; };
+		9C982C2D1DEE88CF00ED9BBA /* SGLiveSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGLiveSession.m; sourceTree = "<group>"; };
 		9CA2D9091DEBC59500AEC8A9 /* SGVideoCapturePreview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoCapturePreview.h; sourceTree = "<group>"; };
 		9CA2D90A1DEBC59500AEC8A9 /* SGVideoCapturePreview.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoCapturePreview.m; sourceTree = "<group>"; };
 		9CA2D90D1DEBE34800AEC8A9 /* SGVideoConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoConfiguration.h; sourceTree = "<group>"; };
@@ -98,6 +102,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9C982C2B1DEE88AA00ED9BBA /* SGLive */ = {
+			isa = PBXGroup;
+			children = (
+				9C982C2C1DEE88CF00ED9BBA /* SGLiveSession.h */,
+				9C982C2D1DEE88CF00ED9BBA /* SGLiveSession.m */,
+			);
+			path = SGLive;
+			sourceTree = "<group>";
+		};
 		9CA4761B1DE531FE00B1B0D1 = {
 			isa = PBXGroup;
 			children = (
@@ -120,6 +133,7 @@
 			children = (
 				9CA476281DE531FE00B1B0D1 /* SGMediaKit.h */,
 				9CA476291DE531FE00B1B0D1 /* Info.plist */,
+				9C982C2B1DEE88AA00ED9BBA /* SGLive */,
 				9CA476731DE53D1E00B1B0D1 /* SGCapture */,
 				9CA476301DE5333100B1B0D1 /* SGPlayer */,
 			);
@@ -224,6 +238,7 @@
 				9CA476591DE5333100B1B0D1 /* SGAVGLView.h in Headers */,
 				9CA4765B1DE5333100B1B0D1 /* SGAVPlayer.h in Headers */,
 				9CA476571DE5333100B1B0D1 /* SGAVGLTexture.h in Headers */,
+				9C982C2E1DEE88CF00ED9BBA /* SGLiveSession.h in Headers */,
 				9CA476521DE5333100B1B0D1 /* SGAVGLProgram.h in Headers */,
 				9CA476611DE5333100B1B0D1 /* SGPlayerMacro.h in Headers */,
 				9CA476541DE5333100B1B0D1 /* SGAVGLSensors.h in Headers */,
@@ -316,6 +331,7 @@
 				9CA476531DE5333100B1B0D1 /* SGAVGLProgram.m in Sources */,
 				9CA476511DE5333100B1B0D1 /* SGAVGLModel.m in Sources */,
 				9CA4765A1DE5333100B1B0D1 /* SGAVGLView.m in Sources */,
+				9C982C2F1DEE88CF00ED9BBA /* SGLiveSession.m in Sources */,
 				9CA4765C1DE5333100B1B0D1 /* SGAVPlayer.m in Sources */,
 				9CA476631DE5333100B1B0D1 /* SGPlayer+Extension.m in Sources */,
 				9CA476551DE5333100B1B0D1 /* SGAVGLSensors.m in Sources */,
