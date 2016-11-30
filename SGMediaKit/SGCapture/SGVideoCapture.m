@@ -300,7 +300,6 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     
     self.writer = [[GPUImageMovieWriter alloc] initWithMovieURL:self.fileURL size:size];
     self.writer.encodingLiveVideo = YES;
-    self.writer.shouldPassthroughAudio = YES;
     self.videoCamera.audioEncodingTarget = self.writer;
     [self tryAddWriterToFilter];
 }
