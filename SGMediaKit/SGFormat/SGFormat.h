@@ -12,8 +12,6 @@
 @protocol SGFormatDelegate <NSObject>
 
 - (void)formatDidStart:(SGFormat *)format;
-//- (void)formatDidCancel:(SGFormat *)format;
-
 - (void)format:(SGFormat *)format didChangeProgross:(float)progress;
 - (void)format:(SGFormat *)format didCompleteWithError:(NSError *)error;
 
@@ -28,7 +26,7 @@
 
 @property (nonatomic, copy, readonly) NSURL * sourceFileURL;
 @property (nonatomic, copy) NSURL * destinationFileURL;
-@property (nonatomic, copy) NSString * quality;
+@property (nonatomic, copy) NSString * qualityType;
 @property (nonatomic, copy) NSString * fileType;
 
 @property (nonatomic, assign, readonly) float progress;

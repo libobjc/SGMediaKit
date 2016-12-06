@@ -30,9 +30,10 @@
 
 - (instancetype)initWithSourceFileURL:(NSURL *)sourceFileURL
 {
-    if (self = [super init]) {
+    if (self = [super init])
+    {
         self.sourceFileURL = sourceFileURL;
-        self.quality = AVAssetExportPresetMediumQuality;
+        self.qualityType = AVAssetExportPresetMediumQuality;
         self.fileType = AVFileTypeQuickTimeMovie;
     }
     return self;
@@ -54,7 +55,7 @@
     }
     
     self.sourceAsset = [AVURLAsset assetWithURL:self.sourceFileURL];
-    self.exportSession = [AVAssetExportSession exportSessionWithAsset:self.sourceAsset presetName:self.quality];
+    self.exportSession = [AVAssetExportSession exportSessionWithAsset:self.sourceAsset presetName:self.qualityType];
     self.exportSession.shouldOptimizeForNetworkUse = YES;
     self.exportSession.outputFileType = self.fileType;
     self.exportSession.outputURL = self.destinationFileURL;

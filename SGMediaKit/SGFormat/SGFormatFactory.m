@@ -80,7 +80,7 @@ static SGFormatFactory * factory = nil;
         
         self.format = [SGFormat formatWithSourceFileURL:sourceFileURL];
         self.format.destinationFileURL = destinationFileURL;
-        self.format.quality = qualityString;
+        self.format.qualityType = qualityString;
         self.format.fileType = fileType;
         self.format.delegate = self;
     }
