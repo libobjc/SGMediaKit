@@ -16,7 +16,8 @@
 
 @property (nonatomic, copy) NSURL * sourceFileURL;
 @property (nonatomic, copy) NSURL * destinationFileURL;
-@property (nonatomic, assign) SGFormatQuality quality;
+@property (nonatomic, assign) SGFormatQualityType qualityType;
+@property (nonatomic, copy) NSString * fileType;
 
 @property (nonatomic, copy) void (^progressHandler)(float);
 @property (nonatomic, copy) void (^completionHandler)(NSError *);
@@ -27,18 +28,33 @@
 
 static SGFormatMPEG4 * mpeg4 = nil;
 
-+ (void)formatWithSourceFileURL:(NSURL *)sourceFileURL destinationFileURL:(NSURL *)destinationFileURL quality:(SGFormatQuality)quality progressHandler:(void (^)(float))progressHandler completionHandler:(void (^)(NSError *))completionHandler
++ (void)formatWithSourceFileURL:(NSURL *)sourceFileURL
+             destinationFileURL:(NSURL *)destinationFileURL
+                    qualityType:(SGFormatQualityType)qualityType
+                progressHandler:(void (^)(float))progressHandler
+              completionHandler:(void (^)(NSError *))completionHandler
 {
-    mpeg4 = [[SGFormatMPEG4 alloc] initWithSourceFileURL:sourceFileURL destinationFileURL:destinationFileURL quality:quality progressHandler:progressHandler completionHandler:completionHandler];
+    mpeg4 = [[SGFormatMPEG4 alloc] initWithSourceFileURL:sourceFileURL
+                                      destinationFileURL:destinationFileURL
+                                             qualityType:qualityType
+                                                fileType:AVFileTypeMPEG4
+                                         progressHandler:progressHandler
+                                       completionHandler:completionHandler];
     [mpeg4 start];
 }
 
-- (instancetype)initWithSourceFileURL:(NSURL *)sourceFileURL destinationFileURL:(NSURL *)destinationFileURL quality:(SGFormatQuality)quality progressHandler:(void (^)(float))progressHandler completionHandler:(void (^)(NSError *))completionHandler
+- (instancetype)initWithSourceFileURL:(NSURL *)sourceFileURL
+                   destinationFileURL:(NSURL *)destinationFileURL
+                          qualityType:(SGFormatQualityType)qualityType
+                             fileType:(NSString *)fileType
+                      progressHandler:(void (^)(float))progressHandler
+                    completionHandler:(void (^)(NSError *))completionHandler
 {
     if (self = [super init]) {
         self.sourceFileURL = sourceFileURL;
         self.destinationFileURL = destinationFileURL;
-        self.quality = quality;
+        self.qualityType = qualityType;
+        self.fileType = fileType;
         self.progressHandler = progressHandler;
         self.completionHandler = completionHandler;
     }
@@ -47,27 +63,25 @@ static SGFormatMPEG4 * mpeg4 = nil;
 
 - (void)start
 {
-    self.format = [SGFormat formatWithSourceFileURL:self.sourceFileURL];
-    self.format.destinationFileURL = self.destinationFileURL;
-    switch (self.quality) {
-        case SGFormatQualityLow:
-            self.format.quality = AVAssetExportPresetLowQuality;
+    NSString * qualityString;
+    switch (self.qualityType) {
+        case SGFormatQualityTypeLow:
+            qualityString = AVAssetExportPresetLowQuality;
             break;
-        case SGFormatQualityMedium:
-            self.format.quality = AVAssetExportPresetMediumQuality;
+        case SGFormatQualityTypeMedium:
+            qualityString = AVAssetExportPresetMediumQuality;
             break;
-        case SGFormatQualityHighest:
-            self.format.quality = AVAssetExportPresetHighestQuality;
+        case SGFormatQualityTypeHighest:
+            qualityString = AVAssetExportPresetHighestQuality;
             break;
     }
-    self.format.fileType = AVFileTypeMPEG4;
+    
+    self.format = [SGFormat formatWithSourceFileURL:self.sourceFileURL];
+    self.format.destinationFileURL = self.destinationFileURL;
+    self.format.quality = qualityString;
+    self.format.fileType = self.fileType;
     self.format.delegate = self;
     [self.format start];
-}
-
-- (void)formatDidStart:(SGFormat *)format
-{
-    NSLog(@"开始转换");
 }
 
 - (void)format:(SGFormat *)format didChangeProgross:(float)progress
@@ -75,7 +89,6 @@ static SGFormatMPEG4 * mpeg4 = nil;
     if (self.progressHandler) {
         self.progressHandler(progress);
     }
-    NSLog(@"转换进度 : %f", progress);
 }
 
 - (void)format:(SGFormat *)format didCompleteWithError:(NSError *)error
@@ -84,11 +97,6 @@ static SGFormatMPEG4 * mpeg4 = nil;
         self.completionHandler(error);
     }
     [self clean];
-    if (error) {
-        NSLog(@"转换失败 : %@", error);
-    } else {
-        NSLog(@"转换完成");
-    }
 }
 
 - (void)clean
