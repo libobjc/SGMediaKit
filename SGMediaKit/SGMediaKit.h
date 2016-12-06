@@ -21,4 +21,4 @@ FOUNDATION_EXPORT const unsigned char SGMediaKitVersionString[];        // versi
 #import <SGMediaKit/SGVideoConfiguration.h>
 
 // SGFormat
-#import <SGMediaKit/SGFormatMPEG4.h>
+#import <SGMediaKit/SGFormatFactory.h>

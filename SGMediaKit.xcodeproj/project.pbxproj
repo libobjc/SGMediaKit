@@ -9,8 +9,8 @@
 /* Begin PBXBuildFile section */
 		9C13B1961DF661B200F67D62 /* SGFormat.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C13B1941DF661B200F67D62 /* SGFormat.h */; };
 		9C13B1971DF661B200F67D62 /* SGFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C13B1951DF661B200F67D62 /* SGFormat.m */; };
-		9C13B1F71DF6A79A00F67D62 /* SGFormatMPEG4.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C13B1F51DF6A79A00F67D62 /* SGFormatMPEG4.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9C13B1F81DF6A79A00F67D62 /* SGFormatMPEG4.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C13B1F61DF6A79A00F67D62 /* SGFormatMPEG4.m */; };
+		9C13B1FB1DF6C2AD00F67D62 /* SGFormatFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C13B1F91DF6C2AD00F67D62 /* SGFormatFactory.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C13B1FC1DF6C2AD00F67D62 /* SGFormatFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C13B1FA1DF6C2AD00F67D62 /* SGFormatFactory.m */; };
 		9C982C2E1DEE88CF00ED9BBA /* SGLiveSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C982C2C1DEE88CF00ED9BBA /* SGLiveSession.h */; };
 		9C982C2F1DEE88CF00ED9BBA /* SGLiveSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C982C2D1DEE88CF00ED9BBA /* SGLiveSession.m */; };
 		9CA2D90B1DEBC59500AEC8A9 /* SGVideoCapturePreview.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA2D9091DEBC59500AEC8A9 /* SGVideoCapturePreview.h */; };
@@ -54,8 +54,8 @@
 /* Begin PBXFileReference section */
 		9C13B1941DF661B200F67D62 /* SGFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGFormat.h; sourceTree = "<group>"; };
 		9C13B1951DF661B200F67D62 /* SGFormat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGFormat.m; sourceTree = "<group>"; };
-		9C13B1F51DF6A79A00F67D62 /* SGFormatMPEG4.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGFormatMPEG4.h; sourceTree = "<group>"; };
-		9C13B1F61DF6A79A00F67D62 /* SGFormatMPEG4.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGFormatMPEG4.m; sourceTree = "<group>"; };
+		9C13B1F91DF6C2AD00F67D62 /* SGFormatFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGFormatFactory.h; sourceTree = "<group>"; };
+		9C13B1FA1DF6C2AD00F67D62 /* SGFormatFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGFormatFactory.m; sourceTree = "<group>"; };
 		9C982C2C1DEE88CF00ED9BBA /* SGLiveSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGLiveSession.h; sourceTree = "<group>"; };
 		9C982C2D1DEE88CF00ED9BBA /* SGLiveSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGLiveSession.m; sourceTree = "<group>"; };
 		9CA2D9091DEBC59500AEC8A9 /* SGVideoCapturePreview.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGVideoCapturePreview.h; sourceTree = "<group>"; };
@@ -115,8 +115,8 @@
 			children = (
 				9C13B1941DF661B200F67D62 /* SGFormat.h */,
 				9C13B1951DF661B200F67D62 /* SGFormat.m */,
-				9C13B1F51DF6A79A00F67D62 /* SGFormatMPEG4.h */,
-				9C13B1F61DF6A79A00F67D62 /* SGFormatMPEG4.m */,
+				9C13B1F91DF6C2AD00F67D62 /* SGFormatFactory.h */,
+				9C13B1FA1DF6C2AD00F67D62 /* SGFormatFactory.m */,
 			);
 			path = SGFormat;
 			sourceTree = "<group>";
@@ -252,8 +252,8 @@
 				9CA476641DE5333100B1B0D1 /* SGPlayer.h in Headers */,
 				9CA476661DE5333100B1B0D1 /* SGPlayerDefine.h in Headers */,
 				9CA2D90B1DEBC59500AEC8A9 /* SGVideoCapturePreview.h in Headers */,
-				9C13B1F71DF6A79A00F67D62 /* SGFormatMPEG4.h in Headers */,
 				9CA2D90F1DEBE34800AEC8A9 /* SGVideoConfiguration.h in Headers */,
+				9C13B1FB1DF6C2AD00F67D62 /* SGFormatFactory.h in Headers */,
 				9CA476761DE53D3300B1B0D1 /* SGVideoCapture.h in Headers */,
 				9CA476621DE5333100B1B0D1 /* SGPlayer+Extension.h in Headers */,
 				9CA4765F1DE5333100B1B0D1 /* SGNotification.h in Headers */,
@@ -348,6 +348,7 @@
 				9C13B1971DF661B200F67D62 /* SGFormat.m in Sources */,
 				9CA2D9101DEBE34800AEC8A9 /* SGVideoConfiguration.m in Sources */,
 				9CA2D9141DEBE35700AEC8A9 /* SGAudioConfiguration.m in Sources */,
+				9C13B1FC1DF6C2AD00F67D62 /* SGFormatFactory.m in Sources */,
 				9CA4765E1DE5333100B1B0D1 /* SGAVView.m in Sources */,
 				9CA476651DE5333100B1B0D1 /* SGPlayer.m in Sources */,
 				9CA476581DE5333100B1B0D1 /* SGAVGLTexture.m in Sources */,
@@ -356,7 +357,6 @@
 				9CA4765A1DE5333100B1B0D1 /* SGAVGLView.m in Sources */,
 				9C982C2F1DEE88CF00ED9BBA /* SGLiveSession.m in Sources */,
 				9CA4765C1DE5333100B1B0D1 /* SGAVPlayer.m in Sources */,
-				9C13B1F81DF6A79A00F67D62 /* SGFormatMPEG4.m in Sources */,
 				9CA476631DE5333100B1B0D1 /* SGPlayer+Extension.m in Sources */,
 				9CA476551DE5333100B1B0D1 /* SGAVGLSensors.m in Sources */,
 				9CA2D90C1DEBC59500AEC8A9 /* SGVideoCapturePreview.m in Sources */,
