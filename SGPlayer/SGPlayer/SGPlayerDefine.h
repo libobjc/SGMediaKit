@@ -9,6 +9,13 @@
 #ifndef SGPlayerDefine_h
 #define SGPlayerDefine_h
 
+// extern
+#if defined(__cplusplus)
+#define SGPLAYER_EXTERN extern "C"
+#else
+#define SGPLAYER_EXTERN extern
+#endif
+
 #import <Foundation/Foundation.h>
 
 // video type
@@ -42,31 +49,31 @@ typedef NS_ENUM(NSUInteger, SGPlayerBackgroundMode) {
 };
 
 // SGPlayer default identifier
-FOUNDATION_EXPORT NSString * const SGPlayerDefaultIdentifier;
+SGPLAYER_EXTERN NSString * const SGPlayerDefaultIdentifier;
 
 // notification name
-FOUNDATION_EXPORT NSString * const SGPlayerErrorName;                   // player error
-FOUNDATION_EXPORT NSString * const SGPlayerStateChangeName;     // player state change
-FOUNDATION_EXPORT NSString * const SGPlayerProgressChangeName;  // player play progress change
-FOUNDATION_EXPORT NSString * const SGPlayerPlayableChangeName;   // player playable progress change
+SGPLAYER_EXTERN NSString * const SGPlayerErrorName;                   // player error
+SGPLAYER_EXTERN NSString * const SGPlayerStateChangeName;     // player state change
+SGPLAYER_EXTERN NSString * const SGPlayerProgressChangeName;  // player play progress change
+SGPLAYER_EXTERN NSString * const SGPlayerPlayableChangeName;   // player playable progress change
 
 // notification userinfo key
 // all
-FOUNDATION_EXPORT NSString * const SGPlayerIdentifierKey;
+SGPLAYER_EXTERN NSString * const SGPlayerIdentifierKey;
 // error
-FOUNDATION_EXPORT NSString * const SGPlayerErrorMessageKey;
-FOUNDATION_EXPORT NSString * const SGPlayerErrorCodeKey;
+SGPLAYER_EXTERN NSString * const SGPlayerErrorMessageKey;
+SGPLAYER_EXTERN NSString * const SGPlayerErrorCodeKey;
 // state
-FOUNDATION_EXPORT NSString * const SGPlayerStatePreviousKey;
-FOUNDATION_EXPORT NSString * const SGPlayerStateCurrentKey;
+SGPLAYER_EXTERN NSString * const SGPlayerStatePreviousKey;
+SGPLAYER_EXTERN NSString * const SGPlayerStateCurrentKey;
 // progress
-FOUNDATION_EXPORT NSString * const SGPlayerProgressPercentKey;
-FOUNDATION_EXPORT NSString * const SGPlayerProgressCurrentKey;
-FOUNDATION_EXPORT NSString * const SGPlayerProgressTotalKey;
+SGPLAYER_EXTERN NSString * const SGPlayerProgressPercentKey;
+SGPLAYER_EXTERN NSString * const SGPlayerProgressCurrentKey;
+SGPLAYER_EXTERN NSString * const SGPlayerProgressTotalKey;
 // playable
-FOUNDATION_EXPORT NSString * const SGPlayerPlayablePercentKey;
-FOUNDATION_EXPORT NSString * const SGPlayerPlayableCurrentKey;
-FOUNDATION_EXPORT NSString * const SGPlayerPlayableTotalKey;
-FOUNDATION_EXPORT NSString * const SGPlayerPlayableTotalKey;
+SGPLAYER_EXTERN NSString * const SGPlayerPlayablePercentKey;
+SGPLAYER_EXTERN NSString * const SGPlayerPlayableCurrentKey;
+SGPLAYER_EXTERN NSString * const SGPlayerPlayableTotalKey;
+SGPLAYER_EXTERN NSString * const SGPlayerPlayableTotalKey;
 
 #endif

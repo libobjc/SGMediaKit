@@ -13,7 +13,7 @@
 
 // log level
 #ifdef DEBUG
-#define SGLog(...) NSLog(__VA_ARGS__)
+#define SGPlayerLog(...) NSLog(__VA_ARGS__)
 #else
-#define SGLog(...)
+#define SGPlayerLog(...)
 #endif

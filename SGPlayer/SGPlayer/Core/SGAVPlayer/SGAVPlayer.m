@@ -236,7 +236,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                 if (completeHandler) {
                     completeHandler(finished);
                 }
-                SGLog(@"SGAVPlayer seek success");
+                SGPlayerLog(@"SGAVPlayer seek success");
             });
         }];
     });
@@ -356,12 +356,12 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                     case AVPlayerItemStatusUnknown:
                     {
                         self.state = SGPlayerStateBuffering;
-                        SGLog(@"SGAVPlayer item status unknown");
+                        SGPlayerLog(@"SGAVPlayer item status unknown");
                     }
                         break;
                     case AVPlayerItemStatusReadyToPlay:
                     {
-                        SGLog(@"SGAVPlayer item status ready to play");
+                        SGPlayerLog(@"SGAVPlayer item status ready to play");
                         self.readyToPlayTime = [NSDate date].timeIntervalSince1970;
                         switch (self.state) {
                             case SGPlayerStateBuffering:
@@ -381,7 +381,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                         break;
                     case AVPlayerItemStatusFailed:
                     {
-                        SGLog(@"SGAVPlayer item status failed");
+                        SGPlayerLog(@"SGAVPlayer item status failed");
                         self.readyToPlayTime = 0;
                         self.state = SGPlayerStateFailed;
                     }
@@ -524,7 +524,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                         AVKeyValueStatus keyStatus = [weakSelf.avAsset statusOfValueForKey:loadKey error:&error];
                         if (keyStatus == AVKeyValueStatusFailed) {
                             [weakSelf avAssetPrepareFailed:error];
-                            SGLog(@"AVAsset load failed");
+                            SGPlayerLog(@"AVAsset load failed");
                             return;
                         }
                     }
@@ -533,7 +533,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                     if (trackStatus == AVKeyValueStatusLoaded) {
                         [weakSelf setupOutput];
                     } else {
-                        SGLog(@"AVAsset load failed");
+                        SGPlayerLog(@"AVAsset load failed");
                     }
                 });
             }];
@@ -559,7 +559,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     [self.avOutput requestNotificationOfMediaDataChangeWithAdvanceInterval:PixelBufferRequestInterval];
     [self.avPlayerItem addOutput:self.avOutput];
     
-    SGLog(@"SGAVPlayer add output success");
+    SGPlayerLog(@"SGAVPlayer add output success");
 }
 
 
@@ -601,7 +601,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 
 - (void)dealloc
 {
-    SGLog(@"SGAVPlayer release");
+    SGPlayerLog(@"SGAVPlayer release");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self clearPlayer];
 }

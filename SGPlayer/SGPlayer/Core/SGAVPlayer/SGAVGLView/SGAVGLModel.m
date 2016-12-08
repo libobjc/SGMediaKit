@@ -131,7 +131,7 @@
 - (void)dealloc
 {
     [self clear];
-    SGLog(@"SGAVGLModel release");
+    SGPlayerLog(@"SGAVGLModel release");
 }
 
 @end

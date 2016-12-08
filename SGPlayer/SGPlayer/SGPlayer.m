@@ -363,7 +363,7 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
 - (void)tapAction
 {
     if (self.playerViewTapAction) {
-        SGLog(@"SGPlayer tap action");
+        SGPlayerLog(@"SGPlayer tap action");
         self.playerViewTapAction();
     }
 }
@@ -468,13 +468,13 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
 - (void)playerError
 {
     [self clearPlayer];
-    SGLog(@"SGPlayer unsupport video type");
+    SGPlayerLog(@"SGPlayer unsupport video type");
     [SGNotification postPlayer:self errorMessage:@"unsupport video type" code:1901];
 }
 
 - (void)dealloc
 {
-    SGLog(@"SGPlayer release");
+    SGPlayerLog(@"SGPlayer release");
     [self clearPlayer];
 }
 

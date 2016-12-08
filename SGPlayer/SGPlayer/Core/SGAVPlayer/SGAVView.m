@@ -54,7 +54,7 @@
 - (void)tapAction
 {
     if (self.tapActionBlock) {
-        SGLog(@"SGView tap action");
+        SGPlayerLog(@"SGView tap action");
         self.tapActionBlock();
     }
 }
@@ -166,7 +166,7 @@
 
 - (void)dealloc
 {
-    SGLog(@"SGAVView release");
+    SGPlayerLog(@"SGAVView release");
 }
 
 @end

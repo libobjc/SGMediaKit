@@ -79,11 +79,11 @@
     // setup shader
     if (![self compileShader:&_vertexShader_id type:GL_VERTEX_SHADER string:vertexShaderString])
     {
-        SGLog(@"load vertex shader failure");
+        SGPlayerLog(@"load vertex shader failure");
     }
     if (![self compileShader:&_fragmentShader_id type:GL_FRAGMENT_SHADER string:fragmentShaderString])
     {
-        SGLog(@"load fragment shader failure");
+        SGPlayerLog(@"load fragment shader failure");
     }
     glAttachShader(_program_id, _vertexShader_id);
     glAttachShader(_program_id, _fragmentShader_id);
@@ -117,7 +117,7 @@
 {
     if (!shaderString)
     {
-        SGLog(@"Failed to load shader");
+        SGPlayerLog(@"Failed to load shader");
         return NO;
     }
     
@@ -134,7 +134,7 @@
         if (logLength > 0) {
             GLchar * log = (GLchar *)malloc(logLength);
             glGetShaderInfoLog(* shader, logLength, &logLength, log);
-            SGLog(@"Shader compile log:\n%s", log);
+            SGPlayerLog(@"Shader compile log:\n%s", log);
             free(log);
         }
     }
@@ -163,7 +163,7 @@
 
 - (void)dealloc
 {
-    SGLog(@"SGAVGLProgram release");
+    SGPlayerLog(@"SGAVGLProgram release");
     
     [self clearShader];
     [self clearProgram];

@@ -85,7 +85,7 @@
 
 - (void)dealloc
 {
-    SGLog(@"SGAVGLMatrix release");
+    SGPlayerLog(@"SGAVGLMatrix release");
     [self.sensors stop];
 }
 

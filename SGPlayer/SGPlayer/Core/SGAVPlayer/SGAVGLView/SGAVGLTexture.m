@@ -36,7 +36,7 @@
     if (!self.videoTextureCache) {
         CVReturn result = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, self.context, NULL, &_videoTextureCache);
         if (result != noErr) {
-            SGLog(@"create CVOpenGLESTextureCacheCreate failure %d", result);
+            SGPlayerLog(@"create CVOpenGLESTextureCacheCreate failure %d", result);
             return;
         }
     }
@@ -52,7 +52,7 @@
     GLsizei textureHeight = (GLsizei)CVPixelBufferGetHeight(pixelBuffer);
     
     if (!self.videoTextureCache) {
-        SGLog(@"no video texture cache");
+        SGPlayerLog(@"no video texture cache");
         return;
     }
     
@@ -73,7 +73,7 @@
                                                           0,
                                                           &_lumaTexture);
     if (result) {
-        SGLog(@"create CVOpenGLESTextureCacheCreateTextureFromImage failure 1 %d", result);
+        SGPlayerLog(@"create CVOpenGLESTextureCacheCreateTextureFromImage failure 1 %d", result);
     }
     
     glBindTexture(CVOpenGLESTextureGetTarget(self.lumaTexture), CVOpenGLESTextureGetName(self.lumaTexture));
@@ -97,7 +97,7 @@
                                                           1,
                                                           &_chromaTexture);
     if (result) {
-        SGLog(@"create CVOpenGLESTextureCacheCreateTextureFromImage failure 2 %d", result);
+        SGPlayerLog(@"create CVOpenGLESTextureCacheCreateTextureFromImage failure 2 %d", result);
     }
     
     glBindTexture(CVOpenGLESTextureGetTarget(self.chromaTexture), CVOpenGLESTextureGetName(self.chromaTexture));
@@ -113,7 +113,7 @@
 
 - (void)dealloc
 {
-    SGLog(@"SGAVGLTexture release");
+    SGPlayerLog(@"SGAVGLTexture release");
     _hasTexture = NO;
     [self clearVideoCache];
     [self cleanTextures];

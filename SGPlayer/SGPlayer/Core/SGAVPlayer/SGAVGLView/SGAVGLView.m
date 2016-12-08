@@ -95,7 +95,7 @@
 
 - (void)tapGestureAction:(UITapGestureRecognizer *)tap
 {
-    SGLog(@"SGAVGLView tap action");
+    SGPlayerLog(@"SGAVGLView tap action");
     if ([self.sgDelegate respondsToSelector:@selector(sgav_glViewTapAction:)]) {
         [self.sgDelegate sgav_glViewTapAction:self];
     }
@@ -211,7 +211,7 @@
 
 - (void)dealloc
 {
-    SGLog(@"SGAVGLView release");
+    SGPlayerLog(@"SGAVGLView release");
     [self clearGL];
     
     if ([EAGLContext currentContext] == self.context) {
