@@ -210,6 +210,20 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
     }
 }
 
+- (CGSize)presentationSize
+{
+    switch (self.playerType) {
+        case SGPlayerTypeAVPlayer:
+        {
+            return self.avPlayer.presentationSize;
+        }
+        case SGPlayerTypeUnknown:
+        {
+            return CGSizeZero;
+        }
+    }
+}
+
 - (NSTimeInterval)progress
 {
     switch (self.playerType) {

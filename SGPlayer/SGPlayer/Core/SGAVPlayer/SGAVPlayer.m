@@ -422,6 +422,14 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     return 0;
 }
 
+- (CGSize)presentationSize
+{
+    if (self.avPlayerItem) {
+        return self.avPlayerItem.presentationSize;
+    }
+    return CGSizeZero;
+}
+
 - (UIView *)view
 {
     if (!_view) {
