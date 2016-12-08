@@ -7,6 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
+
+typedef NS_ENUM(NSUInteger, SGFormatQualityType)
+{
+    SGFormatQualityTypeLow,
+    SGFormatQualityTypeMedium,
+    SGFormatQualityTypeHighest,
+    SGFormatQualityType640x480,
+    SGFormatQualityType960x540,
+    SGFormatQualityType1280x720,
+    SGFormatQualityType1920x1080,
+    SGFormatQualityType3840x2160,
+    SGFormatQualityTypeAppleM4A,
+    SGFormatQualityTypePassthrough,
+};
+
 @class SGFormat;
 
 @protocol SGFormatDelegate <NSObject>
@@ -26,7 +41,7 @@
 
 @property (nonatomic, copy, readonly) NSURL * sourceFileURL;
 @property (nonatomic, copy) NSURL * destinationFileURL;
-@property (nonatomic, copy) NSString * qualityType;
+@property (nonatomic, assign) SGFormatQualityType qualityType;
 @property (nonatomic, copy) NSString * fileType;
 
 @property (nonatomic, assign, readonly) float progress;

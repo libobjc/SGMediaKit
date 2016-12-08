@@ -55,7 +55,7 @@
     }
     
     self.sourceAsset = [AVURLAsset assetWithURL:self.sourceFileURL];
-    self.exportSession = [AVAssetExportSession exportSessionWithAsset:self.sourceAsset presetName:self.qualityType];
+    self.exportSession = [AVAssetExportSession exportSessionWithAsset:self.sourceAsset presetName:self.presetName];
     self.exportSession.shouldOptimizeForNetworkUse = YES;
     self.exportSession.outputFileType = self.fileType;
     self.exportSession.outputURL = self.destinationFileURL;
@@ -98,6 +98,44 @@
             [self.delegate format:self didChangeProgross:progress];
         }
     }
+}
+
+- (NSString *)presetName
+{
+    NSString * presetName = AVAssetExportPresetPassthrough;
+    switch (self.qualityType) {
+        case SGFormatQualityTypeLow:
+            presetName = AVAssetExportPresetLowQuality;
+            break;
+        case SGFormatQualityTypeMedium:
+            presetName = AVAssetExportPresetMediumQuality;
+            break;
+        case SGFormatQualityTypeHighest:
+            presetName = AVAssetExportPresetHighestQuality;
+            break;
+        case SGFormatQualityType640x480:
+            presetName = AVAssetExportPreset640x480;
+            break;
+        case SGFormatQualityType960x540:
+            presetName = AVAssetExportPreset960x540;
+            break;
+        case SGFormatQualityType1280x720:
+            presetName = AVAssetExportPreset1280x720;
+            break;
+        case SGFormatQualityType1920x1080:
+            presetName = AVAssetExportPreset1920x1080;
+            break;
+        case SGFormatQualityType3840x2160:
+            presetName = AVAssetExportPreset3840x2160;
+            break;
+        case SGFormatQualityTypeAppleM4A:
+            presetName = AVAssetExportPresetAppleM4A;
+            break;
+        case SGFormatQualityTypePassthrough:
+            presetName = AVAssetExportPresetPassthrough;
+            break;
+    }
+    return presetName;
 }
 
 - (void)dealloc

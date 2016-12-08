@@ -8,19 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSUInteger, SGFormatQualityType) {
-    SGFormatQualityTypeLow,
-    SGFormatQualityTypeMedium,
-    SGFormatQualityTypeHighest,
-};
-
 @interface SGFormatFactory : NSObject
 
-+ (BOOL)isReady;
++ (instancetype)formatFactory;
 
-+ (void)mpeg4FormatWithSourceFileURL:(NSURL *)sourceFileURL
+@property (nonatomic, assign, readonly) BOOL running;
+
+- (void)mpeg4FormatWithSourceFileURL:(NSURL *)sourceFileURL
                   destinationFileURL:(NSURL *)destinationFileURL
-                         qualityType:(SGFormatQualityType)qualityType
                      progressHandler:(void(^)(float progress))progressHandler
                    completionHandler:(void(^)(NSError * error))completionHandler;
 

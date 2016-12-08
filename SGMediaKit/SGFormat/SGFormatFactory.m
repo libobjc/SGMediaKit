@@ -12,9 +12,8 @@
 
 @interface SGFormatFactory () <SGFormatDelegate>
 
+@property (nonatomic, assign) BOOL running;
 @property (nonatomic, strong) SGFormat * format;
-
-@property (nonatomic, assign) SGFormatQualityType qualityType;
 @property (nonatomic, copy) void (^progressHandler)(float);
 @property (nonatomic, copy) void (^completionHandler)(NSError *);
 
@@ -22,20 +21,22 @@
 
 @implementation SGFormatFactory
 
-static SGFormatFactory * factory = nil;
-
-+ (BOOL)isReady
++ (instancetype)formatFactory
 {
-    return factory == nil;
+    static SGFormatFactory * factory = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        factory = [[self alloc] init];
+    });
+    return factory;
 }
 
-+ (void)mpeg4FormatWithSourceFileURL:(NSURL *)sourceFileURL
+- (void)mpeg4FormatWithSourceFileURL:(NSURL *)sourceFileURL
                   destinationFileURL:(NSURL *)destinationFileURL
-                         qualityType:(SGFormatQualityType)qualityType
                      progressHandler:(void(^)(float progress))progressHandler
                    completionHandler:(void(^)(NSError * error))completionHandler
 {
-    if (![self isReady]) {
+    if (self.running) {
         if (completionHandler) {
             NSError * error = [NSError errorWithDomain:@"有任务正在进行..." code:1 userInfo:nil];
             completionHandler(error);
@@ -43,52 +44,37 @@ static SGFormatFactory * factory = nil;
         return;
     }
     
-    factory = [[SGFormatFactory alloc] initWithSourceFileURL:sourceFileURL
-                                      destinationFileURL:destinationFileURL
-                                             qualityType:qualityType
-                                                fileType:AVFileTypeMPEG4
-                                         progressHandler:progressHandler
-                                       completionHandler:completionHandler];
-    [factory start];
+    [self setupWithSourceFileURL:sourceFileURL
+              destinationFileURL:destinationFileURL
+                     qualityType:SGFormatQualityTypePassthrough
+                        fileType:AVFileTypeMPEG4
+                 progressHandler:progressHandler
+               completionHandler:completionHandler];
+    [self start];
 }
 
-- (instancetype)initWithSourceFileURL:(NSURL *)sourceFileURL
-                   destinationFileURL:(NSURL *)destinationFileURL
-                          qualityType:(SGFormatQualityType)qualityType
-                             fileType:(NSString *)fileType
-                      progressHandler:(void (^)(float))progressHandler
-                    completionHandler:(void (^)(NSError *))completionHandler
+- (void)setupWithSourceFileURL:(NSURL *)sourceFileURL
+            destinationFileURL:(NSURL *)destinationFileURL
+                   qualityType:(SGFormatQualityType)qualityType
+                      fileType:(NSString *)fileType
+               progressHandler:(void (^)(float))progressHandler
+             completionHandler:(void (^)(NSError *))completionHandler
 {
-    if (self = [super init])
-    {
-        self.qualityType = qualityType;
-        self.progressHandler = progressHandler;
-        self.completionHandler = completionHandler;
-        
-        NSString * qualityString;
-        switch (self.qualityType) {
-            case SGFormatQualityTypeLow:
-                qualityString = AVAssetExportPresetLowQuality;
-                break;
-            case SGFormatQualityTypeMedium:
-                qualityString = AVAssetExportPresetMediumQuality;
-                break;
-            case SGFormatQualityTypeHighest:
-                qualityString = AVAssetExportPresetHighestQuality;
-                break;
-        }
-        
-        self.format = [SGFormat formatWithSourceFileURL:sourceFileURL];
-        self.format.destinationFileURL = destinationFileURL;
-        self.format.qualityType = qualityString;
-        self.format.fileType = fileType;
-        self.format.delegate = self;
-    }
-    return self;
+    [self clean];
+    
+    self.progressHandler = progressHandler;
+    self.completionHandler = completionHandler;
+    
+    self.format = [SGFormat formatWithSourceFileURL:sourceFileURL];
+    self.format.destinationFileURL = destinationFileURL;
+    self.format.qualityType = qualityType;
+    self.format.fileType = fileType;
+    self.format.delegate = self;
 }
 
 - (void)start
 {
+    self.running = YES;
     [self.format start];
 }
 
@@ -101,6 +87,7 @@ static SGFormatFactory * factory = nil;
 
 - (void)format:(SGFormat *)format didCompleteWithError:(NSError *)error
 {
+    self.running = NO;
     if (self.completionHandler) {
         self.completionHandler(error);
     }
@@ -109,14 +96,21 @@ static SGFormatFactory * factory = nil;
 
 - (void)clean
 {
+    self.running = NO;
     [self cleanHandler];
-    if (factory) factory = nil;
+    [self cleanFormat];
 }
 
 - (void)cleanHandler
 {
     self.progressHandler = nil;
     self.completionHandler = nil;
+}
+
+- (void)cleanFormat
+{
+    self.format.delegate = nil;
+    self.format = nil;
 }
 
 - (void)dealloc
