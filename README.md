@@ -1,5 +1,4 @@
-# SGMediaKit
-### 内含VR全景播放器
+# SGMediaKit & SGPlayer VR全景播放器 
 
 ===
 ### SGMediaKit 是一个以视频、音频播放为核心的媒体资源处理框架。
