@@ -36,6 +36,21 @@
                      progressHandler:(void(^)(float progress))progressHandler
                    completionHandler:(void(^)(NSError * error))completionHandler
 {
+    [self startWithSourceFileURL:sourceFileURL
+              destinationFileURL:destinationFileURL
+                     qualityType:SGFormatQualityTypePassthrough
+                        fileType:AVFileTypeMPEG4
+                 progressHandler:progressHandler
+               completionHandler:completionHandler];
+}
+
+- (void)startWithSourceFileURL:(NSURL *)sourceFileURL
+            destinationFileURL:(NSURL *)destinationFileURL
+                   qualityType:(SGFormatQualityType)qualityType
+                      fileType:(NSString *)fileType
+               progressHandler:(void (^)(float))progressHandler
+             completionHandler:(void (^)(NSError *))completionHandler
+{
     if (self.running) {
         if (completionHandler) {
             NSError * error = [NSError errorWithDomain:@"有任务正在进行..." code:1 userInfo:nil];
@@ -46,8 +61,8 @@
     
     [self setupWithSourceFileURL:sourceFileURL
               destinationFileURL:destinationFileURL
-                     qualityType:SGFormatQualityTypePassthrough
-                        fileType:AVFileTypeMPEG4
+                     qualityType:qualityType
+                        fileType:fileType
                  progressHandler:progressHandler
                completionHandler:completionHandler];
     [self start];
