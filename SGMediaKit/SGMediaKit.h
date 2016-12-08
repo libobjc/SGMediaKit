@@ -11,7 +11,7 @@
 FOUNDATION_EXPORT double SGMediaKitVersionNumber;       // version number
 FOUNDATION_EXPORT const unsigned char SGMediaKitVersionString[];        // version string
 
-// SGPlayer
+// SGPlayer 1.0
 #import <SGMediaKit/SGPlayer.h>
 #import <SGMediaKit/SGPlayer+Extension.h>
 #import <SGMediaKit/SGPlayerDefine.h>
