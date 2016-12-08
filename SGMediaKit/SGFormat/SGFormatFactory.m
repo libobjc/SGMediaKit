@@ -74,8 +74,12 @@
 
 - (void)start
 {
-    self.running = YES;
     [self.format start];
+}
+
+- (void)formatDidStart:(SGFormat *)format
+{
+    self.running = YES;
 }
 
 - (void)format:(SGFormat *)format didChangeProgross:(float)progress
