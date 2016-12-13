@@ -310,6 +310,10 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
         }
         _avPlayer = avPlayer;
         
+        if ([UIDevice currentDevice].systemVersion.floatValue >= 10.0) {
+            _avPlayer.automaticallyWaitsToMinimizeStalling = NO;
+        }
+        
         if (_avPlayer) {
             SGWeakSelf
             self.playBackTimeObserver = [_avPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
