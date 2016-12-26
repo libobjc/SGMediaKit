@@ -120,6 +120,8 @@
 // draw GLKView
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
+    [self.program use];
+    
     glClear(GL_COLOR_BUFFER_BIT);
     CVPixelBufferRef pixelBuffer = [self.dataSource sgav_glViewPixelBufferToDraw:self];
     if (!pixelBuffer && !self.texture.hasTexture) return;
@@ -132,6 +134,8 @@
             scale = 3;
         }
     }
+    
+    [self.model bindBufferVertexPointer:self.program.pPosition textureCoordPointer:self.program.pTextureCoord];
     
     switch (self.displayMode) {
         case SGDisplayModeNormal:

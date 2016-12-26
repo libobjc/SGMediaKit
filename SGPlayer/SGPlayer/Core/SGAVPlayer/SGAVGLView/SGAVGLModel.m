@@ -38,21 +38,15 @@
 - (void)bindBufferVertexPointer:(GLuint)vertexPointer textureCoordPointer:(GLuint)textureCoordPointer
 {
     // index
-    glGenBuffers(1, &_index_id);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _index_count * sizeof(GLushort), _index_buffer, GL_STATIC_DRAW);
     
     // vertex
-    glGenBuffers(1, &_vertex_id);
     glBindBuffer(GL_ARRAY_BUFFER, _vertex_id);
-    glBufferData(GL_ARRAY_BUFFER, _vertex_count * 3 * sizeof(GLfloat), _vertex_buffer, GL_STATIC_DRAW);
     glEnableVertexAttribArray(vertexPointer);
     glVertexAttribPointer(vertexPointer, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), NULL);
     
     // texture coord
-    glGenBuffers(1, &_texture_id);
     glBindBuffer(GL_ARRAY_BUFFER, _texture_id);
-    glBufferData(GL_ARRAY_BUFFER, _vertex_count * 2 * sizeof(GLfloat), _texture_buffer, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(textureCoordPointer);
     glVertexAttribPointer(textureCoordPointer, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*2, NULL);
 }
@@ -72,6 +66,30 @@
 
 - (void)setup
 {
+    [self setupModel];
+    [self setupBufferData];
+}
+
+- (void)setupBufferData
+{
+    // index
+    glGenBuffers(1, &_index_id);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _index_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, _index_count * sizeof(GLushort), _index_buffer, GL_STATIC_DRAW);
+    
+    // vertex
+    glGenBuffers(1, &_vertex_id);
+    glBindBuffer(GL_ARRAY_BUFFER, _vertex_id);
+    glBufferData(GL_ARRAY_BUFFER, _vertex_count * 3 * sizeof(GLfloat), _vertex_buffer, GL_STATIC_DRAW);
+    
+    // texture coord
+    glGenBuffers(1, &_texture_id);
+    glBindBuffer(GL_ARRAY_BUFFER, _texture_id);
+    glBufferData(GL_ARRAY_BUFFER, _vertex_count * 2 * sizeof(GLfloat), _texture_buffer, GL_DYNAMIC_DRAW);
+}
+
+- (void)setupModel
+{
     int slices_count = 200;
     int parallels_count = slices_count / 2;
     float step = (2.0f * ES_PI) / (float)slices_count;
@@ -89,7 +107,7 @@
         for (int j = 0; j < slices_count + 1; j++)
         {
             int vertex = (i * (slices_count + 1) + j) * 3;
-
+            
             if (_vertex_buffer)
             {
                 _vertex_buffer[vertex + 0] = radius * sinf(step * (float)i) * cosf(step * (float)j);
