@@ -74,6 +74,14 @@
 		9CA2D9101DEBE34800AEC8A9 /* SGVideoConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA2D90E1DEBE34800AEC8A9 /* SGVideoConfiguration.m */; };
 		9CA2D9131DEBE35700AEC8A9 /* SGAudioConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA2D9111DEBE35700AEC8A9 /* SGAudioConfiguration.h */; };
 		9CA2D9141DEBE35700AEC8A9 /* SGAudioConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA2D9121DEBE35700AEC8A9 /* SGAudioConfiguration.m */; };
+		9CA377F51E13AAD9001C923C /* SGDistortionModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA377F11E13AAD9001C923C /* SGDistortionModel.h */; };
+		9CA377F61E13AAD9001C923C /* SGDistortionModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA377F11E13AAD9001C923C /* SGDistortionModel.h */; };
+		9CA377F71E13AAD9001C923C /* SGDistortionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA377F21E13AAD9001C923C /* SGDistortionModel.m */; };
+		9CA377F81E13AAD9001C923C /* SGDistortionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA377F21E13AAD9001C923C /* SGDistortionModel.m */; };
+		9CA377F91E13AAD9001C923C /* SGDistortionRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA377F31E13AAD9001C923C /* SGDistortionRenderer.h */; };
+		9CA377FA1E13AAD9001C923C /* SGDistortionRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA377F31E13AAD9001C923C /* SGDistortionRenderer.h */; };
+		9CA377FB1E13AAD9001C923C /* SGDistortionRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA377F41E13AAD9001C923C /* SGDistortionRenderer.m */; };
+		9CA377FC1E13AAD9001C923C /* SGDistortionRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA377F41E13AAD9001C923C /* SGDistortionRenderer.m */; };
 		9CA4762A1DE531FE00B1B0D1 /* SGMediaKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476281DE531FE00B1B0D1 /* SGMediaKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9CA476721DE53CAB00B1B0D1 /* GPUImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CA476711DE53CAB00B1B0D1 /* GPUImage.framework */; };
 		9CA476761DE53D3300B1B0D1 /* SGVideoCapture.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA476741DE53D3300B1B0D1 /* SGVideoCapture.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -123,6 +131,10 @@
 		9CA2D90E1DEBE34800AEC8A9 /* SGVideoConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoConfiguration.m; sourceTree = "<group>"; };
 		9CA2D9111DEBE35700AEC8A9 /* SGAudioConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAudioConfiguration.h; sourceTree = "<group>"; };
 		9CA2D9121DEBE35700AEC8A9 /* SGAudioConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAudioConfiguration.m; sourceTree = "<group>"; };
+		9CA377F11E13AAD9001C923C /* SGDistortionModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGDistortionModel.h; sourceTree = "<group>"; };
+		9CA377F21E13AAD9001C923C /* SGDistortionModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGDistortionModel.m; sourceTree = "<group>"; };
+		9CA377F31E13AAD9001C923C /* SGDistortionRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGDistortionRenderer.h; sourceTree = "<group>"; };
+		9CA377F41E13AAD9001C923C /* SGDistortionRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGDistortionRenderer.m; sourceTree = "<group>"; };
 		9CA476251DE531FE00B1B0D1 /* SGMediaKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SGMediaKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CA476281DE531FE00B1B0D1 /* SGMediaKit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SGMediaKit.h; sourceTree = "<group>"; };
 		9CA476291DE531FE00B1B0D1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -190,6 +202,7 @@
 		9C7C70F91DF904180098E2E7 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				9CA377F01E13AAD9001C923C /* SGDistortion */,
 				9C7C70FA1DF904180098E2E7 /* SGAVPlayer */,
 				9C7C710D1DF904180098E2E7 /* SGNotification.h */,
 				9C7C710E1DF904180098E2E7 /* SGNotification.m */,
@@ -237,6 +250,17 @@
 				9C982C2D1DEE88CF00ED9BBA /* SGLiveSession.m */,
 			);
 			path = SGLive;
+			sourceTree = "<group>";
+		};
+		9CA377F01E13AAD9001C923C /* SGDistortion */ = {
+			isa = PBXGroup;
+			children = (
+				9CA377F11E13AAD9001C923C /* SGDistortionModel.h */,
+				9CA377F21E13AAD9001C923C /* SGDistortionModel.m */,
+				9CA377F31E13AAD9001C923C /* SGDistortionRenderer.h */,
+				9CA377F41E13AAD9001C923C /* SGDistortionRenderer.m */,
+			);
+			path = SGDistortion;
 			sourceTree = "<group>";
 		};
 		9CA4761B1DE531FE00B1B0D1 = {
@@ -304,6 +328,7 @@
 				9C7C71431DF904180098E2E7 /* SGPlayer.h in Headers */,
 				9C7C713F1DF904180098E2E7 /* SGPlayer+Extension.h in Headers */,
 				9C7C71471DF904180098E2E7 /* SGPlayerDefine.h in Headers */,
+				9CA377F61E13AAD9001C923C /* SGDistortionModel.h in Headers */,
 				9C7C716F1DF909440098E2E7 /* SGPlayerHeader.h in Headers */,
 				9C7C71391DF904180098E2E7 /* SGNotification.h in Headers */,
 				9C7C712D1DF904180098E2E7 /* SGAVGLView.h in Headers */,
@@ -316,6 +341,7 @@
 				9C7C711B1DF904180098E2E7 /* SGAVGLModel.h in Headers */,
 				9C7C71171DF904180098E2E7 /* SGAVGLMatrix.h in Headers */,
 				9C7C71271DF904180098E2E7 /* SGAVGLShader.h in Headers */,
+				9CA377FA1E13AAD9001C923C /* SGDistortionRenderer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,6 +352,8 @@
 				9C7C71461DF904180098E2E7 /* SGPlayerDefine.h in Headers */,
 				9C7C71301DF904180098E2E7 /* SGAVPlayer.h in Headers */,
 				9C7C713E1DF904180098E2E7 /* SGPlayer+Extension.h in Headers */,
+				9CA377F51E13AAD9001C923C /* SGDistortionModel.h in Headers */,
+				9CA377F91E13AAD9001C923C /* SGDistortionRenderer.h in Headers */,
 				9C7C712C1DF904180098E2E7 /* SGAVGLView.h in Headers */,
 				9C7C711A1DF904180098E2E7 /* SGAVGLModel.h in Headers */,
 				9C13B1961DF661B200F67D62 /* SGFormat.h in Headers */,
@@ -451,6 +479,7 @@
 				9C7C713B1DF904180098E2E7 /* SGNotification.m in Sources */,
 				9C7C71491DF904180098E2E7 /* SGPlayerDefine.m in Sources */,
 				9C7C71191DF904180098E2E7 /* SGAVGLMatrix.m in Sources */,
+				9CA377FC1E13AAD9001C923C /* SGDistortionRenderer.m in Sources */,
 				9C7C71371DF904180098E2E7 /* SGAVView.m in Sources */,
 				9C7C71451DF904180098E2E7 /* SGPlayer.m in Sources */,
 				9C7C712B1DF904180098E2E7 /* SGAVGLTexture.m in Sources */,
@@ -460,6 +489,7 @@
 				9C7C71331DF904180098E2E7 /* SGAVPlayer.m in Sources */,
 				9C7C71411DF904180098E2E7 /* SGPlayer+Extension.m in Sources */,
 				9C7C71251DF904180098E2E7 /* SGAVGLSensors.m in Sources */,
+				9CA377F81E13AAD9001C923C /* SGDistortionModel.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -467,6 +497,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9CA377F71E13AAD9001C923C /* SGDistortionModel.m in Sources */,
 				9CA476771DE53D3300B1B0D1 /* SGVideoCapture.m in Sources */,
 				9C13B1971DF661B200F67D62 /* SGFormat.m in Sources */,
 				9C7C71481DF904180098E2E7 /* SGPlayerDefine.m in Sources */,
@@ -483,6 +514,7 @@
 				9C7C71201DF904180098E2E7 /* SGAVGLProgram.m in Sources */,
 				9C7C71361DF904180098E2E7 /* SGAVView.m in Sources */,
 				9C7C713A1DF904180098E2E7 /* SGNotification.m in Sources */,
+				9CA377FB1E13AAD9001C923C /* SGDistortionRenderer.m in Sources */,
 				9C13B1FC1DF6C2AD00F67D62 /* SGFormatFactory.m in Sources */,
 				9C982C2F1DEE88CF00ED9BBA /* SGLiveSession.m in Sources */,
 				9CA2D90C1DEBC59500AEC8A9 /* SGVideoCapturePreview.m in Sources */,
