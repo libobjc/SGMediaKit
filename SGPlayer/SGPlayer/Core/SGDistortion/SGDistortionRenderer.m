@@ -74,8 +74,6 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 @property (nonatomic, strong) SGDistortionModel * leftEye;
 @property (nonatomic, strong) SGDistortionModel * rightEye;
 
-@property (nonatomic, assign) CGSize viewportSize;
-
 @end
 
 @implementation SGDistortionRenderer

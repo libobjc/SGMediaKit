@@ -15,6 +15,8 @@
 
 - (instancetype)initWithViewportSize:(CGSize)viewportSize;
 
+@property (nonatomic, assign) CGSize viewportSize;
+
 - (void)beforDraw;
 - (void)afterDraw;
 

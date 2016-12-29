@@ -12,6 +12,7 @@
 #import "SGAVGLModel.h"
 #import "SGAVGLMatrix.h"
 #import "SGAVGLTexture.h"
+#import "SGDistortionRenderer.h"
 
 @interface SGAVGLView () <GLKViewDelegate>
 
@@ -25,6 +26,7 @@
 @property (nonatomic, strong) SGAVGLModel * model;
 @property (nonatomic, strong) SGAVGLMatrix * matrix;
 @property (nonatomic, strong) SGAVGLTexture * texture;
+@property (nonatomic, strong) SGDistortionRenderer * distorionRenderer;
 
 @end
 
@@ -38,6 +40,8 @@
     dispatch_once(&setupOnceToken, ^{
         [self setup];
     });
+    NSInteger scale = [UIScreen mainScreen].scale;
+    self.distorionRenderer.viewportSize = CGSizeMake(CGRectGetWidth(self.bounds) * scale, CGRectGetHeight(self.bounds) * scale);
 }
 
 #pragma mark - Setup
@@ -120,23 +124,23 @@
 // draw GLKView
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    [self.program use];
-    
+    glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
+    
     CVPixelBufferRef pixelBuffer = [self.dataSource sgav_glViewPixelBufferToDraw:self];
     if (!pixelBuffer && !self.texture.hasTexture) return;
-    [self.texture updateTextureWithPixelBuffer:pixelBuffer];
     
-    NSInteger scale = 2;
-    if ([UIScreen instancesRespondToSelector:@selector(currentMode)]) {
-        CGSize size = [UIScreen mainScreen].currentMode.size;
-        if (CGSizeEqualToSize(size, CGSizeMake(1242, 2208))) {
-            scale = 3;
-        }
+    if (self.displayMode == SGDisplayModeBox) {
+        [self.distorionRenderer beforDraw];
     }
     
+    [self.program use];
+    
+    [self.texture updateTextureWithPixelBuffer:pixelBuffer];
+    [self.program prepareVariable];
     [self.model bindBufferVertexPointer:self.program.pPosition textureCoordPointer:self.program.pTextureCoord];
     
+    NSInteger scale = [UIScreen mainScreen].scale;
     switch (self.displayMode) {
         case SGDisplayModeNormal:
         {
@@ -165,6 +169,11 @@
             }
         }
             break;
+    }
+    
+    if (self.displayMode == SGDisplayModeBox) {
+        [self bindDrawable];
+        [self.distorionRenderer afterDraw];
     }
 }
 
@@ -209,6 +218,14 @@
         _texture = [[SGAVGLTexture alloc] initWithContext:self.context];
     }
     return _texture;
+}
+
+- (SGDistortionRenderer *)distorionRenderer
+{
+    if (!_distorionRenderer) {
+        _distorionRenderer = [[SGDistortionRenderer alloc] initWithViewportSize:CGSizeMake(1334, 750)];
+    }
+    return _distorionRenderer;
 }
 
 #pragma mark - release

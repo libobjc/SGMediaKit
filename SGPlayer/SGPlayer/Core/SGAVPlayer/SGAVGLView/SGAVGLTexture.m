@@ -44,7 +44,17 @@
 
 - (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer
 {
-    if (pixelBuffer == nil) return;
+    if (pixelBuffer == nil) {
+        if (self.lumaTexture) {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(CVOpenGLESTextureGetTarget(self.lumaTexture), CVOpenGLESTextureGetName(self.lumaTexture));
+        }
+        if (self.chromaTexture) {
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(CVOpenGLESTextureGetTarget(self.chromaTexture), CVOpenGLESTextureGetName(self.chromaTexture));
+        }
+        return;
+    }
     
     CVReturn result;
     
