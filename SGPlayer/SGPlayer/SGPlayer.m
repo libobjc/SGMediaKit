@@ -30,32 +30,16 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
 
 @synthesize view = _view;
 
-+ (instancetype)playerWithURL:(NSURL *)contentURL
++ (instancetype)player
 {
-    return [[self alloc] initWithURL:contentURL];
-}
-
-+ (instancetype)playerWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
-{
-    return [[self alloc] initWithURL:contentURL videoType:videoType];
+    return [[self alloc] init];
 }
 
 - (instancetype)init
 {
-    return [self initWithURL:nil];
-}
-
-- (instancetype)initWithURL:(NSURL *)contentURL
-{
-    return [self initWithURL:contentURL videoType:SGVideoTypeNormal];
-}
-
-- (instancetype)initWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
-{
     if (self = [super init]) {
-        self.contentURL = contentURL;
-        self.videoType = videoType;
-        self.identifier = SGPlayerDefaultIdentifier;
+        self.contentURL = nil;
+        self.videoType = SGVideoTypeNormal;
         self.backgroundMode = SGPlayerBackgroundModeAutoPlayAndPause;
         self.displayMode = SGDisplayModeNormal;
         [self setupPlayer];

@@ -11,9 +11,6 @@
 
 #import <Foundation/Foundation.h>
 
-// SGPlayer default identifier
-NSString * const SGPlayerDefaultIdentifier = @"1000";
-
 // notification name
 NSString * const SGPlayerErrorName = @"SGPlayerErrorName";                   // player error
 NSString * const SGPlayerStateChangeName = @"SGPlayerStateChangeName";     // player state change
