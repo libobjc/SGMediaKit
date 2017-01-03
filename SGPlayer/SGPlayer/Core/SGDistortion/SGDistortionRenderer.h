@@ -18,7 +18,7 @@
 
 @property (nonatomic, assign) CGSize viewportSize;
 
-- (void)beforDraw;
-- (void)afterDraw;
+- (void)beforDrawFrame;
+- (void)afterDrawFrame;
 
 @end

@@ -100,12 +100,12 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
     }
 }
 
-- (void)beforDraw
+- (void)beforDrawFrame
 {
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer_id);
 }
 
-- (void)afterDraw
+- (void)afterDrawFrame
 {
     glViewport(0, 0, self.viewportSize.width, self.viewportSize.height);
     

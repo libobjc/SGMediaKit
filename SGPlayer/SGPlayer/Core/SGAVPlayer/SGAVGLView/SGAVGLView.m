@@ -137,7 +137,7 @@
     if (!pixelBuffer && !self.texture.hasTexture) return;
     
     if (self.displayMode == SGDisplayModeBox) {
-        [self.distorionRenderer beforDraw];
+        [self.distorionRenderer beforDrawFrame];
     }
     
     [self.program use];
@@ -179,7 +179,7 @@
     
     if (self.displayMode == SGDisplayModeBox) {
         [self bindDrawable];
-        [self.distorionRenderer afterDraw];
+        [self.distorionRenderer afterDrawFrame];
     }
 }
 
