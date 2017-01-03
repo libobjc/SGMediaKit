@@ -10,12 +10,25 @@
 
 @implementation SGFFPlayer
 
++ (instancetype)player
+{
+    return [[self alloc] init];
+}
+
+- (instancetype)init
+{
+    if (self = [super init]) {
+        
+    }
+    return self;
+}
+
 - (void)replaceVideoWithURL:(NSURL *)contentURL
 {
     [self replaceVideoWithURL:contentURL videoType:SGVideoTypeNormal];
 }
 
-- (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(id)videoType
+- (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
 {
     NSLog(@"SGFFPlayer %s", __func__);
 }
@@ -45,9 +58,20 @@
     NSLog(@"SGFFPlayer %s", __func__);
 }
 
-- (void)setVolume:(int)volume
+- (void)setVolume:(CGFloat)volume
 {
     NSLog(@"SGFFPlayer %s", __func__);
+}
+
+- (void)setViewTapBlock:(void (^)())block
+{
+    NSLog(@"SGFFPlayer %s", __func__);
+}
+
+- (UIImage *)snapshot
+{
+    NSLog(@"SGFFPlayer %s", __func__);
+    return nil;
 }
 
 @end

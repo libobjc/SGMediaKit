@@ -50,7 +50,7 @@
 
 - (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
 {
-    SGDecoderType preDecoderType = [self.decoder decoderTypeForContentURL:self.contentURL];
+//    SGDecoderType preDecoderType = [self.decoder decoderTypeForContentURL:self.contentURL];
     self.contentURL = contentURL;
     self.decoderType = [self.decoder decoderTypeForContentURL:self.contentURL];
     self.videoType = videoType;
@@ -323,6 +323,22 @@
         _avPlayer.backgroundMode = self.backgroundMode;
     }
     return _avPlayer;
+}
+
+- (SGFFPlayer *)ffPlayer
+{
+    if (!_ffPlayer) {
+        _ffPlayer = [SGFFPlayer player];
+        [self setupPlayerView:self.ffPlayer.view];
+        _ffPlayer.abstractPlayer = self;
+        _ffPlayer.displayMode = self.displayMode;
+        [_ffPlayer setViewTapBlock:self.playerViewTapAction];
+        _ffPlayer.volume = self.volume;
+        _ffPlayer.viewAnimationHidden = self.viewAnimationHidden;
+        _ffPlayer.playableBufferInterval = self.playableBufferInterval;
+        _ffPlayer.backgroundMode = self.backgroundMode;
+    }
+    return _ffPlayer;
 }
 
 - (void)setupPlayerView:(UIView *)playerView;
