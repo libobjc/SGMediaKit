@@ -36,37 +36,19 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 
 @synthesize playableTime = _playableTime;
 
-#pragma mark - init
-
-+ (instancetype)playerWithURL:(NSURL *)contentURL
++ (instancetype)player
 {
-    return [[self alloc] initWithURL:contentURL videoType:SGVideoTypeNormal];
-}
-
-+ (instancetype)playerWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
-{
-    return [[self alloc] initWithURL:contentURL videoType:videoType];
+    return [[self alloc] init];
 }
 
 - (instancetype)init
 {
-    return [self initWithURL:nil];
-}
-
-- (instancetype)initWithURL:(NSURL *)contentURL
-{
-    return [self initWithURL:contentURL videoType:SGVideoTypeNormal];
-}
-
-- (instancetype)initWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
-{
     if (self = [super init]) {
-        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
         
-        self.contentURL = contentURL;
-        self.videoType = videoType;
+        self.contentURL = nil;
+        self.videoType = SGVideoTypeNormal;
         self.playableBufferInterval = 2.f;
         [self setupPlayer];
     }

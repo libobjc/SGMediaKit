@@ -8,12 +8,14 @@
 
 #import <UIKit/UIKit.h>
 #import "SGPlayerDefine.h"
+#import "SGPlayerDecoder.h"
 
 @interface SGPlayer : NSObject
 
 + (instancetype)new NS_UNAVAILABLE;
-
 + (instancetype)player;
+
+@property (nonatomic, strong) SGPlayerDecoder * decoder;      // default is [SGPlayerDecoder defaultDecoder]
 
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 @property (nonatomic, assign, readonly) SGVideoType videoType;

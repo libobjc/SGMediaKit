@@ -10,19 +10,15 @@
 #import "SGPlayerMacro.h"
 #import "SGNotification.h"
 #import "SGAVPlayer.h"
-
-#define kSGVideoTypeError 1900
-
-typedef NS_ENUM(NSUInteger, SGPlayerType) {
-    SGPlayerTypeUnknown,    // unsupport video type
-    SGPlayerTypeAVPlayer,   // normal or vr video
-};
+#import "SGFFPlayer.h"
 
 @interface SGPlayer ()
 
 @property (nonatomic, copy) void(^playerViewTapAction)();
-@property (nonatomic, assign, readonly) SGPlayerType playerType;
+
+@property (nonatomic, assign) SGDecoderType decoderType;
 @property (nonatomic, strong) SGAVPlayer * avPlayer;
+@property (nonatomic, strong) SGFFPlayer * ffPlayer;
 
 @end
 
@@ -38,11 +34,11 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
 - (instancetype)init
 {
     if (self = [super init]) {
+        self.decoder = [SGPlayerDecoder defaultDecoder];
         self.contentURL = nil;
         self.videoType = SGVideoTypeNormal;
         self.backgroundMode = SGPlayerBackgroundModeAutoPlayAndPause;
         self.displayMode = SGDisplayModeNormal;
-        [self setupPlayer];
     }
     return self;
 }
@@ -54,48 +50,40 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
 
 - (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
 {
-    SGPlayerType beforePlayerType = self.playerType;
+    SGDecoderType preDecoderType = [self.decoder decoderTypeForContentURL:self.contentURL];
     self.contentURL = contentURL;
+    self.decoderType = [self.decoder decoderTypeForContentURL:self.contentURL];
     self.videoType = videoType;
     
-    if (beforePlayerType == self.playerType == SGPlayerTypeAVPlayer)
-    {
-        // SGAVPlayer
-        [self.avPlayer replaceVideoWithURL:contentURL videoType:videoType];
-    }
-    else
-    {
-        [self setupPlayer];
-    }
-}
-
-- (SGPlayerState)state
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            return self.avPlayer.state;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            return SGPlayerStateFailed;
-        }
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            [self.avPlayer replaceVideoWithURL:contentURL videoType:videoType];
+            if (_ffPlayer) {
+                [self.ffPlayer stop];
+            }
+            break;
+        case SGDecoderTypeFFmpeg:
+            [self.ffPlayer replaceVideoWithURL:contentURL videoType:videoType];
+            if (_avPlayer) {
+                [self.avPlayer stop];
+            }
+            break;
+        case SGDecoderTypeError:
+            break;
     }
 }
 
 - (void)play
 {
     [UIApplication sharedApplication].idleTimerDisabled = YES;
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
             [self.avPlayer play];
-        }
             break;
-        case SGPlayerTypeUnknown:
-        {
-            
-        }
+        case SGDecoderTypeFFmpeg:
+            [self.ffPlayer play];
+            break;
+        case SGDecoderTypeError:
             break;
     }
 }
@@ -103,16 +91,14 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
 - (void)pause
 {
     [UIApplication sharedApplication].idleTimerDisabled = NO;
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
             [self.avPlayer pause];
-        }
             break;
-        case SGPlayerTypeUnknown:
-        {
-            
-        }
+        case SGDecoderTypeFFmpeg:
+            [self.ffPlayer pause];
+            break;
+        case SGDecoderTypeError:
             break;
     }
 }
@@ -124,179 +110,21 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
 
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL))completeHandler
 {
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
             [self.avPlayer seekToTime:time completeHandler:completeHandler];
-        }
             break;
-        case SGPlayerTypeUnknown:
-        {
-            
-        }
+        case SGDecoderTypeFFmpeg:
+            [self.ffPlayer seekToTime:time completeHandler:completeHandler];
             break;
-    }
-}
-
-- (void)setVolume:(CGFloat)volume
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            self.avPlayer.volume = volume;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            
-        }
-    }
-}
-
-- (CGFloat)volume
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            return self.avPlayer.volume;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            return 0;
-        }
-    }
-}
-
-- (void)setViewAnimationHidden:(BOOL)viewAnimationHidden
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            self.avPlayer.viewAnimationHidden = viewAnimationHidden;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            
-        }
-    }
-}
-
-- (BOOL)viewAnimationHidden
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            return self.avPlayer.viewAnimationHidden;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            return NO;
-        }
-    }
-}
-
-- (CGSize)presentationSize
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            return self.avPlayer.presentationSize;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            return CGSizeZero;
-        }
-    }
-}
-
-- (NSTimeInterval)progress
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            return self.avPlayer.progress;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            return 0;
-        }
-    }
-}
-
-- (NSTimeInterval)duration
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            return self.avPlayer.duration;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            return 0;
-        }
-    }
-}
-
-- (NSTimeInterval)playableTime
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            return self.avPlayer.playableTime;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            return 0;
-        }
-    }
-}
-
-- (NSTimeInterval)playableBufferInterval
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            return self.avPlayer.playableBufferInterval;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            return 0;
-        }
-    }
-}
-
-- (UIImage *)snapshot
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            return self.avPlayer.snapshot;
-        }
-        case SGPlayerTypeUnknown:
-        {
-            return nil;
-        }
-    }
-}
-
-- (void)setPlayableBufferInterval:(NSTimeInterval)playableBufferInterval
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            self.avPlayer.playableBufferInterval = playableBufferInterval;
-        }
-            break;
-        case SGPlayerTypeUnknown:
-        {
-            
-        }
+        case SGDecoderTypeError:
             break;
     }
 }
 
 - (void)setContentURL:(NSURL *)contentURL
 {
-    _contentURL = contentURL;
+    _contentURL = [contentURL copy];
 }
 
 - (void)setVideoType:(SGVideoType)videoType
@@ -304,46 +132,161 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
     switch (videoType) {
         case SGVideoTypeNormal:
         case SGVideoTypeVR:
-        {
             _videoType = videoType;
-        }
             break;
         default:
-        {
-            _videoType = kSGVideoTypeError;
-        }
+            _videoType = SGVideoTypeNormal;
             break;
+    }
+}
+
+- (void)setBackgroundMode:(SGPlayerBackgroundMode)backgroundMode
+{
+    _backgroundMode = backgroundMode;
+    if (_avPlayer) {
+        self.avPlayer.backgroundMode = backgroundMode;
+    }
+    if (_ffPlayer) {
+        self.ffPlayer.backgroundMode = backgroundMode;
+    }
+}
+
+- (void)setViewTapBlock:(void (^)())block
+{
+    self.playerViewTapAction = block;
+    if (_avPlayer) {
+        [self.avPlayer setViewTapBlock:block];
+    }
+    if (_ffPlayer) {
+        [self.ffPlayer setViewTapBlock:block];
+    }
+}
+
+- (void)setDisplayMode:(SGDisplayMode)displayMode
+{
+    _displayMode = displayMode;
+    if (_avPlayer) {
+        self.avPlayer.displayMode = displayMode;
+    }
+    if (_ffPlayer) {
+        self.ffPlayer.displayMode = displayMode;
+    }
+}
+
+- (void)setVolume:(CGFloat)volume
+{
+    _volume = volume;
+    if (_avPlayer) {
+        self.avPlayer.volume = volume;
+    }
+    if (_ffPlayer) {
+        self.ffPlayer.volume = volume;
+    }
+}
+
+- (void)setViewAnimationHidden:(BOOL)viewAnimationHidden
+{
+    _viewAnimationHidden = viewAnimationHidden;
+    if (_avPlayer) {
+        self.avPlayer.viewAnimationHidden = viewAnimationHidden;
+    }
+    if (_ffPlayer) {
+        self.ffPlayer.viewAnimationHidden = viewAnimationHidden;
+    }
+}
+
+- (void)setPlayableBufferInterval:(NSTimeInterval)playableBufferInterval
+{
+    _playableBufferInterval = playableBufferInterval;
+    if (_avPlayer) {
+        self.avPlayer.playableBufferInterval = playableBufferInterval;
+    }
+    if (_ffPlayer) {
+        self.ffPlayer.playableBufferInterval = playableBufferInterval;
+    }
+}
+
+- (SGPlayerState)state
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return self.avPlayer.state;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.state;
+        case SGDecoderTypeError:
+            return SGPlayerStateNone;
+    }
+}
+
+- (CGSize)presentationSize
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return self.avPlayer.presentationSize;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.presentationSize;
+        case SGDecoderTypeError:
+            return CGSizeZero;
+    }
+}
+
+- (NSTimeInterval)progress
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return self.avPlayer.progress;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.progress;
+        case SGDecoderTypeError:
+            return 0;
+    }
+}
+
+- (NSTimeInterval)duration
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return self.avPlayer.duration;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.duration;
+        case SGDecoderTypeError:
+            return 0;
+    }
+}
+
+- (NSTimeInterval)playableTime
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return self.avPlayer.playableTime;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.playableTime;
+        case SGDecoderTypeError:
+            return 0;
+    }
+}
+
+- (UIImage *)snapshot
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return self.avPlayer.snapshot;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.snapshot;
+        case SGDecoderTypeError:
+            return nil;
     }
 }
 
 - (BOOL)seeking
 {
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
             return self.avPlayer.seeking;
-        }
-            break;
-        case SGPlayerTypeUnknown:
-        {
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.seeking;
+        case SGDecoderTypeError:
             return NO;
-        }
-            break;
-    }
-}
-
-- (SGPlayerType)playerType
-{
-    switch (_videoType) {
-        case SGVideoTypeNormal:
-        case SGVideoTypeVR:
-        {
-            return SGPlayerTypeAVPlayer;
-        }
-        default:
-        {
-            return SGPlayerTypeUnknown;
-        }
     }
 }
 
@@ -366,65 +309,25 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
     }
 }
 
-- (void)setViewTapBlock:(void (^)())block
+- (SGAVPlayer *)avPlayer
 {
-    self.playerViewTapAction = block;
-    [self setupPlayerViewTapAction];
-}
-
-- (void)setDisplayMode:(SGDisplayMode)displayMode
-{
-    _displayMode = displayMode;
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            self.avPlayer.displayMode = displayMode;
-        }
-            break;
-        case SGPlayerTypeUnknown:
-        {
-            
-        }
-            break;
+    if (!_avPlayer) {
+        _avPlayer = [SGAVPlayer player];
+        [self setupPlayerView:self.avPlayer.view];
+        _avPlayer.abstractPlayer = self;
+        _avPlayer.displayMode = self.displayMode;
+        [_avPlayer setViewTapBlock:self.playerViewTapAction];
+        _avPlayer.volume = self.volume;
+        _avPlayer.viewAnimationHidden = self.viewAnimationHidden;
+        _avPlayer.playableBufferInterval = self.playableBufferInterval;
+        _avPlayer.backgroundMode = self.backgroundMode;
     }
-}
-
-- (void)setupPlayer
-{
-    [self clearPlayer];
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            self.avPlayer = [SGAVPlayer playerWithURL:self.contentURL videoType:self.videoType];
-            [self setupPlayerView:self.avPlayer.view];
-            self.avPlayer.abstractPlayer = self;
-            self.avPlayer.displayMode = self.displayMode;
-        }
-            break;
-        case SGPlayerTypeUnknown:
-        {
-            [self playerError];
-        }
-            break;
-    }
-    if (self.playerViewTapAction) {
-        [self setupPlayerViewTapAction];
-    }
-}
-
-- (void)clearPlayer
-{
-    if (self.avPlayer) {
-        [self.avPlayer stop];
-        self.avPlayer = nil;
-    }
-    [self clearPlayerView];
-    [UIApplication sharedApplication].idleTimerDisabled = NO;
+    return _avPlayer;
 }
 
 - (void)setupPlayerView:(UIView *)playerView;
 {
-    [self clearPlayerView];
+    [self cleanPlayerView];
     [self.view addSubview:playerView];
     
     playerView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -440,40 +343,36 @@ typedef NS_ENUM(NSUInteger, SGPlayerType) {
     [self.view addConstraint:right];
 }
 
-- (void)clearPlayerView
+- (void)cleanPlayer
+{
+    if (_avPlayer) {
+        [self.avPlayer stop];
+        self.avPlayer = nil;
+    }
+    if (_ffPlayer) {
+        [self.ffPlayer stop];
+        self.ffPlayer = nil;
+    }
+    [self cleanPlayerView];
+    [UIApplication sharedApplication].idleTimerDisabled = NO;
+}
+
+- (void)cleanPlayerView
 {
     [self.view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj removeFromSuperview];
     }];
 }
 
-- (void)setupPlayerViewTapAction
-{
-    switch (self.playerType) {
-        case SGPlayerTypeAVPlayer:
-        {
-            [self.avPlayer setViewTapBlock:self.playerViewTapAction];
-        }
-            break;
-        case SGPlayerTypeUnknown:
-        {
-            
-        }
-            break;
-    }
-}
-
 - (void)playerError
 {
-    [self clearPlayer];
-    SGPlayerLog(@"SGPlayer unsupport video type");
     [SGNotification postPlayer:self errorMessage:@"unsupport video type" code:1901];
 }
 
 - (void)dealloc
 {
     SGPlayerLog(@"SGPlayer release");
-    [self clearPlayer];
+    [self cleanPlayer];
 }
 
 @end
