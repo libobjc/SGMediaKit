@@ -13,6 +13,7 @@
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
++ (instancetype)distortionRenderer;
 - (instancetype)initWithViewportSize:(CGSize)viewportSize;
 
 @property (nonatomic, assign) CGSize viewportSize;

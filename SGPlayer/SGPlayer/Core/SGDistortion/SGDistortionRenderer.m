@@ -78,6 +78,11 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 
 @implementation SGDistortionRenderer
 
++ (instancetype)distortionRenderer
+{
+    return [[self alloc] initWithViewportSize:CGSizeZero];
+}
+
 - (instancetype)initWithViewportSize:(CGSize)viewportSize
 {
     if (self = [super init]) {
@@ -85,6 +90,14 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
         [self setup];
     }
     return self;
+}
+
+- (void)setViewportSize:(CGSize)viewportSize
+{
+    if (!CGSizeEqualToSize(_viewportSize, viewportSize)) {
+        _viewportSize = viewportSize;
+        [self resetFrameBufferSize];
+    }
 }
 
 - (void)beforDraw
@@ -163,6 +176,7 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 {
     [self setupFrameBuffer];
     [self setupProgramAndShader];
+    [self resetFrameBufferSize];
 }
 
 - (void)useProgram
@@ -178,13 +192,11 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, self.viewportSize.width, self.viewportSize.height, 0, GL_RGB, GL_UNSIGNED_BYTE, nil);
     
     [self checkGLError];
     
     glGenRenderbuffers(1, &color_render_id);
     glBindRenderbuffer(GL_RENDERBUFFER, color_render_id);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, self.viewportSize.width, self.viewportSize.height);
     
     [self checkGLError];
     
@@ -194,6 +206,15 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, color_render_id);
     
     [self checkGLError];
+}
+
+- (void)resetFrameBufferSize
+{
+    glBindTexture(GL_TEXTURE_2D, frame_texture_id);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, self.viewportSize.width, self.viewportSize.height, 0, GL_RGB, GL_UNSIGNED_BYTE, nil);
+    
+    glBindRenderbuffer(GL_RENDERBUFFER, color_render_id);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, self.viewportSize.width, self.viewportSize.height);
 }
 
 - (void)setupProgramAndShader

@@ -40,8 +40,14 @@
     dispatch_once(&setupOnceToken, ^{
         [self setup];
     });
+    self.distorionRenderer.viewportSize = [self pixelSize];
+}
+
+- (CGSize)pixelSize
+{
     NSInteger scale = [UIScreen mainScreen].scale;
-    self.distorionRenderer.viewportSize = CGSizeMake(CGRectGetWidth(self.bounds) * scale, CGRectGetHeight(self.bounds) * scale);
+    CGSize size = CGSizeMake(CGRectGetWidth(self.bounds) * scale, CGRectGetHeight(self.bounds) * scale);
+    return size;
 }
 
 #pragma mark - Setup
@@ -223,7 +229,7 @@
 - (SGDistortionRenderer *)distorionRenderer
 {
     if (!_distorionRenderer) {
-        _distorionRenderer = [[SGDistortionRenderer alloc] initWithViewportSize:CGSizeMake(1334, 750)];
+        _distorionRenderer = [SGDistortionRenderer distortionRenderer];
     }
     return _distorionRenderer;
 }
