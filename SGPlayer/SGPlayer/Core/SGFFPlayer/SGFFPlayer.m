@@ -7,6 +7,7 @@
 //
 
 #import "SGFFPlayer.h"
+#import "avformat.h"
 
 @implementation SGFFPlayer
 
@@ -18,7 +19,11 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            av_register_all();
+            avformat_network_init();
+        });
     }
     return self;
 }
