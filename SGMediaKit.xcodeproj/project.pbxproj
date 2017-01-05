@@ -318,6 +318,12 @@
 		9CDEFA7F1E1CB29F005510C9 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CB2D7151E1CA9A700C5F3F0 /* libavutil.a */; };
 		9CDEFA801E1CB29F005510C9 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CB2D7161E1CA9A700C5F3F0 /* libswresample.a */; };
 		9CDEFA811E1CB29F005510C9 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CB2D7171E1CA9A700C5F3F0 /* libswscale.a */; };
+		9CDEFA871E1CE528005510C9 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CDEFA861E1CE528005510C9 /* config.h */; };
+		9CDEFA881E1CE528005510C9 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CDEFA861E1CE528005510C9 /* config.h */; };
+		9CDEFA9E1E1D050B005510C9 /* NSDictionary+SGFFmpeg.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CDEFA9C1E1D050B005510C9 /* NSDictionary+SGFFmpeg.h */; };
+		9CDEFA9F1E1D050B005510C9 /* NSDictionary+SGFFmpeg.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CDEFA9C1E1D050B005510C9 /* NSDictionary+SGFFmpeg.h */; };
+		9CDEFAA01E1D050B005510C9 /* NSDictionary+SGFFmpeg.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDEFA9D1E1D050B005510C9 /* NSDictionary+SGFFmpeg.m */; };
+		9CDEFAA11E1D050B005510C9 /* NSDictionary+SGFFmpeg.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CDEFA9D1E1D050B005510C9 /* NSDictionary+SGFFmpeg.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -489,6 +495,13 @@
 		9CB2D7151E1CA9A700C5F3F0 /* libavutil.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libavutil.a; sourceTree = "<group>"; };
 		9CB2D7161E1CA9A700C5F3F0 /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswresample.a; sourceTree = "<group>"; };
 		9CB2D7171E1CA9A700C5F3F0 /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswscale.a; sourceTree = "<group>"; };
+		9CDEFA831E1CD835005510C9 /* ffplay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ffplay.c; sourceTree = "<group>"; };
+		9CDEFA861E1CE528005510C9 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		9CDEFA9C1E1D050B005510C9 /* NSDictionary+SGFFmpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+SGFFmpeg.h"; sourceTree = "<group>"; };
+		9CDEFA9D1E1D050B005510C9 /* NSDictionary+SGFFmpeg.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+SGFFmpeg.m"; sourceTree = "<group>"; };
+		9CDEFB5E1E1DE506005510C9 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
+		9CDEFB601E1DE50E005510C9 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
+		9CDEFB621E1DE5F5005510C9 /* libbz2.1.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.1.0.tbd; path = usr/lib/libbz2.1.0.tbd; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -540,6 +553,7 @@
 		9C3335501E1B4EA100E4DDCC /* SGFFPlayer */ = {
 			isa = PBXGroup;
 			children = (
+				9CDEFA951E1D0134005510C9 /* SGFFmpeg */,
 				9CB2D69E1E1CA9A700C5F3F0 /* ffmpeg */,
 				9C3335511E1B51CD00E4DDCC /* SGFFPlayer.h */,
 				9C3335521E1B51CD00E4DDCC /* SGFFPlayer.m */,
@@ -672,6 +686,9 @@
 		9CA476701DE53CAB00B1B0D1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9CDEFB621E1DE5F5005510C9 /* libbz2.1.0.tbd */,
+				9CDEFB601E1DE50E005510C9 /* libbz2.tbd */,
+				9CDEFB5E1E1DE506005510C9 /* VideoToolbox.framework */,
 				9C390EF91DFFDF430053DE4A /* AVFoundation.framework */,
 				9CA476711DE53CAB00B1B0D1 /* GPUImage.framework */,
 			);
@@ -696,6 +713,8 @@
 		9CB2D69E1E1CA9A700C5F3F0 /* ffmpeg */ = {
 			isa = PBXGroup;
 			children = (
+				9CDEFA861E1CE528005510C9 /* config.h */,
+				9CDEFA831E1CD835005510C9 /* ffplay.c */,
 				9CB2D69F1E1CA9A700C5F3F0 /* include */,
 				9CB2D7101E1CA9A700C5F3F0 /* lib */,
 			);
@@ -884,6 +903,15 @@
 			path = lib;
 			sourceTree = "<group>";
 		};
+		9CDEFA951E1D0134005510C9 /* SGFFmpeg */ = {
+			isa = PBXGroup;
+			children = (
+				9CDEFA9C1E1D050B005510C9 /* NSDictionary+SGFFmpeg.h */,
+				9CDEFA9D1E1D050B005510C9 /* NSDictionary+SGFFmpeg.m */,
+			);
+			path = SGFFmpeg;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -955,6 +983,7 @@
 				9C7C71311DF904180098E2E7 /* SGAVPlayer.h in Headers */,
 				9CB2D7751E1CA9A700C5F3F0 /* crc.h in Headers */,
 				9CB2D76F1E1CA9A700C5F3F0 /* channel_layout.h in Headers */,
+				9CDEFA881E1CE528005510C9 /* config.h in Headers */,
 				9CB2D7351E1CA9A700C5F3F0 /* videotoolbox.h in Headers */,
 				9CB2D7451E1CA9A700C5F3F0 /* buffersrc.h in Headers */,
 				9C7C71291DF904180098E2E7 /* SGAVGLTexture.h in Headers */,
@@ -1009,6 +1038,7 @@
 				9C7C71271DF904180098E2E7 /* SGAVGLShader.h in Headers */,
 				9CA377FA1E13AAD9001C923C /* SGDistortionRenderer.h in Headers */,
 				9CB2D7731E1CA9A700C5F3F0 /* cpu.h in Headers */,
+				9CDEFA9F1E1D050B005510C9 /* NSDictionary+SGFFmpeg.h in Headers */,
 				9CB2D7A91E1CA9A700C5F3F0 /* mastering_display_metadata.h in Headers */,
 				9CB2D7BD1E1CA9A700C5F3F0 /* pixfmt.h in Headers */,
 				9CB2D7B31E1CA9A700C5F3F0 /* murmur3.h in Headers */,
@@ -1030,6 +1060,7 @@
 				9CB2D7C21E1CA9A700C5F3F0 /* rc4.h in Headers */,
 				9CB2D7241E1CA9A700C5F3F0 /* dxva2.h in Headers */,
 				9CB2D7981E1CA9A700C5F3F0 /* hwcontext_vdpau.h in Headers */,
+				9CDEFA871E1CE528005510C9 /* config.h in Headers */,
 				9CB2D7B41E1CA9A700C5F3F0 /* opt.h in Headers */,
 				9CB2D7761E1CA9A700C5F3F0 /* des.h in Headers */,
 				9CB2D7641E1CA9A700C5F3F0 /* bprint.h in Headers */,
@@ -1118,6 +1149,7 @@
 				9CB2D7BE1E1CA9A700C5F3F0 /* random_seed.h in Headers */,
 				9C7C71161DF904180098E2E7 /* SGAVGLMatrix.h in Headers */,
 				9CB2D7401E1CA9A700C5F3F0 /* avfiltergraph.h in Headers */,
+				9CDEFA9E1E1D050B005510C9 /* NSDictionary+SGFFmpeg.h in Headers */,
 				9CB2D7921E1CA9A700C5F3F0 /* hwcontext_dxva2.h in Headers */,
 				9CB2D7461E1CA9A700C5F3F0 /* version.h in Headers */,
 				9CB2D78E1E1CA9A700C5F3F0 /* hwcontext.h in Headers */,
@@ -1270,6 +1302,7 @@
 				9C7C712F1DF904180098E2E7 /* SGAVGLView.m in Sources */,
 				9C7C71331DF904180098E2E7 /* SGAVPlayer.m in Sources */,
 				9C7C71411DF904180098E2E7 /* SGPlayer+Extension.m in Sources */,
+				9CDEFAA11E1D050B005510C9 /* NSDictionary+SGFFmpeg.m in Sources */,
 				9C7C71251DF904180098E2E7 /* SGAVGLSensors.m in Sources */,
 				9CA377F81E13AAD9001C923C /* SGDistortionModel.m in Sources */,
 			);
@@ -1292,6 +1325,7 @@
 				9C7C711C1DF904180098E2E7 /* SGAVGLModel.m in Sources */,
 				9C3335551E1B51CD00E4DDCC /* SGFFPlayer.m in Sources */,
 				9CA2D9141DEBE35700AEC8A9 /* SGAudioConfiguration.m in Sources */,
+				9CDEFAA01E1D050B005510C9 /* NSDictionary+SGFFmpeg.m in Sources */,
 				9C7C71401DF904180098E2E7 /* SGPlayer+Extension.m in Sources */,
 				9C7C71441DF904180098E2E7 /* SGPlayer.m in Sources */,
 				9C7C71241DF904180098E2E7 /* SGAVGLSensors.m in Sources */,
