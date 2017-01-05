@@ -33,7 +33,7 @@
     if (self = [super init])
     {
         self.sourceFileURL = sourceFileURL;
-        self.qualityType = AVAssetExportPresetMediumQuality;
+        self.qualityType = SGFormatQualityTypeMedium;
         self.fileType = AVFileTypeQuickTimeMovie;
     }
     return self;
