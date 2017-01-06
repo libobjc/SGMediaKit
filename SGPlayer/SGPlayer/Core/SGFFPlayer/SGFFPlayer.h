@@ -24,7 +24,7 @@
 
 // preview
 @property (nonatomic, assign) SGDisplayMode displayMode;
-@property (nonatomic, strong, readonly) SGAVView * view;      // graphics view
+@property (nonatomic, strong, readonly) UIView * view;      // graphics view
 @property (nonatomic, assign) BOOL viewAnimationHidden;     // default is NO;
 - (UIImage *)snapshot;
 - (void)setViewTapBlock:(void(^)())block;   // view tap action

@@ -7,37 +7,17 @@
 //
 
 #import "SGFFPlayer.h"
-#import "NSDictionary+SGFFmpeg.h"
-#import "avformat.h"
+#import "SGFFDecoder.h"
 
-static void SGFFLog(void * context, int level, const char * format, va_list args)
-{
-    
-}
+@interface SGFFPlayer () <SGFFDecoderDelegate>
 
-static NSError * checkErrorCode(int errorCode)
-{
-    if (errorCode != 0) {
-        char * error_string_buffer = malloc(256);
-        av_strerror(errorCode, error_string_buffer, 256);
-        NSString * error_string = [[NSString alloc] initWithUTF8String:error_string_buffer];
-        NSError * error = [NSError errorWithDomain:error_string code:errorCode userInfo:nil];
-        return error;
-    }
-    return nil;
-}
-
-@interface SGFFPlayer ()
-
-{
-    AVFormatContext * _format_context;
-}
-
-- (NSString *)contentURLString;
+@property (nonatomic, strong) SGFFDecoder * decoder;
 
 @end
 
 @implementation SGFFPlayer
+
+@synthesize view = _view;
 
 + (instancetype)player
 {
@@ -47,12 +27,7 @@ static NSError * checkErrorCode(int errorCode)
 - (instancetype)init
 {
     if (self = [super init]) {
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            av_log_set_callback(SGFFLog);
-            av_register_all();
-            avformat_network_init();
-        });
+        
     }
     return self;
 }
@@ -66,31 +41,16 @@ static NSError * checkErrorCode(int errorCode)
 {
     self.contentURL = contentURL;
     self.videoType = videoType;
-    [self prepareVideo];
+    [self setupDecoder];
 }
 
-- (void)prepareVideo
+- (void)setupDecoder
 {
-    _format_context = NULL;
-    int errorCode = 0;
-    NSError * error = nil;
-    
-    errorCode = avformat_open_input(&_format_context, [self contentURLString].UTF8String, NULL, NULL);
-    error = checkErrorCode(errorCode);
-    if (error) {
-        NSLog(@"%@", error);
-        return;
+    if (self.decoder) {
+        [self.decoder closeFile];
+        self.decoder = nil;
     }
-    
-    errorCode = avformat_find_stream_info(_format_context, NULL);
-    error = checkErrorCode(errorCode);
-    if (error) {
-        NSLog(@"%@", error);
-        return;
-    }
-    
-    NSDictionary * dic = [NSDictionary sg_dictionaryWithAVDictionary:_format_context->metadata];
-    NSLog(@"metadata : %@", dic);
+    self.decoder = [SGFFDecoder decoderWithContentURL:self.contentURL delegate:self delegateQueue:dispatch_get_main_queue()];
 }
 
 - (void)play
@@ -139,15 +99,6 @@ static NSError * checkErrorCode(int errorCode)
     _contentURL = [contentURL copy];
 }
 
-- (NSString *)contentURLString
-{
-    if ([self.contentURL isFileURL]) {
-        return [self.contentURL path];
-    } else {
-        return [self.contentURL absoluteString];
-    }
-}
-
 - (void)setVideoType:(SGVideoType)videoType
 {
     switch (videoType) {
@@ -159,6 +110,28 @@ static NSError * checkErrorCode(int errorCode)
             _videoType = SGVideoTypeNormal;
             break;
     }
+}
+
+#pragma mark - SGFFDecoderDelegate
+
+- (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error
+{
+    NSLog(@"decoder error : %@", error);
+}
+
+- (void)decoderDidOpenInputStream:(SGFFDecoder *)decoder
+{
+    NSLog(@"decoder did open input stream");
+}
+
+- (void)decoderDidFindStreamInfo:(SGFFDecoder *)decoder
+{
+    NSLog(@"decoder did find stream info \nmetadata : %@", decoder.metadata);
+}
+
+- (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder
+{
+    NSLog(@"decoder did prepare to decode frames");
 }
 
 @end
