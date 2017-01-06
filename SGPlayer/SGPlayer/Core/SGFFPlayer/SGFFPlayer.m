@@ -114,24 +114,46 @@
 
 #pragma mark - SGFFDecoderDelegate
 
-- (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error
-{
-    NSLog(@"decoder error : %@", error);
-}
-
 - (void)decoderDidOpenInputStream:(SGFFDecoder *)decoder
 {
-    NSLog(@"decoder did open input stream");
+    
+    NSLog(@"SGFFPlayer %s \nmetadata : %@", __func__, decoder.metadata);
 }
 
-- (void)decoderDidFindStreamInfo:(SGFFDecoder *)decoder
+- (void)decoder:(SGFFDecoder *)decoder openInputStreamError:(NSError *)error
 {
-    NSLog(@"decoder did find stream info \nmetadata : %@", decoder.metadata);
+    NSLog(@"SGFFPlayer %s, \nerror : %@", __func__, error);
+}
+
+- (void)decoderDidOpenVideoStream:(SGFFDecoder *)decoder
+{
+    NSLog(@"SGFFPlayer %s", __func__);
+}
+
+- (void)decoder:(SGFFDecoder *)decoder openVideoStreamError:(NSError *)error
+{
+    NSLog(@"SGFFPlayer %s, \nerror : %@", __func__, error);
+    
+}
+
+- (void)decoderDidOpenAudioStream:(SGFFDecoder *)decoder
+{
+    NSLog(@"SGFFPlayer %s", __func__);
+}
+
+- (void)decoder:(SGFFDecoder *)decoder openAudioStreamError:(NSError *)error
+{
+    NSLog(@"SGFFPlayer %s, \nerror : %@", __func__, error);
 }
 
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder
 {
-    NSLog(@"decoder did prepare to decode frames");
+    NSLog(@"SGFFPlayer %s", __func__);
+}
+
+- (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error
+{
+    NSLog(@"SGFFPlayer %s, \nerror : %@", __func__, error);
 }
 
 @end

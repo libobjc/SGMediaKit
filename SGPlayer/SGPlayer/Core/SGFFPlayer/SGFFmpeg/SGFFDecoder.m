@@ -82,25 +82,54 @@ static NSError * checkErrorCode(int errorCode)
 {
     dispatch_async(self.open_steam_queue, ^{
         NSError * error;
+        
+        // input stream
         error = [self openStream];
         if (error) {
-            NSLog(@"open stream error : %@", error);
-            [self delegateErrorCallback:error];
+            if ([self.delegate respondsToSelector:@selector(decoder:openInputStreamError:)]) {
+                [self delegateAsyncCallback:^{
+                    [self.delegate decoder:self openInputStreamError:error];
+                }];
+            }
             return;
+        } else {
+            if ([self.delegate respondsToSelector:@selector(decoderDidOpenInputStream:)]) {
+                [self delegateAsyncCallback:^{
+                    [self.delegate decoderDidOpenInputStream:self];
+                }];
+            }
         }
         
+        // video stream
         error = [self fetchVideoStream];
         if (error) {
-            NSLog(@"open video stream error : %@", error);
-            [self delegateErrorCallback:error];
-            return;
+            if ([self.delegate respondsToSelector:@selector(decoder:openVideoStreamError:)]) {
+                [self delegateAsyncCallback:^{
+                    [self.delegate decoder:self openVideoStreamError:error];
+                }];
+            }
+        } else {
+            if ([self.delegate respondsToSelector:@selector(decoderDidOpenVideoStream:)]) {
+                [self delegateAsyncCallback:^{
+                    [self.delegate decoderDidOpenVideoStream:self];
+                }];
+            }
         }
         
+        // audio stream
         error = [self fetchAutioStream];
         if (error) {
-            NSLog(@"open video stream error : %@", error);
-            [self delegateErrorCallback:error];
-            return;
+            if ([self.delegate respondsToSelector:@selector(decoder:openAudioStreamError:)]) {
+                [self delegateAsyncCallback:^{
+                    [self.delegate decoder:self openAudioStreamError:error];
+                }];
+            }
+        } else {
+            if ([self.delegate respondsToSelector:@selector(decoderDidOpenAudioStream:)]) {
+                [self delegateAsyncCallback:^{
+                    [self.delegate decoderDidOpenAudioStream:self];
+                }];
+            }
         }
         
         if ([self.delegate respondsToSelector:@selector(decoderDidPrepareToDecodeFrames:)]) {
@@ -120,30 +149,22 @@ static NSError * checkErrorCode(int errorCode)
     errorCode = avformat_open_input(&_format_context, self.contentURLString.UTF8String, NULL, NULL);
     error = checkErrorCode(errorCode);
     if (error || !_format_context) {
-        NSLog(@"open input error : %@", error);
+        if (_format_context) {
+            avformat_free_context(_format_context);
+        }
         return error;
-    }
-    
-    if ([self.delegate respondsToSelector:@selector(decoderDidOpenInputStream:)]) {
-        [self delegateAsyncCallback:^{
-            [self.delegate decoderDidOpenInputStream:self];
-        }];
     }
     
     errorCode = avformat_find_stream_info(_format_context, NULL);
     error = checkErrorCode(errorCode);
     if (error || !_format_context) {
-        NSLog(@"find stream info error : %@", error);
+        if (_format_context) {
+            avformat_close_input(_format_context);
+        }
         return error;
     }
     self.metadata = [NSDictionary sg_dictionaryWithAVDictionary:_format_context->metadata];
-    
-    if ([self.delegate respondsToSelector:@selector(decoderDidFindStreamInfo:)]) {
-        [self delegateAsyncCallback:^{
-            [self.delegate decoderDidFindStreamInfo:self];
-        }];
-    }
-    
+
     return error;
 }
 
@@ -152,16 +173,21 @@ static NSError * checkErrorCode(int errorCode)
     NSError * error = nil;
     self.video_stream_indexs = [self fetchStreamsForMediaType:AVMEDIA_TYPE_VIDEO];
     
-    for (NSNumber * number in self.video_stream_indexs) {
-        NSInteger index = number.integerValue;
-        if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0) {
-            error = [self openVideoStream:index];
-            if (!error) {
-                _video_stream = _format_context->streams[index];
-                break;
+    if (self.video_stream_indexs.count > 0) {
+        for (NSNumber * number in self.video_stream_indexs) {
+            NSInteger index = number.integerValue;
+            if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0) {
+                error = [self openVideoStream:index];
+                if (!error) {
+                    _video_stream = _format_context->streams[index];
+                    break;
+                }
             }
         }
+    } else {
+        error = [NSError errorWithDomain:@"video stream not found" code:-1 userInfo:nil];
     }
+    
     return error;
 }
 
@@ -192,14 +218,19 @@ static NSError * checkErrorCode(int errorCode)
     NSError * error = nil;
     self.audio_stream_indexs = [self fetchStreamsForMediaType:AVMEDIA_TYPE_AUDIO];
     
-    for (NSNumber * number in self.audio_stream_indexs) {
-        NSInteger index = number.integerValue;
-        error = [self openAudioStream:index];
-        if (!error) {
-            _audio_stream = _format_context->streams[index];
-            break;
+    if (self.audio_stream_indexs.count > 0) {
+        for (NSNumber * number in self.audio_stream_indexs) {
+            NSInteger index = number.integerValue;
+            error = [self openAudioStream:index];
+            if (!error) {
+                _audio_stream = _format_context->streams[index];
+                break;
+            }
         }
+    } else {
+        error = [NSError errorWithDomain:@"audio stream not found" code:-1 userInfo:nil];
     }
+    
     return error;
 }
 

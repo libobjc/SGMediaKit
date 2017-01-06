@@ -12,10 +12,20 @@
 
 @protocol SGFFDecoderDelegate <NSObject>
 
+// open input stream
 - (void)decoderDidOpenInputStream:(SGFFDecoder *)decoder;
-- (void)decoderDidFindStreamInfo:(SGFFDecoder *)decoder;
-- (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error;
+- (void)decoder:(SGFFDecoder *)decoder openInputStreamError:(NSError *)error;
+
+// open video stream
+- (void)decoderDidOpenVideoStream:(SGFFDecoder *)decoder;
+- (void)decoder:(SGFFDecoder *)decoder openVideoStreamError:(NSError *)error;
+
+// open audio stream
+- (void)decoderDidOpenAudioStream:(SGFFDecoder *)decoder;
+- (void)decoder:(SGFFDecoder *)decoder openAudioStreamError:(NSError *)error;
+
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder;
+- (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error;
 
 @end
 
