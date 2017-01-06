@@ -29,6 +29,39 @@ static NSError * checkErrorCode(int errorCode)
     return nil;
 }
 
+static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTimebase, NSTimeInterval * pFPS, NSTimeInterval * pTimebase)
+{
+    NSTimeInterval fps, timebase;
+    
+    if (stream->time_base.den && stream->time_base.num) {
+        timebase = av_q2d(stream->time_base);
+    } else if (stream->codec->time_base.den && stream->codec->time_base.num) {
+        timebase = av_q2d(stream->codec->time_base);
+    } else {
+        timebase = defaultTimebase;
+    }
+
+    if (stream->codec->ticks_per_frame != 1) {
+        
+    }
+    
+    if (stream->avg_frame_rate.den && stream->avg_frame_rate.num) {
+        fps = av_q2d(stream->avg_frame_rate);
+    } else if (stream->r_frame_rate.den && stream->r_frame_rate.num) {
+        fps = av_q2d(stream->r_frame_rate);
+    } else {
+        fps = 1.0 / timebase;
+    }
+    
+    if (pFPS) {
+        * pFPS = fps;
+    }
+    
+    if (pTimebase) {
+        * pTimebase = timebase;
+    }
+}
+
 @interface SGFFDecoder ()
 
 {
@@ -193,6 +226,7 @@ static NSError * checkErrorCode(int errorCode)
                 if (!error) {
                     _video_stream_index = index;
                     _video_frame = av_frame_alloc();
+                    fetchAVStreamFPSTimeBase(_format_context->streams[_video_stream_index], 0.04, &_fps, &_video_timebase);
                     break;
                 }
             }
@@ -238,6 +272,7 @@ static NSError * checkErrorCode(int errorCode)
             if (!error) {
                 _audio_stream_index = index;
                 _audio_frame = av_frame_alloc();
+                fetchAVStreamFPSTimeBase(_format_context->streams[_audio_stream_index], 0.025, 0, &_audio_timebase);
                 break;
             }
         }
@@ -371,7 +406,7 @@ static NSError * checkErrorCode(int errorCode)
                         audioFrame.samples = nil;
                         
                         if (audioFrame.duration == 0) {
-                  
+//                            audioFrame.duration = audioFrame.samples.length / (sizeof(float) * numChannels * audioManager.samplingRate);
                         }
                         
                         if (audioFrame) {

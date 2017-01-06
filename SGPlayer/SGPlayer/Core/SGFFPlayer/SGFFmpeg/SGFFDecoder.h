@@ -47,9 +47,9 @@
 @property (nonatomic, assign, readonly) BOOL audioEnable;
 
 @property (nonatomic, assign, readonly) BOOL endOfFile;
-@property (nonatomic, assign, readonly) BOOL decoding;
+@property (nonatomic, assign, readonly) BOOL decoding; 
 
-@property (nonatomic, assign, readonly) float fps;
+@property (nonatomic, assign, readonly) NSTimeInterval fps;
 @property (nonatomic, assign, readonly) NSTimeInterval position;
 
 - (void)decodeFrames;

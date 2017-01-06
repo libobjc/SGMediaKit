@@ -231,6 +231,9 @@
 - (void)decoder:(SGFFDecoder *)decoder didDecodeFrames:(NSArray<SGFFFrame *> *)frames
 {
     NSLog(@"SGFFPlayer %s \nframes : %@", __func__, frames);
+    for (SGFFFrame * frame in frames) {
+        NSLog(@"frame type : %d, postion : %f, duration : %f", frame.type, frame.position, frame.duration);
+    }
     if (frames.count > 0) {
         [self addFrames:frames];
     }
