@@ -12,6 +12,10 @@
 @interface SGFFPlayer () <SGFFDecoderDelegate>
 
 @property (nonatomic, strong) SGFFDecoder * decoder;
+@property (nonatomic, strong) NSTimer * decodeTimer;
+
+@property (nonatomic, strong) NSMutableArray * videoFrames;
+@property (nonatomic, strong) NSMutableArray * audioFrames;
 
 @end
 
@@ -27,7 +31,8 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        
+        [self setupFrames];
+        [self setupDecodeTimer];
     }
     return self;
 }
@@ -42,15 +47,6 @@
     self.contentURL = contentURL;
     self.videoType = videoType;
     [self setupDecoder];
-}
-
-- (void)setupDecoder
-{
-    if (self.decoder) {
-        [self.decoder closeFile];
-        self.decoder = nil;
-    }
-    self.decoder = [SGFFDecoder decoderWithContentURL:self.contentURL delegate:self delegateQueue:dispatch_get_main_queue()];
 }
 
 - (void)play
@@ -112,6 +108,85 @@
     }
 }
 
+#pragma mark - frames
+
+- (void)setupFrames
+{
+    [self cleanFrames];
+    self.videoFrames = [NSMutableArray array];
+    self.audioFrames = [NSMutableArray array];
+}
+
+- (void)addFrames:(NSArray <SGFFFrame *> *)frames
+{
+    for (SGFFFrame * frame in frames) {
+        switch (frame.type) {
+            case SGFFFrameTypeVideo:
+            {
+                [self.videoFrames addObject:frame];
+            }
+                break;
+            case SGFFFrameTypeAudio:
+            {
+                [self.audioFrames addObject:frame];
+            }
+                break;
+            default:
+                break;
+        }
+    }
+    NSLog(@"\nvideo frame count : %ld\naudio frame count : %ld", self.videoFrames.count, self.audioFrames.count);
+}
+
+#pragma mark - decode frames
+
+- (void)setupDecoder
+{
+    [self cleanDecoder];
+    self.decoder = [SGFFDecoder decoderWithContentURL:self.contentURL delegate:self delegateQueue:dispatch_get_main_queue()];
+}
+
+- (void)setupDecodeTimer
+{
+    self.decodeTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(decodeTimerHandler) userInfo:nil repeats:YES];
+    [[NSRunLoop mainRunLoop] addTimer:self.decodeTimer forMode:NSRunLoopCommonModes];
+    [self pauseDecodeTimer];
+}
+
+- (void)pauseDecodeTimer
+{
+    self.decodeTimer.fireDate = [NSDate distantFuture];
+}
+
+- (void)resumeDecodeTimer
+{
+    self.decodeTimer.fireDate = [NSDate distantPast];
+}
+
+- (void)decodeTimerHandler
+{
+    if (!self.decoder.endOfFile && !self.decoder.decoding) {
+        [self.decoder decodeFrames];
+    }
+}
+
+#pragma mark - clean
+
+- (void)cleanDecoder
+{
+    if (self.decoder) {
+        [self.decoder closeFile];
+        self.decoder = nil;
+    }
+    [self pauseDecodeTimer];
+}
+
+- (void)cleanFrames
+{
+    [self.videoFrames removeAllObjects];
+    [self.audioFrames removeAllObjects];
+}
+
 #pragma mark - SGFFDecoderDelegate
 
 - (void)decoderDidOpenInputStream:(SGFFDecoder *)decoder
@@ -150,6 +225,21 @@
 {
     NSLog(@"SGFFPlayer %s", __func__);
     NSLog(@"\nvideo enable : %d\naudio enable : %d", decoder.videoEnable, decoder.audioEnable);
+    [self resumeDecodeTimer];
+}
+
+- (void)decoder:(SGFFDecoder *)decoder didDecodeFrames:(NSArray<SGFFFrame *> *)frames
+{
+    NSLog(@"SGFFPlayer %s \nframes : %@", __func__, frames);
+    if (frames.count > 0) {
+        [self addFrames:frames];
+    }
+}
+
+- (void)decoderDidEndOfFile:(SGFFDecoder *)decoder
+{
+    NSLog(@"SGFFPlayer %s", __func__);
+    [self pauseDecodeTimer];
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error

@@ -10,6 +10,8 @@
 #import "NSDictionary+SGFFmpeg.h"
 #import "avformat.h"
 
+static NSTimeInterval decode_frames_min_duration = 0.0;
+
 static void SGFFLog(void * context, int level, const char * format, va_list args)
 {
     
@@ -31,17 +33,24 @@ static NSError * checkErrorCode(int errorCode)
 
 {
     AVFormatContext * _format_context;
-    AVStream * _video_stream;
-    AVStream * _audio_stream;
+    NSInteger _video_stream_index;
+    NSInteger _audio_stream_index;
+    AVFrame * _video_frame;
+    AVFrame * _audio_frame;
+    NSTimeInterval _video_timebase;
+    NSTimeInterval _audio_timebase;
 }
 
 @property (nonatomic, weak) id <SGFFDecoderDelegate> delegate;
 @property (nonatomic, strong) dispatch_queue_t delegate_queue;
-@property (nonatomic, strong) dispatch_queue_t open_steam_queue;
+@property (nonatomic, strong) dispatch_queue_t ffmpeg_queue;
 
 @property (nonatomic, copy) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSString * contentURLString;
 @property (nonatomic, copy) NSDictionary * metadata;
+@property (nonatomic, assign) BOOL endOfFile;
+@property (nonatomic, assign) BOOL decoding;
+@property (nonatomic, assign) NSTimeInterval position;
 
 @property (nonatomic, copy) NSArray <NSNumber *> * video_stream_indexs;
 @property (nonatomic, copy) NSArray <NSNumber *> * audio_stream_indexs;
@@ -69,7 +78,10 @@ static NSError * checkErrorCode(int errorCode)
         self.contentURL = contentURL;
         self.delegate = delegate;
         self.delegate_queue = delegateQueue;
-        self.open_steam_queue = dispatch_queue_create("sgffdecoder.open.stream.queue", DISPATCH_QUEUE_SERIAL);
+        self.ffmpeg_queue = dispatch_queue_create("sgffdecoder.ffmpeg.queue", DISPATCH_QUEUE_SERIAL);
+        
+        _video_stream_index = -1;
+        _audio_stream_index = -1;
         
         [self openFile];
     }
@@ -80,7 +92,7 @@ static NSError * checkErrorCode(int errorCode)
 
 - (void)openFile
 {
-    dispatch_async(self.open_steam_queue, ^{
+    dispatch_async(self.ffmpeg_queue, ^{
         NSError * error;
         
         // input stream
@@ -179,7 +191,8 @@ static NSError * checkErrorCode(int errorCode)
             if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0) {
                 error = [self openVideoStream:index];
                 if (!error) {
-                    _video_stream = _format_context->streams[index];
+                    _video_stream_index = index;
+                    _video_frame = av_frame_alloc();
                     break;
                 }
             }
@@ -223,7 +236,8 @@ static NSError * checkErrorCode(int errorCode)
             NSInteger index = number.integerValue;
             error = [self openAudioStream:index];
             if (!error) {
-                _audio_stream = _format_context->streams[index];
+                _audio_stream_index = index;
+                _audio_frame = av_frame_alloc();
                 break;
             }
         }
@@ -271,114 +285,120 @@ static NSError * checkErrorCode(int errorCode)
     return nil;
 }
 
-- (void)fetchTime
-{
-//        _video_frame = av_frame_alloc();
-//    
-//        if (stream->time_base.den && stream->time_base.num) {
-//            _time_base = av_q2d(stream->time_base);
-//        } else {
-//            _time_base = 0.04;
-//        }
-//    
-//        if (stream->avg_frame_rate.den && stream->avg_frame_rate.num) {
-//            _fps = av_q2d(stream->avg_frame_rate);
-//        } else {
-//            _fps = 1.0 / _time_base;
-//        }
-}
-
 #pragma mark - decode frames
 
 - (void)decodeFrames
 {
-    /*
-    AVPacket packet;
+    [self decodeFramesWithDuration:decode_frames_min_duration];
+}
+
+- (void)decodeFramesWithDuration:(NSTimeInterval)duration
+{
+    self.decoding = YES;
     
-    BOOL finished = NO;
-    while (!finished) {
+    dispatch_async(self.ffmpeg_queue, ^{
         
-        int errorCode = av_read_frame(_format_context, &packet);
-        NSError * error = checkErrorCode(errorCode);
-        if (error) {
-            NSLog(@"error : %@", error);
-            break;
-        }
+        NSMutableArray <SGFFFrame *> * frames = [NSMutableArray array];
+        AVPacket packet;
+        BOOL finished = NO;
+        NSTimeInterval decodeDuration = 0;
         
-        if (packet.stream_index == _video_strame->index) {
-            int packet_size = packet.size;
-            if (packet_size > 0) {
-                
-                int gotframe = 0;
-                int result = avcodec_decode_video2(_video_strame->codec, _video_frame, &gotframe, &packet);
-                NSError * error = checkErrorCode(result);
-                if (error) {
-                    NSLog(@"decode video error : %@", error);
-                    break;
+        while (!finished) {
+            int errorCode = av_read_frame(_format_context, &packet);
+            NSError * error = checkErrorCode(errorCode);
+            if (error) {
+                NSLog(@"end of file %d", self.endOfFile);
+                self.endOfFile = YES;
+                finished = YES;
+                if ([self.delegate respondsToSelector:@selector(decoderDidEndOfFile:)]) {
+                    [self delegateAsyncCallback:^{
+                        [self.delegate decoderDidEndOfFile:self];
+                    }];
                 }
-                
-                if (gotframe) {
-                    
-                    avpicture_alloc(&(_picture), AV_PIX_FMT_RGB24, _video_strame->codec->width, _video_strame->codec->height);
-                    
-                    _sws_context = sws_getCachedContext(_sws_context,
-                                                        _video_strame->codec->width,
-                                                        _video_strame->codec->height,
-                                                        _video_strame->codec->pix_fmt,
-                                                        _video_strame->codec->width,
-                                                        _video_strame->codec->height,
-                                                        AV_PIX_FMT_RGB24,
-                                                        SWS_FAST_BILINEAR,
-                                                        NULL, NULL, NULL);
-                    
-                    sws_scale(_sws_context, (const uint8_t **)_video_frame->data, _video_frame->linesize, 0, _video_strame->codec->height, _picture.data,
-                              _picture.linesize);
-                    
-                    NSData * data = [NSData dataWithBytes:_picture.data length:_picture.linesize[0] * _video_strame->codec->height];
-                    
-                    UIImage * image = nil;
-                    
-                    CGDataProviderRef provider = CGDataProviderCreateWithCFData((__bridge CFDataRef)(data));
-                    if (provider) {
-                        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-                        if (colorSpace) {
-                            CGImageRef imageRef = CGImageCreate(_video_strame->codec->width,
-                                                                _video_strame->codec->height,
-                                                                8,
-                                                                24,
-                                                                _picture.linesize[0],
-                                                                colorSpace,
-                                                                kCGBitmapByteOrderDefault,
-                                                                provider,
-                                                                NULL,
-                                                                YES, // NO
-                                                                kCGRenderingIntentDefault);
-                            
-                            if (imageRef) {
-                                image = [UIImage imageWithCGImage:imageRef];
-                                CGImageRelease(imageRef);
-                            }
-                            CGColorSpaceRelease(colorSpace);
+                break;
+            }
+            
+            if (packet.stream_index == _video_stream_index)
+            {
+                int packet_size = packet.size;
+                while (packet_size > 0)
+                {
+                    int gotframe = 0;
+                    int lenght = avcodec_decode_video2(_format_context->streams[_video_stream_index]->codec, _video_frame, &gotframe, &packet);
+                    if (lenght <= 0) break;
+                    if (gotframe) {
+                        if (!_video_frame->data[0]) break;
+#warning video frame
+                        SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] init];
+                        videoFrame.width = _format_context->streams[_video_stream_index]->codec->width;
+                        videoFrame.height = _format_context->streams[_video_stream_index]->codec->height;
+                        videoFrame.position = av_frame_get_best_effort_timestamp(_video_frame) * _video_timebase;
+                        
+                        const int64_t frame_duration = av_frame_get_pkt_duration(_video_frame);
+                        if (frame_duration) {
+                            videoFrame.duration = frame_duration * _video_timebase;
+                            videoFrame.duration += _video_frame->repeat_pict * _video_timebase * 0.5;
+                        } else {
+                            videoFrame.duration = 1.0 / self.fps;
                         }
-                        CGDataProviderRelease(provider);
+                        
+                        if (videoFrame) {
+                            [frames addObject:videoFrame];
+                            self.position = videoFrame.position;
+                            decodeDuration += videoFrame.duration;
+                            if (decodeDuration > duration) {
+                                finished = YES;
+                            }
+                        }
                     }
-                    
-                    if (image) {
-                        static dispatch_once_t onceToken;
-                        dispatch_once(&onceToken, ^{
-                            NSString  *jpgPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Test.jpg"];
-                            [UIImageJPEGRepresentation(image, 1.0) writeToFile:jpgPath atomically:YES];
-                        });
+                    packet_size -= lenght;
+                }
+            }
+            else if (packet.stream_index == _audio_stream_index)
+            {
+                int packet_size = packet.size;
+                while (packet_size > 0)
+                {
+                    int gotframe = 0;
+                    int lenght = avcodec_decode_audio4(_format_context->streams[_audio_stream_index]->codec, _audio_frame, &gotframe, &packet);
+                    if (lenght <= 0) break;
+                    if (gotframe) {
+                        if (!_audio_frame->data[0]) break;
+#warning audio frame
+                        SGFFAudioFrame * audioFrame = [[SGFFAudioFrame alloc] init];
+                        audioFrame.position = av_frame_get_best_effort_timestamp(_audio_frame) * _audio_timebase;
+                        audioFrame.duration = av_frame_get_pkt_duration(_audio_frame) * _audio_timebase;
+                        audioFrame.samples = nil;
+                        
+                        if (audioFrame.duration == 0) {
+                  
+                        }
+                        
+                        if (audioFrame) {
+                            [frames addObject:audioFrame];
+                            if (_video_stream_index == -1) {
+                                self.position = audioFrame.position;
+                                decodeDuration += audioFrame.duration;
+                                if (decodeDuration > duration) {
+                                    finished = YES;
+                                }
+                            }
+                        }
                     }
-                    
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [(UIImageView *)self.view setImage:image];
-                    });
+                    packet_size -= lenght;
                 }
             }
         }
-    }
-     */
+        
+        if ([self.delegate respondsToSelector:@selector(decoder:didDecodeFrames:)]) {
+            [self delegateAsyncCallback:^{
+                [self.delegate decoder:self didDecodeFrames:frames];
+            }];
+        }
+        av_packet_unref(&packet);
+        
+        self.decoding = NO;
+    });
 }
 
 #pragma mark - close stream
@@ -401,18 +421,12 @@ static NSError * checkErrorCode(int errorCode)
 
 - (BOOL)videoEnable
 {
-    if (_video_stream) {
-        return YES;
-    }
-    return NO;
+    return _video_stream_index != -1;
 }
 
 - (BOOL)audioEnable
 {
-    if (_audio_stream) {
-        return YES;
-    }
-    return NO;
+    return _audio_stream_index != -1;
 }
 
 #pragma mark - delegate callback

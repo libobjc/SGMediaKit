@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SGFFFrame.h"
 
 @class SGFFDecoder;
 
@@ -25,7 +26,10 @@
 - (void)decoder:(SGFFDecoder *)decoder openAudioStreamError:(NSError *)error;
 
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder;
+- (void)decoder:(SGFFDecoder *)decoder didDecodeFrames:(NSArray <SGFFFrame *> *)frames;
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error;
+
+- (void)decoderDidEndOfFile:(SGFFDecoder *)decoder;
 
 @end
 
@@ -42,10 +46,14 @@
 @property (nonatomic, assign, readonly) BOOL videoEnable;
 @property (nonatomic, assign, readonly) BOOL audioEnable;
 
+@property (nonatomic, assign, readonly) BOOL endOfFile;
+@property (nonatomic, assign, readonly) BOOL decoding;
+
 @property (nonatomic, assign, readonly) float fps;
-@property (nonatomic, assign, readonly) float timebase;
+@property (nonatomic, assign, readonly) NSTimeInterval position;
 
 - (void)decodeFrames;
+- (void)decodeFramesWithDuration:(NSTimeInterval)duration;
 - (void)closeFile;
 
 @end
