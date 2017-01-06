@@ -399,6 +399,22 @@ static NSError * checkErrorCode(int errorCode)
     }
 }
 
+- (BOOL)videoEnable
+{
+    if (_video_stream) {
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)audioEnable
+{
+    if (_audio_stream) {
+        return YES;
+    }
+    return NO;
+}
+
 #pragma mark - delegate callback
 
 - (void)delegateAsyncCallback:(dispatch_block_t)block

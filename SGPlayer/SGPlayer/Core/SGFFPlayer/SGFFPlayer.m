@@ -149,6 +149,7 @@
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder
 {
     NSLog(@"SGFFPlayer %s", __func__);
+    NSLog(@"\nvideo enable : %d\naudio enable : %d", decoder.videoEnable, decoder.audioEnable);
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error

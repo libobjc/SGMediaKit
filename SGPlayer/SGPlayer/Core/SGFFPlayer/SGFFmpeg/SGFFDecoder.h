@@ -39,6 +39,9 @@
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSDictionary * metadata;
 
+@property (nonatomic, assign, readonly) BOOL videoEnable;
+@property (nonatomic, assign, readonly) BOOL audioEnable;
+
 @property (nonatomic, assign, readonly) float fps;
 @property (nonatomic, assign, readonly) float timebase;
 
