@@ -7,8 +7,11 @@
 //
 
 #import "SGFFDecoder.h"
+#import "SGAudioManager.h"
 #import "NSDictionary+SGFFmpeg.h"
 #import "avformat.h"
+#import "swresample.h"
+#import <Accelerate/Accelerate.h>
 
 static NSTimeInterval decode_frames_min_duration = 0.0;
 
@@ -72,6 +75,10 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
     AVFrame * _audio_frame;
     NSTimeInterval _video_timebase;
     NSTimeInterval _audio_timebase;
+    
+    SwrContext * _audio_swr_context;
+    void * _audio_swr_buffer;
+    NSUInteger _audio_swr_buffer_size;
 }
 
 @property (nonatomic, weak) id <SGFFDecoderDelegate> delegate;
@@ -286,6 +293,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 - (NSError *)openAudioStream:(NSInteger)audioStreamIndex
 {
     NSError * error = nil;
+    int errorCode = 0;
     AVStream * stream = _format_context->streams[audioStreamIndex];
     
     AVCodec * codec = avcodec_find_decoder(stream->codecpar->codec_id);
@@ -295,11 +303,33 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         return error;
     }
     
-    int errorCode = avcodec_open2(stream->codec, codec, NULL);
+    errorCode = avcodec_open2(stream->codec, codec, NULL);
     error = checkErrorCode(errorCode);
     if (error) {
         NSLog(@"avcidec open error %@", error);
         return error;
+    }
+    
+    SGAudioManager * audioManager = [SGAudioManager manager];
+    BOOL result = YES;
+    if (stream->codec->sample_fmt == AV_SAMPLE_FMT_S16) {
+        if (audioManager.samplingRate == stream->codec->sample_rate && audioManager.numOutputChannels == stream->codec->channels) {
+            result = NO;
+        }
+    }
+    
+    if (result) {
+        _audio_swr_context = swr_alloc_set_opts(NULL, av_get_default_channel_layout(audioManager.numOutputChannels), AV_SAMPLE_FMT_S16, audioManager.samplingRate, av_get_default_channel_layout(stream->codec->channels), stream->codec->sample_fmt, stream->codec->sample_rate, 0, NULL);
+        
+        errorCode = swr_init(_audio_swr_context);
+        error = checkErrorCode(errorCode);
+        if (error) {
+            if (_audio_swr_context) {
+                swr_free(&_audio_swr_context);
+            }
+            avcodec_close(stream->codec);
+            return error;
+        }
     }
     
     return error;
@@ -399,14 +429,51 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                     if (lenght <= 0) break;
                     if (gotframe) {
                         if (!_audio_frame->data[0]) break;
-#warning audio frame
+                        
+                        SGAudioManager * audioManager = [SGAudioManager manager];
+                        NSInteger numFrames;
+                        void * audioData;
+                        
+                        if (_audio_swr_context) {
+                            const NSUInteger ratio = MAX(1, audioManager.samplingRate / _format_context->streams[_audio_stream_index]->codec->sample_rate) * MAX(1, audioManager.numOutputChannels / _format_context->streams[_audio_stream_index]->codec->channels) * 2;
+                            const int bufSize = av_samples_get_buffer_size(NULL, audioManager.numOutputChannels, _audio_frame->nb_samples * ratio, AV_SAMPLE_FMT_S16, 1);
+                            
+                            if (!_audio_swr_buffer || _audio_swr_buffer_size < bufSize) {
+                                _audio_swr_buffer_size = bufSize;
+                                _audio_swr_buffer = realloc(_audio_swr_buffer, _audio_swr_buffer_size);
+                            }
+                            
+                            Byte * outbuf[2] = { _audio_swr_buffer, 0 };
+                            numFrames = swr_convert(_audio_swr_context, outbuf, _audio_frame->nb_samples * ratio, (const uint8_t **)_audio_frame->data, _audio_frame->nb_samples);
+                            error = checkErrorCode(numFrames);
+                            if (error) {
+                                NSLog(@"audio codec error : %@", error);
+                                return;
+                            }
+                            audioData = _audio_swr_buffer;
+                        } else {
+                            if (_format_context->streams[_audio_stream_index]->codec->sample_fmt != AV_SAMPLE_FMT_S16) {
+                                NSLog(@"audio format error");
+                                return;
+                            }
+                            audioData = _audio_frame->data[0];
+                            numFrames = _audio_frame->nb_samples;
+                        }
+                        
+                        const NSUInteger numElements = numFrames * audioManager.numOutputChannels;
+                        NSMutableData *data = [NSMutableData dataWithLength:numElements * sizeof(float)];
+                        
+                        float scale = 1.0 / (float)INT16_MAX ;
+                        vDSP_vflt16((SInt16 *)audioData, 1, data.mutableBytes, 1, numElements);
+                        vDSP_vsmul(data.mutableBytes, 1, &scale, data.mutableBytes, 1, numElements);
+
                         SGFFAudioFrame * audioFrame = [[SGFFAudioFrame alloc] init];
                         audioFrame.position = av_frame_get_best_effort_timestamp(_audio_frame) * _audio_timebase;
                         audioFrame.duration = av_frame_get_pkt_duration(_audio_frame) * _audio_timebase;
-                        audioFrame.samples = nil;
+                        audioFrame.samples = data;
                         
                         if (audioFrame.duration == 0) {
-//                            audioFrame.duration = audioFrame.samples.length / (sizeof(float) * numChannels * audioManager.samplingRate);
+                            audioFrame.duration = audioFrame.samples.length / (sizeof(float) * audioManager.numOutputChannels * audioManager.samplingRate);
                         }
                         
                         if (audioFrame) {
