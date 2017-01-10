@@ -26,6 +26,7 @@
 @property (nonatomic, assign) NSTimeInterval progress;
 @property (nonatomic, assign) NSTimeInterval bufferDuration;
 
+@property (nonatomic, assign) BOOL prepareToPlay;
 @property (nonatomic, assign) BOOL seeking;
 @property (nonatomic, assign) BOOL playing;
 
@@ -131,7 +132,9 @@
     [self.decoder seekToTime:time completeHandler:^(BOOL finished) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         strongSelf.seeking = NO;
-        [strongSelf resumeDecodeTimer];
+        if (strongSelf.prepareToPlay) {
+            [strongSelf resumeDecodeTimer];
+        }
         if (completeHandler) {
             completeHandler(finished);
         }
@@ -238,6 +241,7 @@
     self.videoType = nil;
     self.seeking = NO;
     self.playing = NO;
+    self.prepareToPlay = NO;
     self.state = SGPlayerStateNone;
     self.progress = 0;
 }
@@ -310,7 +314,8 @@
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder
 {
     NSLog(@"SGFFPlayer %s", __func__);
-    NSLog(@"\nvideo enable : %d\naudio enable : %d", decoder.videoEnable, decoder.audioEnable);
+    NSLog(@"\nvideo enable : %d\naudio enable : %d\nseek enable : %d\nduration : %f", decoder.videoEnable, decoder.audioEnable, decoder.seekEnable, self.decoder.duration);
+    self.prepareToPlay = YES;
     [self resumeDecodeTimer];
     self.state = SGPlayerStateReadyToPlay;
 }
