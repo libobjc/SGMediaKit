@@ -8,14 +8,26 @@
 
 #import "SGFFPlayer.h"
 #import "SGFFDecoder.h"
+#import "KxAudioManager.h"
+#import "SGNotification.h"
 
-@interface SGFFPlayer () <SGFFDecoderDelegate>
+@interface SGFFPlayer () <SGFFDecoderDelegate, KxAudioManagerDelegate>
 
 @property (nonatomic, strong) SGFFDecoder * decoder;
 @property (nonatomic, strong) NSTimer * decodeTimer;
 
 @property (nonatomic, strong) NSMutableArray * videoFrames;
 @property (nonatomic, strong) NSMutableArray * audioFrames;
+
+@property (nonatomic, strong) NSData * currentAudioFrameSamples;
+@property (nonatomic, assign) NSUInteger currentAudioFramePosition;
+
+@property (nonatomic, assign) SGPlayerState state;
+@property (nonatomic, assign) NSTimeInterval progress;
+@property (nonatomic, assign) NSTimeInterval bufferDuration;
+
+@property (nonatomic, assign) BOOL seeking;
+@property (nonatomic, assign) BOOL playing;
 
 @end
 
@@ -31,7 +43,12 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        [self setupFrames];
+        
+        self.videoFrames = [NSMutableArray array];
+        self.audioFrames = [NSMutableArray array];
+        self.playableBufferInterval = 2.f;
+        
+        [[KxAudioManager audioManager] activateAudioSession];
         [self setupDecodeTimer];
     }
     return self;
@@ -44,6 +61,7 @@
 
 - (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
 {
+    [self clean];
     self.contentURL = contentURL;
     self.videoType = videoType;
     [self setupDecoder];
@@ -51,17 +69,51 @@
 
 - (void)play
 {
-    NSLog(@"SGFFPlayer %s", __func__);
-}
-
-- (void)stop
-{
-    NSLog(@"SGFFPlayer %s", __func__);
+    self.playing = YES;
+    [KxAudioManager audioManager].delegate = self;
+    [KxAudioManager audioManager].delegateQueue = dispatch_get_main_queue();
+    [[KxAudioManager audioManager] play];
+    
+    switch (self.state) {
+        case SGPlayerStateNone:
+        case SGPlayerStateSuspend:
+        case SGPlayerStateFailed:
+        case SGPlayerStateFinished:
+        {
+            self.state = SGPlayerStateBuffering;
+        }
+            break;
+        case SGPlayerStateReadyToPlay:
+        case SGPlayerStatePlaying:
+        case SGPlayerStateBuffering:
+            break;
+    }
 }
 
 - (void)pause
 {
-    NSLog(@"SGFFPlayer %s", __func__);
+    self.playing = NO;
+    [[KxAudioManager audioManager] pause];
+    
+    switch (self.state) {
+        case SGPlayerStateNone:
+        case SGPlayerStateSuspend:
+            break;
+        case SGPlayerStateFailed:
+        case SGPlayerStateReadyToPlay:
+        case SGPlayerStateFinished:
+        case SGPlayerStatePlaying:
+        case SGPlayerStateBuffering:
+        {
+            self.state = SGPlayerStateSuspend;
+        }
+            break;
+    }
+}
+
+- (void)stop
+{
+    [self clean];
 }
 
 - (void)seekToTime:(NSTimeInterval)time
@@ -69,9 +121,21 @@
     [self seekToTime:time completeHandler:nil];
 }
 
-- (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL))completeHandler
+- (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler
 {
-    NSLog(@"SGFFPlayer %s", __func__);
+    [self cleanFrames];
+    self.seeking = YES;
+    self.progress = time;
+    
+    __weak typeof(self) weakSelf = self;
+    [self.decoder seekToTime:time completeHandler:^(BOOL finished) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        strongSelf.seeking = NO;
+        [strongSelf resumeDecodeTimer];
+        if (completeHandler) {
+            completeHandler(finished);
+        }
+    }];
 }
 
 - (void)setVolume:(CGFloat)volume
@@ -88,6 +152,15 @@
 {
     NSLog(@"SGFFPlayer %s", __func__);
     return nil;
+}
+
+- (void)setState:(SGPlayerState)state
+{
+    if (_state != state) {
+        SGPlayerState temp = _state;
+        _state = state;
+        [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
+    }
 }
 
 - (void)setContentURL:(NSURL *)contentURL
@@ -108,14 +181,17 @@
     }
 }
 
-#pragma mark - frames
-
-- (void)setupFrames
+- (NSTimeInterval)playableTime
 {
-    [self cleanFrames];
-    self.videoFrames = [NSMutableArray array];
-    self.audioFrames = [NSMutableArray array];
+    return self.progress + self.bufferDuration;
 }
+
+- (NSTimeInterval)duration
+{
+    return self.decoder.duration;
+}
+
+#pragma mark - frames
 
 - (void)addFrames:(NSArray <SGFFFrame *> *)frames
 {
@@ -129,13 +205,60 @@
             case SGFFFrameTypeAudio:
             {
                 [self.audioFrames addObject:frame];
+                self.bufferDuration += frame.duration;
             }
                 break;
             default:
                 break;
         }
     }
-    NSLog(@"\nvideo frame count : %ld\naudio frame count : %ld", self.videoFrames.count, self.audioFrames.count);
+    
+    if (self.playing) {
+        if (self.audioFrames.count <= 0) {
+            self.state = SGPlayerStateBuffering;
+        } else {
+            self.state = SGPlayerStatePlaying;
+        }
+    }
+//    NSLog(@"\nvideo frame count : %ld\naudio frame count : %ld", self.videoFrames.count, self.audioFrames.count);
+}
+
+#pragma mark - clean
+
+- (void)clean
+{
+    [self cleanPlayer];
+    [self cleanFrames];
+    [self cleanDecoder];
+}
+
+- (void)cleanPlayer
+{
+    self.contentURL = nil;
+    self.videoType = nil;
+    self.seeking = NO;
+    self.playing = NO;
+    self.state = SGPlayerStateNone;
+    self.progress = 0;
+}
+
+- (void)cleanFrames
+{
+    [self.videoFrames removeAllObjects];
+    [self.audioFrames removeAllObjects];
+    
+    self.currentAudioFrameSamples = nil;
+    self.currentAudioFramePosition = 0;
+    self.bufferDuration = 0;
+}
+
+- (void)cleanDecoder
+{
+    if (self.decoder) {
+        [self.decoder closeFile];
+        self.decoder = nil;
+    }
+    [self pauseDecodeTimer];
 }
 
 #pragma mark - decode frames
@@ -148,7 +271,11 @@
 
 - (void)setupDecodeTimer
 {
-    self.decodeTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 target:self selector:@selector(decodeTimerHandler) userInfo:nil repeats:YES];
+    __weak typeof(self) weakSelf = self;
+    self.decodeTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 repeats:YES block:^(NSTimer * _Nonnull timer) {
+        __strong typeof(weakSelf) strongSelf = weakSelf;
+        [strongSelf decodeTimerHandler];
+    }];
     [[NSRunLoop mainRunLoop] addTimer:self.decodeTimer forMode:NSRunLoopCommonModes];
     [self pauseDecodeTimer];
 }
@@ -160,65 +287,24 @@
 
 - (void)resumeDecodeTimer
 {
-    self.decodeTimer.fireDate = [NSDate distantPast];
+    if (self.decodeTimer.fireDate.timeIntervalSince1970 > [NSDate date].timeIntervalSince1970) {
+        self.decodeTimer.fireDate = [NSDate distantPast];
+    }
 }
 
 - (void)decodeTimerHandler
 {
+    if (self.seeking) return;
     if (!self.decoder.endOfFile && !self.decoder.decoding) {
         [self.decoder decodeFrames];
     }
 }
 
-#pragma mark - clean
-
-- (void)cleanDecoder
-{
-    if (self.decoder) {
-        [self.decoder closeFile];
-        self.decoder = nil;
-    }
-    [self pauseDecodeTimer];
-}
-
-- (void)cleanFrames
-{
-    [self.videoFrames removeAllObjects];
-    [self.audioFrames removeAllObjects];
-}
-
 #pragma mark - SGFFDecoderDelegate
 
-- (void)decoderDidOpenInputStream:(SGFFDecoder *)decoder
+- (void)decoderWillOpenInputStream:(SGFFDecoder *)decoder
 {
-    
-    NSLog(@"SGFFPlayer %s \nmetadata : %@", __func__, decoder.metadata);
-}
-
-- (void)decoder:(SGFFDecoder *)decoder openInputStreamError:(NSError *)error
-{
-    NSLog(@"SGFFPlayer %s, \nerror : %@", __func__, error);
-}
-
-- (void)decoderDidOpenVideoStream:(SGFFDecoder *)decoder
-{
-    NSLog(@"SGFFPlayer %s", __func__);
-}
-
-- (void)decoder:(SGFFDecoder *)decoder openVideoStreamError:(NSError *)error
-{
-    NSLog(@"SGFFPlayer %s, \nerror : %@", __func__, error);
-    
-}
-
-- (void)decoderDidOpenAudioStream:(SGFFDecoder *)decoder
-{
-    NSLog(@"SGFFPlayer %s", __func__);
-}
-
-- (void)decoder:(SGFFDecoder *)decoder openAudioStreamError:(NSError *)error
-{
-    NSLog(@"SGFFPlayer %s, \nerror : %@", __func__, error);
+    self.state = SGPlayerStateBuffering;
 }
 
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder
@@ -226,14 +312,12 @@
     NSLog(@"SGFFPlayer %s", __func__);
     NSLog(@"\nvideo enable : %d\naudio enable : %d", decoder.videoEnable, decoder.audioEnable);
     [self resumeDecodeTimer];
+    self.state = SGPlayerStateReadyToPlay;
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didDecodeFrames:(NSArray<SGFFFrame *> *)frames
 {
-    NSLog(@"SGFFPlayer %s \nframes : %@", __func__, frames);
-    for (SGFFFrame * frame in frames) {
-        NSLog(@"frame type : %d, postion : %f, duration : %f", frame.type, frame.position, frame.duration);
-    }
+    if (self.seeking) return;
     if (frames.count > 0) {
         [self addFrames:frames];
     }
@@ -248,6 +332,64 @@
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error
 {
     NSLog(@"SGFFPlayer %s, \nerror : %@", __func__, error);
+}
+
+#pragma mark - audio
+
+- (void)audioManager:(KxAudioManager *)audioManager outputData:(float *)data numberOfFrames:(UInt32)numFrames numberOfChannels:(UInt32)numChannels
+{
+    if (!self.playing) return;
+    
+    [self audioCallbackFillData:data numFrames:numFrames numChannels:numChannels];
+}
+
+- (void)audioCallbackFillData:(float *)outData numFrames:(UInt32) numFrames numChannels:(UInt32)numChannels
+{
+    if (self.bufferDuration < self.playableBufferInterval) {
+        memset(outData, 0, numFrames * numChannels * sizeof(float));
+        return;
+    }
+    
+    while (numFrames > 0) {
+        if (!self.currentAudioFrameSamples) {
+            if (self.audioFrames.count > 0) {
+                
+                SGFFAudioFrame * frame = self.audioFrames[0];
+                [self.audioFrames removeObjectAtIndex:0];
+                self.progress = frame.position;
+                self.bufferDuration -= frame.duration;
+                
+                self.currentAudioFramePosition = 0;
+                self.currentAudioFrameSamples = frame.samples;
+            }
+        }
+        if (self.currentAudioFrameSamples) {
+            const void *bytes = (Byte *)self.currentAudioFrameSamples.bytes + self.currentAudioFramePosition;
+            const NSUInteger bytesLeft = (self.currentAudioFrameSamples.length - self.currentAudioFramePosition);
+            const NSUInteger frameSizeOf = numChannels * sizeof(float);
+            const NSUInteger bytesToCopy = MIN(numFrames * frameSizeOf, bytesLeft);
+            const NSUInteger framesToCopy = bytesToCopy / frameSizeOf;
+            
+            memcpy(outData, bytes, bytesToCopy);
+            numFrames -= framesToCopy;
+            outData += framesToCopy * numChannels;
+            
+            if (bytesToCopy < bytesLeft) {
+                self.currentAudioFramePosition += bytesToCopy;
+            } else {
+                self.currentAudioFrameSamples = nil;
+            }
+        } else {
+            memset(outData, 0, numFrames * numChannels * sizeof(float));
+            break;
+        }
+    }
+}
+
+- (void)dealloc
+{
+    [self cleanDecoder];
+    NSLog(@"SGFFPlayer release %@", [NSThread currentThread]);
 }
 
 @end
