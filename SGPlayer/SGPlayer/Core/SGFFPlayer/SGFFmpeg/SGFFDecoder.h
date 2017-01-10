@@ -56,7 +56,10 @@
 
 - (void)decodeFrames;
 - (void)decodeFramesWithDuration:(NSTimeInterval)duration;
+
+@property (nonatomic, assign, readonly) BOOL seekEnable;
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler;
+
 - (void)closeFile;      // when release of active calls, or when called in dealloc might block the thread
 
 @end

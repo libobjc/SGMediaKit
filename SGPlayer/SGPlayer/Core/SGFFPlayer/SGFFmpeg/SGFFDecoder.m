@@ -141,6 +141,11 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
     return (CGFloat)(_format_context->duration) / AV_TIME_BASE;
 }
 
+- (BOOL)seekEnable
+{
+    return self.duration > 0;
+}
+
 - (void)openFile
 {
     NSBlockOperation * operation = [NSBlockOperation blockOperationWithBlock:^{
@@ -522,6 +527,13 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler
 {
+    if (!self.seekEnable) {
+        if (completeHandler) {
+            completeHandler(NO);
+        }
+        return;
+    }
+    
     NSBlockOperation * operation = [NSBlockOperation blockOperationWithBlock:^{
         self.position = time;
         self.endOfFile = NO;
@@ -536,7 +548,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
             avcodec_flush_buffers(_audio_codec);
         }
         if (completeHandler) {
-            [self delegateSyncCallback:^{
+            [self delegateAsyncCallback:^{
                 if (completeHandler) {
                     completeHandler(YES);
                 }
