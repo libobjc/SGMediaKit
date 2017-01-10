@@ -14,6 +14,7 @@
 @protocol SGFFDecoderDelegate <NSObject>
 
 // open input stream
+- (void)decoderWillOpenInputStream:(SGFFDecoder *)decoder;
 - (void)decoderDidOpenInputStream:(SGFFDecoder *)decoder;
 - (void)decoder:(SGFFDecoder *)decoder openInputStreamError:(NSError *)error;
 
@@ -51,9 +52,11 @@
 
 @property (nonatomic, assign, readonly) NSTimeInterval fps;
 @property (nonatomic, assign, readonly) NSTimeInterval position;
+@property (nonatomic, assign, readonly) NSTimeInterval duration;
 
 - (void)decodeFrames;
 - (void)decodeFramesWithDuration:(NSTimeInterval)duration;
-- (void)closeFile;
+- (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler;
+- (void)closeFile;      // when release of active calls, or when called in dealloc might block the thread
 
 @end
