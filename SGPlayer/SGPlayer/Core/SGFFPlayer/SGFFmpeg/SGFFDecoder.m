@@ -383,7 +383,6 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
             int errorCode = av_read_frame(_format_context, &packet);
             NSError * error = checkErrorCode(errorCode);
             if (error) {
-                NSLog(@"end of file %d", self.endOfFile);
                 self.endOfFile = YES;
                 finished = YES;
                 if ([self.delegate respondsToSelector:@selector(decoderDidEndOfFile:)]) {

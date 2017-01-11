@@ -47,8 +47,8 @@
 @property (nonatomic, assign, readonly) BOOL videoEnable;
 @property (nonatomic, assign, readonly) BOOL audioEnable;
 
-@property (nonatomic, assign, readonly) BOOL endOfFile;
-@property (nonatomic, assign, readonly) BOOL decoding; 
+@property (atomic, assign, readonly) BOOL endOfFile;
+@property (atomic, assign, readonly) BOOL decoding;
 
 @property (nonatomic, assign, readonly) NSTimeInterval fps;
 @property (nonatomic, assign, readonly) NSTimeInterval position;
