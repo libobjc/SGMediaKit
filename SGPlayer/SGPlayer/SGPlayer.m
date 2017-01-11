@@ -39,7 +39,7 @@
         self.videoType = SGVideoTypeNormal;
         self.backgroundMode = SGPlayerBackgroundModeAutoPlayAndPause;
         self.displayMode = SGDisplayModeNormal;
-        self.playableBufferInterval = 5.f;
+        self.playableBufferInterval = 2.f;
         self.viewAnimationHidden = NO;
         self.volume = 1;
     }
