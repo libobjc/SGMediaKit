@@ -13,6 +13,8 @@
 
 @interface SGFFPlayer () <SGFFDecoderDelegate, KxAudioManagerDelegate>
 
+@property (nonatomic, strong) NSLock * lock;
+
 @property (nonatomic, strong) SGFFDecoder * decoder;
 @property (nonatomic, strong) NSTimer * decodeTimer;
 
@@ -47,6 +49,8 @@
 - (instancetype)init
 {
     if (self = [super init]) {
+        
+        self.lock = [[NSLock alloc] init];
         
         self.videoFrames = [NSMutableArray array];
         self.audioFrames = [NSMutableArray array];
@@ -170,62 +174,62 @@
 
 - (void)setState:(SGPlayerState)state
 {
-    @synchronized (self) {
-        if (_state != state) {
-            SGPlayerState temp = _state;
-            _state = state;
-            [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
-        }
+    [self.lock lock];
+    if (_state != state) {
+        SGPlayerState temp = _state;
+        _state = state;
+        [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
     }
+    [self.lock unlock];
 }
 
 - (void)setProgress:(NSTimeInterval)progress
 {
-    @synchronized (self) {
-        if (_progress != progress) {
-            NSTimeInterval previous = _progress;
-            _progress = progress;
-            NSTimeInterval duration = self.duration;
-            if (_progress == 0 || _progress == duration) {
+    [self.lock lock];
+    if (_progress != progress) {
+        NSTimeInterval previous = _progress;
+        _progress = progress;
+        NSTimeInterval duration = self.duration;
+        if (_progress == 0 || _progress == duration) {
+            [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
+        } else {
+            NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
+            if (currentTime - self.lastPostProgressTime >= 1) {
+                self.lastPostProgressTime = currentTime;
                 [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
-            } else {
-                NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
-                if (currentTime - self.lastPostProgressTime >= 1) {
-                    self.lastPostProgressTime = currentTime;
-                    [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
-                }
             }
         }
     }
+    [self.lock unlock];
 }
 
 - (void)setBufferDuration:(NSTimeInterval)bufferDuration
 {
-    @synchronized (self) {
-        if (_bufferDuration != bufferDuration) {
-            if (bufferDuration < 0) {
-                bufferDuration = 0;
+    [self.lock lock];
+    if (_bufferDuration != bufferDuration) {
+        if (bufferDuration < 0) {
+            bufferDuration = 0;
+        }
+        _bufferDuration = bufferDuration;
+        
+        if (!self.decoder.endOfFile) {
+            NSTimeInterval playableTtime = self.playableTime;
+            NSTimeInterval duration = self.duration;
+            if (playableTtime > duration) {
+                playableTtime = duration;
             }
-            _bufferDuration = bufferDuration;
-            
-            if (!self.decoder.endOfFile) {
-                NSTimeInterval playableTtime = self.playableTime;
-                NSTimeInterval duration = self.duration;
-                if (playableTtime > duration) {
-                    playableTtime = duration;
-                }
-                if (_bufferDuration == 0 || playableTtime == duration) {
+            if (_bufferDuration == 0 || playableTtime == duration) {
+                [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
+            } else {
+                NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
+                if (currentTime - self.lastPostPlayableTime >= 1) {
+                    self.lastPostPlayableTime = currentTime;
                     [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
-                } else {
-                    NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
-                    if (currentTime - self.lastPostPlayableTime >= 1) {
-                        self.lastPostPlayableTime = currentTime;
-                        [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
-                    }
                 }
             }
         }
     }
+    [self.lock unlock];
 }
 
 - (void)setContentURL:(NSURL *)contentURL
