@@ -151,25 +151,19 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
     NSBlockOperation * operation = [NSBlockOperation blockOperationWithBlock:^{
         
         if ([self.delegate respondsToSelector:@selector(decoderWillOpenInputStream:)]) {
-            [self delegateSyncCallback:^{
-                [self.delegate decoderWillOpenInputStream:self];
-            }];
+            [self.delegate decoderWillOpenInputStream:self];
         }
         NSError * error;
         // input stream
         error = [self openStream];
         if (error) {
             if ([self.delegate respondsToSelector:@selector(decoder:openInputStreamError:)]) {
-                [self delegateSyncCallback:^{
-                    [self.delegate decoder:self openInputStreamError:error];
-                }];
+                [self.delegate decoder:self openInputStreamError:error];
             }
             return;
         } else {
             if ([self.delegate respondsToSelector:@selector(decoderDidOpenInputStream:)]) {
-                [self delegateSyncCallback:^{
-                    [self.delegate decoderDidOpenInputStream:self];
-                }];
+                [self.delegate decoderDidOpenInputStream:self];
             }
         }
         
@@ -177,15 +171,11 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         error = [self fetchVideoStream];
         if (error) {
             if ([self.delegate respondsToSelector:@selector(decoder:openVideoStreamError:)]) {
-                [self delegateSyncCallback:^{
-                    [self.delegate decoder:self openVideoStreamError:error];
-                }];
+                [self.delegate decoder:self openVideoStreamError:error];
             }
         } else {
             if ([self.delegate respondsToSelector:@selector(decoderDidOpenVideoStream:)]) {
-                [self delegateSyncCallback:^{
-                    [self.delegate decoderDidOpenVideoStream:self];
-                }];
+                [self.delegate decoderDidOpenVideoStream:self];
             }
         }
         
@@ -193,22 +183,16 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         error = [self fetchAutioStream];
         if (error) {
             if ([self.delegate respondsToSelector:@selector(decoder:openAudioStreamError:)]) {
-                [self delegateSyncCallback:^{
-                    [self.delegate decoder:self openAudioStreamError:error];
-                }];
+                [self.delegate decoder:self openAudioStreamError:error];
             }
         } else {
             if ([self.delegate respondsToSelector:@selector(decoderDidOpenAudioStream:)]) {
-                [self delegateSyncCallback:^{
-                    [self.delegate decoderDidOpenAudioStream:self];
-                }];
+                [self.delegate decoderDidOpenAudioStream:self];
             }
         }
         
         if ([self.delegate respondsToSelector:@selector(decoderDidPrepareToDecodeFrames:)]) {
-            [self delegateSyncCallback:^{
-                [self.delegate decoderDidPrepareToDecodeFrames:self];
-            }];
+            [self.delegate decoderDidPrepareToDecodeFrames:self];
         }
     }];
     operation.queuePriority = NSOperationQueuePriorityVeryHigh;
@@ -403,9 +387,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                 self.endOfFile = YES;
                 finished = YES;
                 if ([self.delegate respondsToSelector:@selector(decoderDidEndOfFile:)]) {
-                    [self delegateSyncCallback:^{
-                        [self.delegate decoderDidEndOfFile:self];
-                    }];
+                    [self.delegate decoderDidEndOfFile:self];
                 }
                 break;
             }
@@ -513,9 +495,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         }
         
         if ([self.delegate respondsToSelector:@selector(decoder:didDecodeFrames:)]) {
-            [self delegateSyncCallback:^{
-                [self.delegate decoder:self didDecodeFrames:frames];
-            }];
+            [self.delegate decoder:self didDecodeFrames:frames];
         }
         av_packet_unref(&packet);
         
@@ -548,11 +528,9 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
             avcodec_flush_buffers(_audio_codec);
         }
         if (completeHandler) {
-            [self delegateAsyncCallback:^{
-                if (completeHandler) {
-                    completeHandler(YES);
-                }
-            }];
+            if (completeHandler) {
+                completeHandler(YES);
+            }
         }
     }];
     operation.queuePriority = NSOperationQueuePriorityVeryHigh;
@@ -685,9 +663,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 {
     if (error) {
         if ([self.delegate respondsToSelector:@selector(decoder:didError:)]) {
-            [self delegateAsyncCallback:^{
-                [self.delegate decoder:self didError:error];
-            }];
+            [self.delegate decoder:self didError:error];
         }
     }
 }
