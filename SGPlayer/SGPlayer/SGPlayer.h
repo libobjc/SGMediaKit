@@ -38,7 +38,7 @@
 @property (nonatomic, assign, readonly) NSTimeInterval playableTime;
 @property (nonatomic, assign) NSTimeInterval playableBufferInterval;    // default is 2s
 @property (nonatomic, assign, readonly) BOOL seeking;
-@property (nonatomic, assign) CGFloat volume;
+@property (nonatomic, assign) CGFloat volume;       // default is 1
 
 - (void)play;
 - (void)pause;
