@@ -21,8 +21,7 @@ NSString * const SGPlayerPlayableChangeName = @"SGPlayerPlayableChangeName";   /
 // all
 NSString * const SGPlayerIdentifierKey = @"identifier";
 // error
-NSString * const SGPlayerErrorMessageKey = @"message";
-NSString * const SGPlayerErrorCodeKey = @"code";
+NSString * const SGPlayerErrorKey = @"error";
 // state
 NSString * const SGPlayerStatePreviousKey = @"previous";
 NSString * const SGPlayerStateCurrentKey = @"current";

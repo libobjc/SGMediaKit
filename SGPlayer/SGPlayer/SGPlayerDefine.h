@@ -78,8 +78,7 @@ SGPLAYER_EXTERN NSString * const SGPlayerPlayableChangeName;   // player playabl
 // all
 SGPLAYER_EXTERN NSString * const SGPlayerIdentifierKey;
 // error
-SGPLAYER_EXTERN NSString * const SGPlayerErrorMessageKey;
-SGPLAYER_EXTERN NSString * const SGPlayerErrorCodeKey;
+SGPLAYER_EXTERN NSString * const SGPlayerErrorKey;
 // state
 SGPLAYER_EXTERN NSString * const SGPlayerStatePreviousKey;
 SGPLAYER_EXTERN NSString * const SGPlayerStateCurrentKey;

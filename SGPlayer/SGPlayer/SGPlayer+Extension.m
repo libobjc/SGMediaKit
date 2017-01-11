@@ -30,6 +30,11 @@
     if (errorAction) [[NSNotificationCenter defaultCenter] addObserver:target selector:errorAction name:SGPlayerErrorName object:player];
 }
 
+- (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction errorAction:(SEL)errorAction
+{
+    [self.class registerPlayerNotification:self target:target stateAction:stateAction progressAction:progressAction playableAction:playableAction errorAction:errorAction];
+}
+
 - (void)removePlayerNotificationTarget:(id)target
 {
     [self.class removePlayerNotification:self target:target];
@@ -59,7 +64,6 @@
 + (SGState *)stateFromUserInfo:(NSDictionary *)userInfo
 {
     SGState * state = [[SGState alloc] init];
-    state.identifier = [userInfo objectForKey:SGPlayerIdentifierKey];
     state.previous = [[userInfo objectForKey:SGPlayerStatePreviousKey] integerValue];
     state.current = [[userInfo objectForKey:SGPlayerStateCurrentKey] integerValue];
     return state;
@@ -72,7 +76,6 @@
 + (SGProgress *)progressFromUserInfo:(NSDictionary *)userInfo
 {
     SGProgress * progress = [[SGProgress alloc] init];
-    progress.identifier = [userInfo objectForKey:SGPlayerIdentifierKey];
     progress.percent = [[userInfo objectForKey:SGPlayerProgressPercentKey] doubleValue];
     progress.current = [[userInfo objectForKey:SGPlayerProgressCurrentKey] doubleValue];
     progress.total = [[userInfo objectForKey:SGPlayerProgressTotalKey] doubleValue];
@@ -86,7 +89,6 @@
 + (SGPlayable *)playableFromUserInfo:(NSDictionary *)userInfo
 {
     SGPlayable * playable = [[SGPlayable alloc] init];
-    playable.identifier = [userInfo objectForKey:SGPlayerIdentifierKey];
     playable.percent = [[userInfo objectForKey:SGPlayerPlayablePercentKey] doubleValue];
     playable.current = [[userInfo objectForKey:SGPlayerPlayableCurrentKey] doubleValue];
     playable.total = [[userInfo objectForKey:SGPlayerPlayableTotalKey] doubleValue];
@@ -100,9 +102,7 @@
 + (SGError *)errorFromUserInfo:(NSDictionary *)userInfo
 {
     SGError * error = [[SGError alloc] init];
-    error.identifier = [userInfo objectForKey:SGPlayerIdentifierKey];
-    error.message = [userInfo objectForKey:SGPlayerErrorMessageKey];
-    error.code = [[userInfo objectForKey:SGPlayerErrorCodeKey] integerValue];
+    error.error = [userInfo objectForKey:SGPlayerErrorKey];
     return error;
 }
 

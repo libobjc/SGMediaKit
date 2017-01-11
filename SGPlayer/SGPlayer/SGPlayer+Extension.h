@@ -18,7 +18,9 @@
 @interface SGPlayer (Extension)
 
 + (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction;      // object's class is NSNotification
++ (void)registerPlayerNotification:(SGPlayer *)player target:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction errorAction:(SEL)errorAction;
 - (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction;      // object's class is NSNotification
+- (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction errorAction:(SEL)errorAction;
 + (void)removePlayerNotificationTarget:(id)target;
 - (void)removePlayerNotificationTarget:(id)target;
 
@@ -27,7 +29,6 @@
 #pragma mark - Models
 
 @interface SGModel : NSObject
-@property (nonatomic, copy) NSString * identifier;
 @end
 
 @interface SGState : SGModel
@@ -51,8 +52,7 @@
 @end
 
 @interface SGError : SGModel
-@property (nonatomic, copy) NSString * message;
-@property (nonatomic, assign) NSInteger code;
+@property (nonatomic, copy) NSError * error;
 + (SGError *)errorFromUserInfo:(NSDictionary *)userInfo;
 @end
 

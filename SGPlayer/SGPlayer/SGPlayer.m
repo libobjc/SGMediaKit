@@ -385,11 +385,6 @@
     }];
 }
 
-- (void)playerError
-{
-    [SGNotification postPlayer:self errorMessage:@"unsupport video type" code:1901];
-}
-
 - (void)dealloc
 {
     SGPlayerLog(@"SGPlayer release");

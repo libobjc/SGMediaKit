@@ -10,15 +10,15 @@
 
 @implementation SGNotification
 
-+ (void)postPlayer:(SGPlayer *)player errorMessage:(NSString *)message code:(NSInteger)code
++ (void)postPlayer:(SGPlayer *)player error:(NSError *)error
 {
     if (!player) return;
-    if (![message isKindOfClass:[NSString class]] || message == nil) message = @"SGPlayer unknown error";
-    if (code <= 0) code = 1900;
-    NSDictionary * userInfo = @{
-                                SGPlayerErrorMessageKey : message,
-                                SGPlayerErrorCodeKey : @(code)
-                                };
+    NSDictionary * userInfo;
+    if (error) {
+        userInfo = @{
+                     SGPlayerErrorKey : error
+                     };
+    }
     [self postNotificationName:SGPlayerErrorName object:player userInfo:userInfo];
 }
 

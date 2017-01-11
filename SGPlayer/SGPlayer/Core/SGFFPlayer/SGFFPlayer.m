@@ -478,6 +478,12 @@
     }
 }
 
+- (void)errorHandler:(NSError *)error
+{
+    self.state = SGPlayerStateFailed;
+    [SGNotification postPlayer:self.abstractPlayer error:error];
+}
+
 - (void)dealloc
 {
     [self cleanDecoder];
