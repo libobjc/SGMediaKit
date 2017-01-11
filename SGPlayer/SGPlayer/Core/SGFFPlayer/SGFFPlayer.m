@@ -170,58 +170,37 @@
 
 - (void)setState:(SGPlayerState)state
 {
-    static BOOL needPostState = NO;
-    static SGPlayerState previous = SGPlayerStateNone;
-    previous = _state;
-    needPostState = NO;
-    
     @synchronized (self) {
         if (_state != state) {
+            SGPlayerState temp = _state;
             _state = state;
-            needPostState = YES;
+            [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
         }
-    }
-    if (needPostState) {
-        [SGNotification postPlayer:self.abstractPlayer statePrevious:previous current:_state];
     }
 }
 
 - (void)setProgress:(NSTimeInterval)progress
 {
-    static BOOL needPostProgress = NO;
-    static NSTimeInterval duration = 0;
-    needPostProgress = NO;
-    duration = 0;
-    
     @synchronized (self) {
         if (_progress != progress) {
+            NSTimeInterval previous = _progress;
             _progress = progress;
-            duration = self.duration;
+            NSTimeInterval duration = self.duration;
             if (_progress == 0 || _progress == duration) {
-                needPostProgress = YES;
+                [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
             } else {
                 NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
-                if (currentTime - self.lastPostProgressTime >= 10) {
+                if (currentTime - self.lastPostProgressTime >= 1) {
                     self.lastPostProgressTime = currentTime;
-                    needPostProgress = YES;
+                    [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
                 }
             }
         }
-    }
-    if (needPostProgress) {
-        [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
     }
 }
 
 - (void)setBufferDuration:(NSTimeInterval)bufferDuration
 {
-    static BOOL needPostPlayable = NO;
-    static NSTimeInterval duration = 0;
-    static NSTimeInterval playable = 0;
-    needPostPlayable = NO;
-    duration = 0;
-    playable = 0;
-    
     @synchronized (self) {
         if (_bufferDuration != bufferDuration) {
             if (bufferDuration < 0) {
@@ -236,19 +215,16 @@
                     playableTtime = duration;
                 }
                 if (_bufferDuration == 0 || playableTtime == duration) {
-                    needPostPlayable = YES;
+                    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
                 } else {
                     NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
                     if (currentTime - self.lastPostPlayableTime >= 1) {
                         self.lastPostPlayableTime = currentTime;
-                        needPostPlayable = YES;
+                        [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
                     }
                 }
             }
         }
-    }
-    if (needPostPlayable) {
-        [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playable/duration) current:@(playable) total:@(duration)];
     }
 }
 
