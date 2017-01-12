@@ -434,10 +434,11 @@
         if (self.audioFrames.count <= 0) {
             self.progress = self.duration;
             self.state = SGPlayerStateFinished;
+            memset(outData, 0, numFrames * numChannels * sizeof(float));
             return;
         }
     } else {
-        if (self.bufferDuration < self.playableBufferInterval ) {
+        if (self.bufferDuration < self.playableBufferInterval) {
             memset(outData, 0, numFrames * numChannels * sizeof(float));
             return;
         }
