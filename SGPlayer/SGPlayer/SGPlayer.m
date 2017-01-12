@@ -65,7 +65,7 @@
             }
             break;
         case SGDecoderTypeFFmpeg:
-            [self.ffPlayer replaceVideoWithURL:contentURL videoType:videoType];
+            [self.ffPlayer replaceVideo];
             if (_avPlayer) {
                 [self.avPlayer stop];
             }
@@ -154,7 +154,7 @@
         [self.avPlayer reloadVolume];
     }
     if (_ffPlayer) {
-        self.ffPlayer.volume = volume;
+        [self.ffPlayer reloadVolume];
     }
 }
 
@@ -273,15 +273,7 @@
 - (SGFFPlayer *)ffPlayer
 {
     if (!_ffPlayer) {
-        _ffPlayer = [SGFFPlayer player];
-        [self setupPlayerView:self.ffPlayer.view];
-        _ffPlayer.abstractPlayer = self;
-        _ffPlayer.displayMode = self.displayMode;
-        [_ffPlayer setViewTapBlock:self.playerViewTapAction];
-        _ffPlayer.volume = self.volume;
-        _ffPlayer.viewAnimationHidden = self.viewAnimationHidden;
-        _ffPlayer.playableBufferInterval = self.playableBufferInterval;
-        _ffPlayer.backgroundMode = self.backgroundMode;
+        _ffPlayer = [SGFFPlayer playerWithAbstractPlayer:self];
     }
     return _ffPlayer;
 }

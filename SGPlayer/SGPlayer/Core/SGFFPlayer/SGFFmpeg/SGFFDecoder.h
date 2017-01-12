@@ -22,6 +22,8 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 @protocol SGFFDecoderDelegate <NSObject>
 
+@optional
+
 // open input stream
 - (void)decoderWillOpenInputStream:(SGFFDecoder *)decoder;
 - (void)decoderDidOpenInputStream:(SGFFDecoder *)decoder;
@@ -47,7 +49,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
-+ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id <SGFFDecoderDelegate>)delegate delegateQueue:(dispatch_queue_t)delegateQueue;
++ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id <SGFFDecoderDelegate>)delegate;
 
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSDictionary * metadata;

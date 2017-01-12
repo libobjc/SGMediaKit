@@ -90,14 +90,13 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 }
 
 @property (nonatomic, weak) id <SGFFDecoderDelegate> delegate;
-@property (nonatomic, strong) dispatch_queue_t delegate_queue;
 @property (nonatomic, strong) NSOperationQueue * ffmpegQueue;
 
 @property (nonatomic, copy) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSString * contentURLString;
 @property (nonatomic, copy) NSDictionary * metadata;
-@property (nonatomic, assign) BOOL endOfFile;
-@property (nonatomic, assign) BOOL decoding;
+@property (atomic, assign) BOOL endOfFile;
+@property (atomic, assign) BOOL decoding;
 @property (nonatomic, assign) NSTimeInterval position;
 
 @property (nonatomic, copy) NSArray <NSNumber *> * video_stream_indexs;
@@ -107,12 +106,12 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 
 @implementation SGFFDecoder
 
-+ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate delegateQueue:(dispatch_queue_t)delegateQueue
++ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate
 {
-    return [[self alloc] initWithContentURL:contentURL delegate:delegate delegateQueue:delegateQueue];
+    return [[self alloc] initWithContentURL:contentURL delegate:delegate];
 }
 
-- (instancetype)initWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate delegateQueue:(dispatch_queue_t)delegateQueue
+- (instancetype)initWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate
 {
     if (self = [super init]) {
         
@@ -125,7 +124,6 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         
         self.contentURL = contentURL;
         self.delegate = delegate;
-        self.delegate_queue = delegateQueue;
         self.ffmpegQueue = [[NSOperationQueue alloc] init];
         self.ffmpegQueue.maxConcurrentOperationCount = 1;
         
@@ -633,31 +631,6 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 }
 
 #pragma mark - delegate callback
-
-- (void)delegateAsyncCallback:(dispatch_block_t)block
-{
-    [self delegateCallback:block async:YES];
-}
-
-- (void)delegateSyncCallback:(dispatch_block_t)block
-{
-    [self delegateCallback:block async:NO];
-}
-
-- (void)delegateCallback:(dispatch_block_t)block async:(BOOL)async
-{
-    if (block) {
-        dispatch_queue_t queue = self.delegate_queue;
-        if (!queue) {
-            queue = dispatch_get_main_queue();
-        }
-        if (async) {
-            dispatch_sync(queue, block);
-        } else {
-            dispatch_sync(queue, block);
-        }
-    }
-}
 
 - (void)delegateErrorCallback:(NSError *)error
 {
