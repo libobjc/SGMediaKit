@@ -7,17 +7,20 @@
 //
 
 #import "SGAVPlayer.h"
+#import "SGPlayer+DisplayView.h"
 #import "SGPlayerMacro.h"
 #import "SGNotification.h"
-#import "SGAVView.h"
-#import "SGAVGLView.h"
+#import <AVFoundation/AVFoundation.h>
 
 static CGFloat const PixelBufferRequestInterval = 0.03f;
 
-@interface SGAVPlayer () <SGAVGLViewDataSource>
+@interface SGAVPlayer ()
 
-@property (nonatomic, strong) SGAVView * view;
+@property (nonatomic, weak) SGPlayer * abstractPlayer;
+
 @property (nonatomic, assign) SGPlayerState state;
+@property (nonatomic, assign) NSTimeInterval playableTime;
+@property (nonatomic, assign) BOOL seeking;
 
 @property (atomic, strong) id playBackTimeObserver;
 @property (nonatomic, strong) AVPlayer * avPlayer;
@@ -34,67 +37,18 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 
 @implementation SGAVPlayer
 
-@synthesize playableTime = _playableTime;
-
-+ (instancetype)player
++ (instancetype)playerWithAbstractPlayer:(SGPlayer *)abstractPlayer
 {
-    return [[self alloc] init];
+    return [[self alloc] initWithAbstractPlayer:abstractPlayer];
 }
 
-- (instancetype)init
+- (instancetype)initWithAbstractPlayer:(SGPlayer *)abstractPlayer
 {
     if (self = [super init]) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
-        
-        self.contentURL = nil;
-        self.videoType = SGVideoTypeNormal;
-        self.playableBufferInterval = 2.f;
-        [self setupPlayer];
+        self.abstractPlayer = abstractPlayer;
+        [self setupAVPlayer];
     }
     return self;
-}
-
-- (void)applicationDidEnterBackground:(NSNotification *)notification
-{
-    [self.view pause];
-    
-    switch (self.abstractPlayer.backgroundMode) {
-        case SGPlayerBackgroundModeAutoPlayAndPause:
-        {
-            [self setAutoPlayIfNeed];
-        }
-            break;
-        default:
-            break;
-    }
-}
-
-- (void)applicationWillEnterForeground:(NSNotification *)notification
-{
-    [self.view resume];
-    
-    switch (self.abstractPlayer.backgroundMode) {
-        case SGPlayerBackgroundModeAutoPlayAndPause:
-        {
-            [self autoPlayIfNeed];
-        }
-            break;
-        default:
-            break;
-    }
-}
-
-- (void)replaceVideoWithURL:(NSURL *)contentURL
-{
-    [self replaceVideoWithURL:contentURL videoType:SGVideoTypeNormal];
-}
-
-- (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
-{
-    self.contentURL = contentURL;
-    self.videoType = videoType;
-    [self setupPlayer];
 }
 
 #pragma mark - play control
@@ -102,10 +56,10 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 - (void)play
 {
     if (self.state == SGPlayerStateFailed || self.state == SGPlayerStateFinished) {
-        [self clearPlayer];
+        [self replaceEmpty];
     }
     
-    [self trySetupPlayer];
+    [self tryReplaceVideo];
     
     switch (self.state) {
         case SGPlayerStateNone:
@@ -226,9 +180,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 
 - (void)stop
 {
-    [self clearPlayer];
-    self.contentURL = nil;
-    self.videoType = SGVideoTypeNormal;
+    [self replaceEmpty];
 }
 
 - (NSTimeInterval)progress
@@ -252,27 +204,6 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     }
 }
 
-- (void)setContentURL:(NSURL *)contentURL
-{
-    _contentURL = contentURL;
-}
-
-- (void)setVideoType:(SGVideoType)videoType
-{
-    _videoType = videoType;
-}
-
-- (void)setSeeking:(BOOL)seeking
-{
-    _seeking = seeking;
-}
-
-- (void)setDisplayMode:(SGDisplayMode)displayMode
-{
-    _displayMode = displayMode;
-    [self.view setDisplayModeForSGAVGLView:displayMode];
-}
-
 - (void)setVolume:(CGFloat)volume
 {
     self.avPlayer.volume = volume;
@@ -283,54 +214,82 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     return self.avPlayer.volume;
 }
 
-- (void)setAvPlayer:(AVPlayer *)avPlayer
+- (void)reloadPlayableTime
 {
-    if (_avPlayer != avPlayer) {
-        if (self.playBackTimeObserver) {
-            [_avPlayer removeTimeObserver:self.playBackTimeObserver];
-            self.playBackTimeObserver = nil;
-        }
-        _avPlayer = avPlayer;
-        
-        if ([UIDevice currentDevice].systemVersion.floatValue >= 10.0) {
-            _avPlayer.automaticallyWaitsToMinimizeStalling = NO;
-        }
-        
-        if (_avPlayer) {
-            SGWeakSelf
-            self.playBackTimeObserver = [_avPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
-                if (weakSelf.state == SGPlayerStatePlaying) {
-                    CGFloat current = CMTimeGetSeconds(time);
-                    CGFloat duration = weakSelf.duration;
-                    [SGNotification postPlayer:weakSelf.abstractPlayer progressPercent:@(current/duration) current:@(current) total:@(duration)];
-                }
-            }];
-        }
+    if (self.avPlayerItem.status == AVPlayerItemStatusReadyToPlay) {
+        CMTimeRange range = [self.avPlayerItem.loadedTimeRanges.firstObject CMTimeRangeValue];
+        NSTimeInterval start = CMTimeGetSeconds(range.start);
+        NSTimeInterval duration = CMTimeGetSeconds(range.duration);
+        self.playableTime = (start + duration);
+    } else {
+        self.playableTime = 0;
     }
 }
 
-- (void)setAvPlayerItem:(AVPlayerItem *)avPlayerItem
+- (void)setPlayableTime:(NSTimeInterval)playableTime
 {
-    if (_avPlayerItem != avPlayerItem) {
-        [_avPlayerItem removeObserver:self forKeyPath:@"status"];
-        [_avPlayerItem removeObserver:self forKeyPath:@"playbackBufferEmpty"];
-        [_avPlayerItem removeObserver:self forKeyPath:@"loadedTimeRanges"];
-        [_avPlayerItem removeOutput:self.avOutput];
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:_avPlayerItem];
-        _avPlayerItem = avPlayerItem;
-        if (_avPlayerItem) {
-            [_avPlayerItem addObserver:self forKeyPath:@"status" options:0 context:NULL];
-            [_avPlayerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew context:NULL];
-            [_avPlayerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:NULL];
-            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(avplayerItemDidPlayToEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:_avPlayerItem];
-        }
+    if (_playableTime != playableTime) {
+        _playableTime = playableTime;
+        CGFloat duration = self.duration;
+        [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTime/duration) current:@(playableTime) total:@(duration)];
     }
 }
 
-- (void)avplayerItemDidPlayToEnd:(NSNotification *)notification
+- (CGSize)presentationSize
 {
-    self.state = SGPlayerStateFinished;
+    if (self.avPlayerItem) {
+        return self.avPlayerItem.presentationSize;
+    }
+    return CGSizeZero;
 }
+
+- (UIImage *)snapshot
+{
+    switch (self.abstractPlayer.videoType) {
+        case SGVideoTypeNormal:
+        {
+            AVAssetImageGenerator * imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:self.avAsset];
+            imageGenerator.appliesPreferredTrackTransform = YES;
+            imageGenerator.requestedTimeToleranceBefore = kCMTimeZero;
+            imageGenerator.requestedTimeToleranceAfter = kCMTimeZero;
+            
+            NSError * error = nil;
+            CMTime time = self.avPlayerItem.currentTime;
+            CMTime actualTime;
+            CGImageRef cgImage = [imageGenerator copyCGImageAtTime:time actualTime:&actualTime error:&error];
+            UIImage * image = [UIImage imageWithCGImage:cgImage];
+            return image;
+        }
+            break;
+        case SGVideoTypeVR:
+        {
+            return nil;
+        }
+            break;
+    }
+}
+
+//- (CVPixelBufferRef)sgav_glViewPixelBufferToDraw:(SGAVGLView *)glView
+//{
+//    if (self.seeking) return nil;
+//    
+//    BOOL hasNewPixelBuffer = [self.avOutput hasNewPixelBufferForItemTime:self.avPlayerItem.currentTime];
+//    if (!hasNewPixelBuffer) {
+//        if (self.hasPixelBuffer) return nil;
+//        [self trySetupOutput];
+//        return nil;
+//    }
+//    
+//    CVPixelBufferRef pixelBuffer = [self.avOutput copyPixelBufferForItemTime:self.avPlayerItem.currentTime itemTimeForDisplay:nil];
+//    if (!pixelBuffer) {
+//        [self trySetupOutput];
+//    } else {
+//        self.hasPixelBuffer = YES;
+//    }
+//    return pixelBuffer;
+//}
+
+#pragma mark - play state change
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
 {
@@ -382,14 +341,8 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
             }
             else if ([keyPath isEqualToString:@"loadedTimeRanges"])
             {
-                NSTimeInterval playableTime = self.playableTime;
-                if (_playableTime != playableTime) {
-                    _playableTime = playableTime;
-                    CGFloat duration = self.duration;
-                    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTime/duration) current:@(playableTime) total:@(duration)];
-                }
-                
-                if ((playableTime - self.progress) > self.playableBufferInterval) {
+                [self reloadPlayableTime];
+                if ((self.playableTime - self.progress) > self.abstractPlayer.playableBufferInterval) {
                     [self playIfNeed];
                 }
             }
@@ -397,135 +350,57 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     });
 }
 
-- (NSTimeInterval)playableTime
+- (void)avplayerItemDidPlayToEnd:(NSNotification *)notification
 {
-    if (self.avPlayerItem.status == AVPlayerItemStatusReadyToPlay) {
-        CMTimeRange range = [self.avPlayerItem.loadedTimeRanges.firstObject CMTimeRangeValue];
-        NSTimeInterval start = CMTimeGetSeconds(range.start);
-        NSTimeInterval duration = CMTimeGetSeconds(range.duration);
-        return (start + duration);
-    }
-    return 0;
+    self.state = SGPlayerStateFinished;
 }
 
-- (CGSize)presentationSize
+- (void)avAssetPrepareFailed:(NSError *)error
 {
-    if (self.avPlayerItem) {
-        return self.avPlayerItem.presentationSize;
-    }
-    return CGSizeZero;
+    SGPlayerLog(@"%s", error);
 }
 
-- (UIView *)view
+#pragma mark - replace video
+
+- (void)tryReplaceVideo
 {
-    if (!_view) {
-        _view = [[SGAVView alloc] initWithFrame:CGRectZero];
+    if (!self.avPlayerItem) {
+        [self replaceVideo];
     }
-    return _view;
 }
 
-- (UIImage *)snapshot
+- (void)replaceVideo
 {
-    switch (self.videoType) {
+    [self replaceEmpty];
+    if (!self.abstractPlayer.contentURL) return;
+    
+    self.avAsset = [AVAsset assetWithURL:self.abstractPlayer.contentURL];
+    switch (self.abstractPlayer.videoType) {
         case SGVideoTypeNormal:
-        {
-            AVAssetImageGenerator * imageGenerator = [AVAssetImageGenerator assetImageGeneratorWithAsset:self.avAsset];
-            imageGenerator.appliesPreferredTrackTransform = YES;
-            imageGenerator.requestedTimeToleranceBefore = kCMTimeZero;
-            imageGenerator.requestedTimeToleranceAfter = kCMTimeZero;
-            
-            NSError * error = nil;
-            CMTime time = self.avPlayerItem.currentTime;
-            CMTime actualTime;
-            CGImageRef cgImage = [imageGenerator copyCGImageAtTime:time actualTime:&actualTime error:&error];
-            UIImage * image = [UIImage imageWithCGImage:cgImage];
-            return image;
-        }
+            [self setupAVPlayerItemAutoLoadedAsset:YES];
+            self.abstractPlayer.displayView.rendererType = SGDisplayRendererTypeAVPlayerLayer;
             break;
         case SGVideoTypeVR:
         {
-            return self.view.glViewSnapshot;
-        }
-            break;
-    }
-}
-
-- (void)setViewAnimationHidden:(BOOL)viewAnimationHidden
-{
-    if (_viewAnimationHidden != viewAnimationHidden) {
-        _viewAnimationHidden = viewAnimationHidden;
-        if ([self.view isKindOfClass:[SGAVView class]]) {
-            [self.view setAnimationHiddenForAVPlayerLayer:viewAnimationHidden];
-        }
-    }
-}
-
-- (void)setViewTapBlock:(void (^)())block
-{
-    self.view.tapActionBlock = block;
-}
-
-- (CVPixelBufferRef)sgav_glViewPixelBufferToDraw:(SGAVGLView *)glView
-{
-    if (self.seeking) return nil;
-    
-    BOOL hasNewPixelBuffer = [self.avOutput hasNewPixelBufferForItemTime:self.avPlayerItem.currentTime];
-    if (!hasNewPixelBuffer) {
-        if (self.hasPixelBuffer) return nil;
-        [self trySetupOutput];
-        return nil;
-    }
-    
-    CVPixelBufferRef pixelBuffer = [self.avOutput copyPixelBufferForItemTime:self.avPlayerItem.currentTime itemTimeForDisplay:nil];
-    if (!pixelBuffer) {
-        [self trySetupOutput];
-    } else {
-        self.hasPixelBuffer = YES;
-    }
-    return pixelBuffer;
-}
-
-- (void)trySetupPlayer
-{
-    if (!self.avPlayer) {
-        [self setupPlayer];
-    }
-}
-
-- (void)setupPlayer
-{
-    [self clearPlayer];
-    switch (self.videoType) {
-        case SGVideoTypeNormal:
-        {
-            self.avAsset = [AVAsset assetWithURL:self.contentURL];
-            self.avPlayerItem = [AVPlayerItem playerItemWithAsset:self.avAsset automaticallyLoadedAssetKeys:[self avAssetloadKeys]];
-            self.avPlayer = [AVPlayer playerWithPlayerItem:self.avPlayerItem];
-            [self.view setPlayerForAVPlayerLayer:self.avPlayer animationHidden:self.viewAnimationHidden];
-        }
-            break;
-        case SGVideoTypeVR:
-        {
-            self.avAsset = [AVAsset assetWithURL:self.contentURL];
-            self.avPlayerItem = [AVPlayerItem playerItemWithAsset:self.avAsset];
-            self.avPlayer = [AVPlayer playerWithPlayerItem:self.avPlayerItem];
-            [self.view setPlayerForSGAVGLView:self.avPlayer dataSource:self displayMode:self.displayMode];
+            [self setupAVPlayerItemAutoLoadedAsset:NO];
+            self.abstractPlayer.displayView.rendererType = SGDisplayRendererTypeAVPlayerPixelBufferVR;
             SGWeakSelf
-            [self.avAsset loadValuesAsynchronouslyForKeys:[self avAssetloadKeys] completionHandler:^{
+            [self.avAsset loadValuesAsynchronouslyForKeys:[self.class AVAssetloadKeys] completionHandler:^{
+                SGStrongSelf
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    for (NSString * loadKey in [weakSelf avAssetloadKeys]) {
+                    for (NSString * loadKey in [strongSelf.class AVAssetloadKeys]) {
                         NSError * error = nil;
-                        AVKeyValueStatus keyStatus = [weakSelf.avAsset statusOfValueForKey:loadKey error:&error];
+                        AVKeyValueStatus keyStatus = [strongSelf.avAsset statusOfValueForKey:loadKey error:&error];
                         if (keyStatus == AVKeyValueStatusFailed) {
-                            [weakSelf avAssetPrepareFailed:error];
+                            [strongSelf avAssetPrepareFailed:error];
                             SGPlayerLog(@"AVAsset load failed");
                             return;
                         }
                     }
                     NSError * error = nil;
-                    AVKeyValueStatus trackStatus = [weakSelf.avAsset statusOfValueForKey:@"tracks" error:&error];
+                    AVKeyValueStatus trackStatus = [strongSelf.avAsset statusOfValueForKey:@"tracks" error:&error];
                     if (trackStatus == AVKeyValueStatusLoaded) {
-                        [weakSelf setupOutput];
+                        [strongSelf setupOutput];
                     } else {
                         SGPlayerLog(@"AVAsset load failed");
                     }
@@ -534,6 +409,70 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
         }
             break;
     }
+}
+
+#pragma mark - setup/clean
+
+- (void)setupAVPlayer
+{
+    self.avPlayer = [[AVPlayer alloc] init];
+    if ([UIDevice currentDevice].systemVersion.floatValue >= 10.0) {
+        self.avPlayer.automaticallyWaitsToMinimizeStalling = NO;
+    }
+    SGWeakSelf
+    self.playBackTimeObserver = [self.avPlayer addPeriodicTimeObserverForInterval:CMTimeMake(1, 1) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
+        SGStrongSelf
+        if (strongSelf.state == SGPlayerStatePlaying) {
+            CGFloat current = CMTimeGetSeconds(time);
+            CGFloat duration = strongSelf.duration;
+            [SGNotification postPlayer:strongSelf.abstractPlayer progressPercent:@(current/duration) current:@(current) total:@(duration)];
+        }
+    }];
+    self.abstractPlayer.displayView.avplayer = self.avPlayer;
+}
+
+- (void)replaceEmptyAVPlayer
+{
+    [self.avPlayer replaceCurrentItemWithPlayerItem:nil];
+}
+
+- (void)cleanAVPlayer
+{
+    if (self.playBackTimeObserver) {
+        [self.avPlayer removeTimeObserver:self.playBackTimeObserver];
+        self.playBackTimeObserver = nil;
+    }
+    self.avPlayer = nil;
+}
+
+- (void)setupAVPlayerItemAutoLoadedAsset:(BOOL)autoLoadedAsset
+{
+    [self cleanAVPlayerItem];
+    
+    if (autoLoadedAsset) {
+        self.avPlayerItem = [AVPlayerItem playerItemWithAsset:self.avAsset automaticallyLoadedAssetKeys:[self.class AVAssetloadKeys]];
+    } else {
+        self.avPlayerItem = [AVPlayerItem playerItemWithAsset:self.avAsset];
+    }
+    
+    [self.avPlayerItem addObserver:self forKeyPath:@"status" options:0 context:NULL];
+    [self.avPlayerItem addObserver:self forKeyPath:@"playbackBufferEmpty" options:NSKeyValueObservingOptionNew context:NULL];
+    [self.avPlayerItem addObserver:self forKeyPath:@"loadedTimeRanges" options:NSKeyValueObservingOptionNew context:NULL];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(avplayerItemDidPlayToEnd:) name:AVPlayerItemDidPlayToEndTimeNotification object:_avPlayerItem];
+    
+    [self.avPlayer replaceCurrentItemWithPlayerItem:self.avPlayerItem];
+}
+
+- (void)cleanAVPlayerItem
+{
+    if (self.avPlayerItem) {
+        [self.avPlayerItem removeObserver:self forKeyPath:@"status"];
+        [self.avPlayerItem removeObserver:self forKeyPath:@"playbackBufferEmpty"];
+        [self.avPlayerItem removeObserver:self forKeyPath:@"loadedTimeRanges"];
+        [self.avPlayerItem removeOutput:self.avOutput];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:AVPlayerItemDidPlayToEndTimeNotification object:self.avPlayerItem];
+    }
+    self.avPlayerItem = nil;
 }
 
 - (void)trySetupOutput
@@ -546,7 +485,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 
 - (void)setupOutput
 {
-    [self clearOutput];
+    [self cleanOutput];
     
     NSDictionary * pixelBuffer = @{(id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)};
     self.avOutput = [[AVPlayerItemVideoOutput alloc] initWithPixelBufferAttributes:pixelBuffer];
@@ -556,30 +495,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     SGPlayerLog(@"SGAVPlayer add output success");
 }
 
-
-- (void)avAssetPrepareFailed:(NSError *)error
-{
-    
-}
-
-- (void)clearPlayer
-{
-    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(0) current:@(0) total:@(0)];
-    [SGNotification postPlayer:self.abstractPlayer progressPercent:@(0) current:@(0) total:@(0)];
-    [self clearOutput];
-    self.avPlayer = nil;
-    self.avPlayerItem = nil;
-    self.avAsset = nil;
-    [self.view clear];
-    self.playBackTimeObserver = nil;
-    self.state = SGPlayerStateNone;
-    self.needPlay = NO;
-    self.seeking = NO;
-    _playableTime = 0;
-    self.readyToPlayTime = 0;
-}
-
-- (void)clearOutput
+- (void)cleanOutput
 {
     if (self.avPlayerItem) {
         [self.avPlayerItem removeOutput:self.avOutput];
@@ -588,16 +504,38 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     self.hasPixelBuffer = NO;
 }
 
-- (NSArray <NSString *> *)avAssetloadKeys
+- (void)replaceEmpty
 {
-    return @[@"tracks", @"playable"];
+    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(0) current:@(0) total:@(0)];
+    [SGNotification postPlayer:self.abstractPlayer progressPercent:@(0) current:@(0) total:@(0)];
+    [self cleanOutput];
+    [self replaceEmptyAVPlayer];
+    [self cleanAVPlayerItem];
+    self.avAsset = nil;
+    self.state = SGPlayerStateNone;
+    self.needPlay = NO;
+    self.seeking = NO;
+    self.playableTime = 0;
+    self.readyToPlayTime = 0;
+    [self.abstractPlayer.displayView clean];
+}
+
++ (NSArray <NSString *> *)AVAssetloadKeys
+{
+    static NSArray * keys = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        keys =@[@"tracks", @"playable"];
+    });
+    return keys;
 }
 
 - (void)dealloc
 {
     SGPlayerLog(@"SGAVPlayer release");
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    [self clearPlayer];
+    [self replaceEmpty];
+    [self cleanAVPlayer];
 }
 
 @end
