@@ -34,6 +34,7 @@
 @property (nonatomic, assign) BOOL prepareToPlay;
 @property (nonatomic, assign) BOOL seeking;
 @property (nonatomic, assign) BOOL playing;
+@property (nonatomic, assign) BOOL buffering;
 
 @property (nonatomic, assign) NSTimeInterval lastPostProgressTime;
 @property (nonatomic, assign) NSTimeInterval lastPostPlayableTime;
@@ -181,7 +182,7 @@
             bufferDuration = 0;
         }
         _bufferDuration = bufferDuration;
-        
+//        NSLog(@"buffer duration %f", bufferDuration);
         if (!self.decoder.endOfFile) {
             NSTimeInterval playableTtime = self.playableTime;
             NSTimeInterval duration = self.duration;
@@ -246,11 +247,29 @@
         }
     }
     
-    if (self.playing) {
-        if (self.audioFrames.count <= 0) {
-            self.state = SGPlayerStateBuffering;
-        } else {
-            self.state = SGPlayerStatePlaying;
+    if (self.buffering) {
+        if (self.bufferDuration > self.abstractPlayer.playableBufferInterval || self.decoder.endOfFile) {
+            self.buffering = NO;
+            if (self.playing) {
+                self.state = SGPlayerStatePlaying;
+            } else {
+                switch (self.state) {
+                    case SGPlayerStateNone:
+                    case SGPlayerStateBuffering:
+                    case SGPlayerStatePlaying:
+                        self.state = SGPlayerStateReadyToPlay;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    } else {
+        if (self.bufferDuration <= 0 && !self.decoder.endOfFile) {
+            self.buffering = YES;
+            if (self.playing) {
+                self.state = SGPlayerStateBuffering;
+            }
         }
     }
 }
@@ -280,7 +299,7 @@
 - (void)setupDecodeTimer
 {
     __weak typeof(self) weakSelf = self;
-    self.decodeTimer = [NSTimer scheduledTimerWithTimeInterval:0.01 repeats:YES block:^(NSTimer * _Nonnull timer) {
+    self.decodeTimer = [NSTimer scheduledTimerWithTimeInterval:0.001 repeats:YES block:^(NSTimer * _Nonnull timer) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         [strongSelf decodeTimerHandler];
     }];
@@ -357,11 +376,12 @@
         if (self.audioFrames.count <= 0) {
             self.progress = self.duration;
             self.state = SGPlayerStateFinished;
+            self.playing = NO;
             memset(outData, 0, numFrames * numChannels * sizeof(float));
             return;
         }
     } else {
-        if (self.bufferDuration < self.abstractPlayer.playableBufferInterval) {
+        if (self.buffering) {
             memset(outData, 0, numFrames * numChannels * sizeof(float));
             return;
         }
@@ -372,6 +392,7 @@
             @synchronized (self.audioFrames) {
                 if (self.audioFrames.count > 0) {
                     SGFFAudioFrame * frame = self.audioFrames[0];
+                    
                     [self.audioFrames removeObjectAtIndex:0];
                     self.progress = frame.position;
                     self.bufferDuration -= frame.duration;
@@ -423,6 +444,7 @@
 {
     self.seeking = NO;
     self.playing = NO;
+    self.buffering = NO;
     self.prepareToPlay = NO;
     self.state = SGPlayerStateNone;
     self.progress = 0;
