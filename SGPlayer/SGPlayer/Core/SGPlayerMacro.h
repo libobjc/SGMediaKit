@@ -10,6 +10,7 @@
 
 // weak self
 #define SGWeakSelf __weak typeof(self) weakSelf = self;
+#define SGStrongSelf __strong typeof(weakSelf) strongSelf = weakSelf;
 
 // log level
 #ifdef DEBUG
