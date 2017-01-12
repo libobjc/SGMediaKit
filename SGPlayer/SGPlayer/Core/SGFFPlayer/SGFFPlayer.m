@@ -10,6 +10,7 @@
 #import "SGFFDecoder.h"
 #import "KxAudioManager.h"
 #import "SGNotification.h"
+#import "SGPlayer+DisplayView.h"
 
 @interface SGFFPlayer () <SGFFDecoderDelegate, KxAudioManagerDelegate>
 
@@ -263,6 +264,15 @@
     
     self.decoder = [SGFFDecoder decoderWithContentURL:self.abstractPlayer.contentURL delegate:self];
     [self reloadVolume];
+    
+    switch (self.abstractPlayer.videoType) {
+        case SGVideoTypeNormal:
+            self.abstractPlayer.displayView.rendererType = SGDisplayRendererTypeFFmpegPexelBuffer;
+            break;
+        case SGVideoTypeVR:
+            self.abstractPlayer.displayView.rendererType = SGDisplayRendererTypeFFmpegPexelBufferVR;
+            break;
+    }
 }
 
 #pragma mark - decode frames
