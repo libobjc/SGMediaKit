@@ -12,6 +12,7 @@
 #import "SGDisplayFrame.h"
 
 @class SGPlayer;
+@class SGAVPlayer;
 @class SGDisplayView;
 
 typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
@@ -34,6 +35,7 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
 
 + (instancetype)displayViewWithAbstractPlayer:(SGPlayer *)abstractPlayer;
 
+@property (nonatomic, weak) SGAVPlayer * sgavplayer;
 @property (nonatomic, assign) SGDisplayRendererType rendererType;
 
 //- (void)pause;
@@ -41,6 +43,7 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
 - (void)cleanEmptyBuffer;
 - (void)renderFrame:(SGDisplayFrame *)displayFrame;
 - (void)reloadDisplayMode;
-- (void)setAVPlayer:(AVPlayer *)avplayer avplayerOutputDelegate:(id<SGDisplayViewAVPlayerOutputDelgate>)avplayerOutputDelegate;
+
+- (UIImage *)snapshot;
 
 @end

@@ -8,13 +8,12 @@
 
 #import "SGDisplayView.h"
 #import "SGPlayer.h"
+#import "SGAVPlayer.h"
 #import "SGAVGLView.h"
 
 @interface SGDisplayView () <SGAVGLViewDataSource>
 
 @property (nonatomic, weak) SGPlayer * abstractPlayer;
-@property (nonatomic, weak) AVPlayer * avplayer;
-@property (nonatomic, weak) id <SGDisplayViewAVPlayerOutputDelgate> avplayerOutputDelegate;
 
 @property (nonatomic, strong) AVPlayerLayer * avplayerLayer;
 @property (nonatomic, strong) SGAVGLView * glView;
@@ -83,7 +82,7 @@
             break;
         case SGDisplayRendererTypeAVPlayerLayer:
             if (!self.avplayerLayer) {
-                self.avplayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.avplayer];
+                self.avplayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.sgavplayer.avPlayer];
                 [self.layer insertSublayer:self.avplayerLayer atIndex:0];
             }
             break;
@@ -157,18 +156,23 @@
     }
 }
 
-- (void)setAVPlayer:(AVPlayer *)avplayer avplayerOutputDelegate:(id<SGDisplayViewAVPlayerOutputDelgate>)avplayerOutputDelegate
-{
-    self.avplayer = avplayer;
-    self.avplayerOutputDelegate = avplayerOutputDelegate;
-}
-
 - (CVPixelBufferRef)sgav_glViewPixelBufferToDraw:(SGAVGLView *)glView
 {
-    if ([self.avplayerOutputDelegate respondsToSelector:@selector(displayViewFetchPixelBuffer:)]) {
-        return [self.avplayerOutputDelegate displayViewFetchPixelBuffer:self];
+    return [self.sgavplayer displayViewFetchPixelBuffer:self];
+}
+
+- (UIImage *)snapshot
+{
+    switch (self.rendererType) {
+        case SGDisplayRendererTypeEmpty:
+            return nil;
+        case SGDisplayRendererTypeAVPlayerLayer:
+            return self.sgavplayer.snapshotAtCurrentTime;
+        case SGDisplayRendererTypeAVPlayerPixelBufferVR:
+        case SGDisplayRendererTypeFFmpegPexelBuffer:
+        case SGDisplayRendererTypeFFmpegPexelBufferVR:
+            return self.glView.snapshot;
     }
-    return nil;
 }
 
 @end

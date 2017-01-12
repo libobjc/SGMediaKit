@@ -18,6 +18,7 @@
 + (instancetype)playerWithAbstractPlayer:(SGPlayer *)abstractPlayer;
 
 @property (nonatomic, weak, readonly) SGPlayer * abstractPlayer;
+@property (nonatomic, strong, readonly) AVPlayer * avPlayer;
 
 @property (nonatomic, assign, readonly) SGPlayerState state;
 @property (nonatomic, assign, readonly) CGSize presentationSize;
@@ -25,9 +26,9 @@
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
 @property (nonatomic, assign, readonly) NSTimeInterval playableTime;
 @property (nonatomic, assign, readonly) BOOL seeking;
-@property (nonatomic, assign) CGFloat volume;
 
 - (void)replaceVideo;
+- (void)reloadVolume;
 
 - (void)play;
 - (void)pause;
@@ -35,6 +36,6 @@
 - (void)seekToTime:(NSTimeInterval)time;
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void(^)(BOOL finished))completeHandler;
 
-- (UIImage *)snapshot;
+- (UIImage *)snapshotAtCurrentTime;
 
 @end

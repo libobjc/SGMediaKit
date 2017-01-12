@@ -204,14 +204,9 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     }
 }
 
-- (void)setVolume:(CGFloat)volume
+- (void)reloadVolume
 {
-    self.avPlayer.volume = volume;
-}
-
-- (CGFloat)volume
-{
-    return self.avPlayer.volume;
+    self.avPlayer.volume = self.abstractPlayer.volume;
 }
 
 - (void)reloadPlayableTime
@@ -243,7 +238,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     return CGSizeZero;
 }
 
-- (UIImage *)snapshot
+- (UIImage *)snapshotAtCurrentTime
 {
     switch (self.abstractPlayer.videoType) {
         case SGVideoTypeNormal:
@@ -428,7 +423,8 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
             [SGNotification postPlayer:strongSelf.abstractPlayer progressPercent:@(current/duration) current:@(current) total:@(duration)];
         }
     }];
-    [self.abstractPlayer.displayView setAVPlayer:self.avPlayer avplayerOutputDelegate:self];
+    self.abstractPlayer.displayView.sgavplayer = self;
+    [self reloadVolume];
 }
 
 - (void)replaceEmptyAVPlayer

@@ -151,7 +151,7 @@
 {
     _volume = volume;
     if (_avPlayer) {
-        self.avPlayer.volume = volume;
+        [self.avPlayer reloadVolume];
     }
     if (_ffPlayer) {
         self.ffPlayer.volume = volume;
@@ -226,14 +226,7 @@
 
 - (UIImage *)snapshot
 {
-    switch (self.decoderType) {
-        case SGDecoderTypeAVPlayer:
-            return self.avPlayer.snapshot;
-        case SGDecoderTypeFFmpeg:
-            return self.ffPlayer.snapshot;
-        case SGDecoderTypeError:
-            return nil;
-    }
+    return self.displayView.snapshot;
 }
 
 - (BOOL)seeking
@@ -273,7 +266,6 @@
 {
     if (!_avPlayer) {
         _avPlayer = [SGAVPlayer playerWithAbstractPlayer:self];
-        _avPlayer.volume = self.volume;
     }
     return _avPlayer;
 }
