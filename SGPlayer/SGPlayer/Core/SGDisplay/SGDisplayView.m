@@ -53,7 +53,12 @@
         }
     }
     if (self.glView) {
-        self.glView.frame = layer.bounds;
+        CGSize size = layer.bounds.size;
+        if (size.width < size.height) {
+            self.glView.frame = CGRectMake(0, (size.height-size.width/16*9)/2, size.width, size.width/16*9);
+        } else {
+            self.glView.frame = layer.bounds;
+        }
     }
 }
 
