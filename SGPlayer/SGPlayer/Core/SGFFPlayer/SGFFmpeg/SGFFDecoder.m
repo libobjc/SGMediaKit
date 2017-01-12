@@ -21,16 +21,21 @@ static void SGFFLog(void * context, int level, const char * format, va_list args
 //    NSLog(@"SGFFLog : %@", message);
 }
 
-static NSError * checkErrorCode(int errorCode)
+static NSError * checkErrorCode(int result, SGFFDecoderErrorCode errorCode)
 {
-    if (errorCode < 0) {
+    if (result < 0) {
         char * error_string_buffer = malloc(256);
-        av_strerror(errorCode, error_string_buffer, 256);
+        av_strerror(result, error_string_buffer, 256);
         NSString * error_string = [[NSString alloc] initWithUTF8String:error_string_buffer];
         NSError * error = [NSError errorWithDomain:error_string code:errorCode userInfo:nil];
         return error;
     }
     return nil;
+}
+
+static NSError * checkError(int result)
+{
+    return checkErrorCode(result, -1);
 }
 
 static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTimebase, NSTimeInterval * pFPS, NSTimeInterval * pTimebase)
@@ -153,13 +158,10 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         if ([self.delegate respondsToSelector:@selector(decoderWillOpenInputStream:)]) {
             [self.delegate decoderWillOpenInputStream:self];
         }
-        NSError * error;
         // input stream
-        error = [self openStream];
-        if (error) {
-            if ([self.delegate respondsToSelector:@selector(decoder:openInputStreamError:)]) {
-                [self.delegate decoder:self openInputStreamError:error];
-            }
+        NSError * openError = [self openStream];
+        if (openError) {
+            [self delegateErrorCallback:openError];
             return;
         } else {
             if ([self.delegate respondsToSelector:@selector(decoderDidOpenInputStream:)]) {
@@ -168,27 +170,29 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         }
         
         // video stream
-        error = [self fetchVideoStream];
-        if (error) {
-            if ([self.delegate respondsToSelector:@selector(decoder:openVideoStreamError:)]) {
-                [self.delegate decoder:self openVideoStreamError:error];
-            }
-        } else {
+        NSError * videoError = [self fetchVideoStream];
+        if (!videoError) {
             if ([self.delegate respondsToSelector:@selector(decoderDidOpenVideoStream:)]) {
                 [self.delegate decoderDidOpenVideoStream:self];
             }
         }
         
         // audio stream
-        error = [self fetchAutioStream];
-        if (error) {
-            if ([self.delegate respondsToSelector:@selector(decoder:openAudioStreamError:)]) {
-                [self.delegate decoder:self openAudioStreamError:error];
-            }
-        } else {
+        NSError * audioError = [self fetchAutioStream];
+        if (!audioError) {
             if ([self.delegate respondsToSelector:@selector(decoderDidOpenAudioStream:)]) {
                 [self.delegate decoderDidOpenAudioStream:self];
             }
+        }
+        
+        // video and audio error
+        if (videoError && audioError) {
+            if (videoError.code == SGFFDecoderErrorCodeStreamNotFound && audioError.code != SGFFDecoderErrorCodeStreamNotFound) {
+                [self delegateErrorCallback:audioError];
+            } else {
+                [self delegateErrorCallback:videoError];
+            }
+            return;
         }
         
         if ([self.delegate respondsToSelector:@selector(decoderDidPrepareToDecodeFrames:)]) {
@@ -202,11 +206,11 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 - (NSError *)openStream
 {
     _format_context = NULL;
-    int errorCode = 0;
+    int reslut = 0;
     NSError * error = nil;
     
-    errorCode = avformat_open_input(&_format_context, self.contentURLString.UTF8String, NULL, NULL);
-    error = checkErrorCode(errorCode);
+    reslut = avformat_open_input(&_format_context, self.contentURLString.UTF8String, NULL, NULL);
+    error = checkErrorCode(reslut, SGFFDecoderErrorCodeFormatOpenInput);
     if (error || !_format_context) {
         if (_format_context) {
             avformat_free_context(_format_context);
@@ -214,8 +218,8 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         return error;
     }
     
-    errorCode = avformat_find_stream_info(_format_context, NULL);
-    error = checkErrorCode(errorCode);
+    reslut = avformat_find_stream_info(_format_context, NULL);
+    error = checkErrorCode(reslut, SGFFDecoderErrorCodeFormatFindStreamInfo);
     if (error || !_format_context) {
         if (_format_context) {
             avformat_close_input(_format_context);
@@ -246,7 +250,8 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
             }
         }
     } else {
-        error = [NSError errorWithDomain:@"video stream not found" code:-1 userInfo:nil];
+        error = [NSError errorWithDomain:@"video stream not found" code:SGFFDecoderErrorCodeStreamNotFound userInfo:nil];
+        return error;
     }
     
     return error;
@@ -259,15 +264,13 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
     
     AVCodec * codec = avcodec_find_decoder(stream->codec->codec_id);
     if (!codec) {
-        error = [NSError errorWithDomain:@"video codec not found" code:-1 userInfo:nil];
-        NSLog(@"video codec not found %@", error);
+        error = [NSError errorWithDomain:@"video codec not found decoder" code:SGFFDecoderErrorCodeCodecFindDecoder userInfo:nil];
         return error;
     }
     
-    int errorCode = avcodec_open2(stream->codec, codec, NULL);
-    error = checkErrorCode(errorCode);
+    int result = avcodec_open2(stream->codec, codec, NULL);
+    error = checkErrorCode(result, SGFFDecoderErrorCodeCodecOpen2);
     if (error) {
-        NSLog(@"avcidec open error %@", error);
         return error;
     }
     
@@ -293,7 +296,8 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
             }
         }
     } else {
-        error = [NSError errorWithDomain:@"audio stream not found" code:-1 userInfo:nil];
+        error = [NSError errorWithDomain:@"audio stream not found" code:SGFFDecoderErrorCodeStreamNotFound userInfo:nil];
+        return error;
     }
     
     return error;
@@ -302,36 +306,33 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 - (NSError *)openAudioStream:(NSInteger)audioStreamIndex
 {
     NSError * error = nil;
-    int errorCode = 0;
     AVStream * stream = _format_context->streams[audioStreamIndex];
     
     AVCodec * codec = avcodec_find_decoder(stream->codec->codec_id);
     if (!codec) {
-        error = [NSError errorWithDomain:@"audio codec not found" code:-1 userInfo:nil];
-        NSLog(@"audio codec not found %@", error);
+        error = [NSError errorWithDomain:@"audio codec not found decoder" code:SGFFDecoderErrorCodeCodecFindDecoder userInfo:nil];
         return error;
     }
     
-    errorCode = avcodec_open2(stream->codec, codec, NULL);
-    error = checkErrorCode(errorCode);
+    int result = avcodec_open2(stream->codec, codec, NULL);
+    error = checkErrorCode(result, SGFFDecoderErrorCodeCodecOpen2);
     if (error) {
-        NSLog(@"avcidec open error %@", error);
         return error;
     }
     
     SGAudioManager * audioManager = [SGAudioManager manager];
-    BOOL result = YES;
+    BOOL needSwr = YES;
     if (stream->codec->sample_fmt == AV_SAMPLE_FMT_S16) {
         if (audioManager.samplingRate == stream->codec->sample_rate && audioManager.numOutputChannels == stream->codec->channels) {
-            result = NO;
+            needSwr = NO;
         }
     }
     
-    if (result) {
+    if (needSwr) {
         _audio_swr_context = swr_alloc_set_opts(NULL, av_get_default_channel_layout(audioManager.numOutputChannels), AV_SAMPLE_FMT_S16, audioManager.samplingRate, av_get_default_channel_layout(stream->codec->channels), stream->codec->sample_fmt, stream->codec->sample_rate, 0, NULL);
         
-        errorCode = swr_init(_audio_swr_context);
-        error = checkErrorCode(errorCode);
+        result = swr_init(_audio_swr_context);
+        error = checkErrorCode(result, SGFFDecoderErrorCodeAuidoSwrInit);
         if (error) {
             if (_audio_swr_context) {
                 swr_free(&_audio_swr_context);
@@ -380,8 +381,8 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         NSTimeInterval decodeDuration = 0;
         
         while (!finished) {
-            int errorCode = av_read_frame(_format_context, &packet);
-            NSError * error = checkErrorCode(errorCode);
+            int result = av_read_frame(_format_context, &packet);
+            NSError * error = checkError(result);
             if (error) {
                 self.endOfFile = YES;
                 finished = YES;
@@ -448,7 +449,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                             
                             Byte * outyput_buffer[2] = {_audio_swr_buffer, 0};
                             numberOfFrames = swr_convert(_audio_swr_context, outyput_buffer, _audio_frame->nb_samples * ratio, (const uint8_t **)_audio_frame->data, _audio_frame->nb_samples);
-                            error = checkErrorCode(numberOfFrames);
+                            error = checkError(numberOfFrames);
                             if (error) {
                                 NSLog(@"audio codec error : %@", error);
                                 return;

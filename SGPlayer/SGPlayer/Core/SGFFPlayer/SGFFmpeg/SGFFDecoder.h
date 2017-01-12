@@ -9,6 +9,15 @@
 #import <Foundation/Foundation.h>
 #import "SGFFFrame.h"
 
+typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
+    SGFFDecoderErrorCodeFormatOpenInput,
+    SGFFDecoderErrorCodeFormatFindStreamInfo,
+    SGFFDecoderErrorCodeStreamNotFound,
+    SGFFDecoderErrorCodeCodecFindDecoder,
+    SGFFDecoderErrorCodeCodecOpen2,
+    SGFFDecoderErrorCodeAuidoSwrInit,
+};
+
 @class SGFFDecoder;
 
 @protocol SGFFDecoderDelegate <NSObject>
@@ -16,21 +25,20 @@
 // open input stream
 - (void)decoderWillOpenInputStream:(SGFFDecoder *)decoder;
 - (void)decoderDidOpenInputStream:(SGFFDecoder *)decoder;
-- (void)decoder:(SGFFDecoder *)decoder openInputStreamError:(NSError *)error;
 
-// open video stream
+// open video/audio stream
 - (void)decoderDidOpenVideoStream:(SGFFDecoder *)decoder;
-- (void)decoder:(SGFFDecoder *)decoder openVideoStreamError:(NSError *)error;
-
-// open audio stream
 - (void)decoderDidOpenAudioStream:(SGFFDecoder *)decoder;
-- (void)decoder:(SGFFDecoder *)decoder openAudioStreamError:(NSError *)error;
 
+// decode frames
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder;
 - (void)decoder:(SGFFDecoder *)decoder didDecodeFrames:(NSArray <SGFFFrame *> *)frames;
-- (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error;
 
+// end of file
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder;
+
+// error callback
+- (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error;
 
 @end
 

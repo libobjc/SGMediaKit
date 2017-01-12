@@ -296,7 +296,6 @@
             self.state = SGPlayerStatePlaying;
         }
     }
-//    NSLog(@"\nvideo frame count : %ld\naudio frame count : %ld", self.videoFrames.count, self.audioFrames.count);
 }
 
 #pragma mark - clean
@@ -410,7 +409,6 @@
 
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder
 {
-    NSLog(@"end of file %d", decoder.endOfFile);
     NSTimeInterval duration = decoder.duration;
     [SGNotification postPlayer:self.abstractPlayer playablePercent:@(1) current:@(duration) total:@(duration)];
     [self pauseDecodeTimer];
@@ -418,7 +416,7 @@
 
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error
 {
-    NSLog(@"SGFFPlayer %s, \nerror : %@", __func__, error);
+    [self errorHandler:error];
 }
 
 #pragma mark - audio
