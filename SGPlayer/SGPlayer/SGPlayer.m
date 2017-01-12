@@ -9,6 +9,7 @@
 #import "SGPlayer.h"
 #import "SGPlayerMacro.h"
 #import "SGNotification.h"
+#import "SGDisplayView.h"
 #import "SGAVPlayer.h"
 #import "SGFFPlayer.h"
 
@@ -16,6 +17,7 @@
 
 @property (nonatomic, copy) void(^playerViewTapAction)();
 
+@property (nonatomic, strong) SGDisplayView * displayView;
 @property (nonatomic, assign) SGDecoderType decoderType;
 @property (nonatomic, strong) SGAVPlayer * avPlayer;
 @property (nonatomic, strong) SGFFPlayer * ffPlayer;
@@ -23,8 +25,6 @@
 @end
 
 @implementation SGPlayer
-
-@synthesize view = _view;
 
 + (instancetype)player
 {
@@ -53,14 +53,13 @@
 
 - (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
 {
-//    SGDecoderType preDecoderType = [self.decoder decoderTypeForContentURL:self.contentURL];
     self.contentURL = contentURL;
     self.decoderType = [self.decoder decoderTypeForContentURL:self.contentURL];
     self.videoType = videoType;
     
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
-            [self.avPlayer replaceVideoWithURL:contentURL videoType:videoType];
+            [self.avPlayer replaceVideo];
             if (_ffPlayer) {
                 [self.ffPlayer stop];
             }
@@ -143,37 +142,9 @@
     }
 }
 
-- (void)setBackgroundMode:(SGPlayerBackgroundMode)backgroundMode
-{
-    _backgroundMode = backgroundMode;
-    if (_avPlayer) {
-        self.avPlayer.backgroundMode = backgroundMode;
-    }
-    if (_ffPlayer) {
-        self.ffPlayer.backgroundMode = backgroundMode;
-    }
-}
-
 - (void)setViewTapBlock:(void (^)())block
 {
     self.playerViewTapAction = block;
-    if (_avPlayer) {
-        [self.avPlayer setViewTapBlock:block];
-    }
-    if (_ffPlayer) {
-        [self.ffPlayer setViewTapBlock:block];
-    }
-}
-
-- (void)setDisplayMode:(SGDisplayMode)displayMode
-{
-    _displayMode = displayMode;
-    if (_avPlayer) {
-        self.avPlayer.displayMode = displayMode;
-    }
-    if (_ffPlayer) {
-        self.ffPlayer.displayMode = displayMode;
-    }
 }
 
 - (void)setVolume:(CGFloat)volume
@@ -184,28 +155,6 @@
     }
     if (_ffPlayer) {
         self.ffPlayer.volume = volume;
-    }
-}
-
-- (void)setViewAnimationHidden:(BOOL)viewAnimationHidden
-{
-    _viewAnimationHidden = viewAnimationHidden;
-    if (_avPlayer) {
-        self.avPlayer.viewAnimationHidden = viewAnimationHidden;
-    }
-    if (_ffPlayer) {
-        self.ffPlayer.viewAnimationHidden = viewAnimationHidden;
-    }
-}
-
-- (void)setPlayableBufferInterval:(NSTimeInterval)playableBufferInterval
-{
-    _playableBufferInterval = playableBufferInterval;
-    if (_avPlayer) {
-        self.avPlayer.playableBufferInterval = playableBufferInterval;
-    }
-    if (_ffPlayer) {
-        self.ffPlayer.playableBufferInterval = playableBufferInterval;
     }
 }
 
@@ -295,13 +244,15 @@
 
 - (UIView *)view
 {
-    if (!_view) {
-        _view = [[UIView alloc] initWithFrame:CGRectZero];
-        _view.backgroundColor = [UIColor blackColor];
-        UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapAction)];
-        [_view addGestureRecognizer:tap];
+    return self.displayView;
+}
+
+- (SGDisplayView *)displayView
+{
+    if (!_displayView) {
+        _displayView = [[SGDisplayView alloc] initWithFrame:CGRectZero];
     }
-    return _view;
+    return _displayView;
 }
 
 - (void)tapAction
@@ -315,15 +266,8 @@
 - (SGAVPlayer *)avPlayer
 {
     if (!_avPlayer) {
-        _avPlayer = [SGAVPlayer player];
-        [self setupPlayerView:self.avPlayer.view];
-        _avPlayer.abstractPlayer = self;
-        _avPlayer.displayMode = self.displayMode;
-        [_avPlayer setViewTapBlock:self.playerViewTapAction];
+        _avPlayer = [SGAVPlayer playerWithAbstractPlayer:self];
         _avPlayer.volume = self.volume;
-        _avPlayer.viewAnimationHidden = self.viewAnimationHidden;
-        _avPlayer.playableBufferInterval = self.playableBufferInterval;
-        _avPlayer.backgroundMode = self.backgroundMode;
     }
     return _avPlayer;
 }
