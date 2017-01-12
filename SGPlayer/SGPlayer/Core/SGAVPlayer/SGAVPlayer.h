@@ -8,8 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "SGPlayer.h"
+#import "SGDisplayView.h"
 
-@interface SGAVPlayer : NSObject
+@interface SGAVPlayer : NSObject <SGDisplayViewAVPlayerOutputDelgate>
 
 + (instancetype)new NS_UNAVAILABLE;
 + (instancetype)init NS_UNAVAILABLE;

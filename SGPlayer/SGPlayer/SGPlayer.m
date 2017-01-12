@@ -158,6 +158,12 @@
     }
 }
 
+- (void)setDisplayMode:(SGDisplayMode)displayMode
+{
+    _displayMode = displayMode;
+    [self.displayView reloadDisplayMode];
+}
+
 - (SGPlayerState)state
 {
     switch (self.decoderType) {
@@ -250,7 +256,7 @@
 - (SGDisplayView *)displayView
 {
     if (!_displayView) {
-        _displayView = [[SGDisplayView alloc] initWithFrame:CGRectZero];
+        _displayView = [SGDisplayView displayViewWithAbstractPlayer:self];
     }
     return _displayView;
 }

@@ -11,19 +11,36 @@
 #import "SGPlayerDefine.h"
 #import "SGDisplayFrame.h"
 
+@class SGPlayer;
+@class SGDisplayView;
+
 typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
+    SGDisplayRendererTypeEmpty,
     SGDisplayRendererTypeAVPlayerLayer,
     SGDisplayRendererTypeAVPlayerPixelBufferVR,
     SGDisplayRendererTypeFFmpegPexelBuffer,
     SGDisplayRendererTypeFFmpegPexelBufferVR,
 };
 
+@protocol SGDisplayViewAVPlayerOutputDelgate <NSObject>
+- (CVPixelBufferRef)displayViewFetchPixelBuffer:(SGDisplayView *)displayView;
+@end
+
 @interface SGDisplayView : UIView
 
-@property (nonatomic, weak) AVPlayer * avplayer;
++ (instancetype)new NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithFrame:(CGRect)frame NS_UNAVAILABLE;
+
++ (instancetype)displayViewWithAbstractPlayer:(SGPlayer *)abstractPlayer;
+
 @property (nonatomic, assign) SGDisplayRendererType rendererType;
 
+//- (void)pause;
+//- (void)resume;
+- (void)cleanEmptyBuffer;
 - (void)renderFrame:(SGDisplayFrame *)displayFrame;
-- (void)clean;
+- (void)reloadDisplayMode;
+- (void)setAVPlayer:(AVPlayer *)avplayer avplayerOutputDelegate:(id<SGDisplayViewAVPlayerOutputDelgate>)avplayerOutputDelegate;
 
 @end

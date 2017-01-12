@@ -269,25 +269,25 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     }
 }
 
-//- (CVPixelBufferRef)sgav_glViewPixelBufferToDraw:(SGAVGLView *)glView
-//{
-//    if (self.seeking) return nil;
-//    
-//    BOOL hasNewPixelBuffer = [self.avOutput hasNewPixelBufferForItemTime:self.avPlayerItem.currentTime];
-//    if (!hasNewPixelBuffer) {
-//        if (self.hasPixelBuffer) return nil;
-//        [self trySetupOutput];
-//        return nil;
-//    }
-//    
-//    CVPixelBufferRef pixelBuffer = [self.avOutput copyPixelBufferForItemTime:self.avPlayerItem.currentTime itemTimeForDisplay:nil];
-//    if (!pixelBuffer) {
-//        [self trySetupOutput];
-//    } else {
-//        self.hasPixelBuffer = YES;
-//    }
-//    return pixelBuffer;
-//}
+- (CVPixelBufferRef)displayViewFetchPixelBuffer:(SGDisplayView *)displayView
+{
+    if (self.seeking) return nil;
+    
+    BOOL hasNewPixelBuffer = [self.avOutput hasNewPixelBufferForItemTime:self.avPlayerItem.currentTime];
+    if (!hasNewPixelBuffer) {
+        if (self.hasPixelBuffer) return nil;
+        [self trySetupOutput];
+        return nil;
+    }
+    
+    CVPixelBufferRef pixelBuffer = [self.avOutput copyPixelBufferForItemTime:self.avPlayerItem.currentTime itemTimeForDisplay:nil];
+    if (!pixelBuffer) {
+        [self trySetupOutput];
+    } else {
+        self.hasPixelBuffer = YES;
+    }
+    return pixelBuffer;
+}
 
 #pragma mark - play state change
 
@@ -357,7 +357,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 
 - (void)avAssetPrepareFailed:(NSError *)error
 {
-    SGPlayerLog(@"%s", error);
+    SGPlayerLog(@"%s", __func__);
 }
 
 #pragma mark - replace video
@@ -428,7 +428,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
             [SGNotification postPlayer:strongSelf.abstractPlayer progressPercent:@(current/duration) current:@(current) total:@(duration)];
         }
     }];
-    self.abstractPlayer.displayView.avplayer = self.avPlayer;
+    [self.abstractPlayer.displayView setAVPlayer:self.avPlayer avplayerOutputDelegate:self];
 }
 
 - (void)replaceEmptyAVPlayer
@@ -517,7 +517,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     self.seeking = NO;
     self.playableTime = 0;
     self.readyToPlayTime = 0;
-    [self.abstractPlayer.displayView clean];
+    [self.abstractPlayer.displayView cleanEmptyBuffer];
 }
 
 + (NSArray <NSString *> *)AVAssetloadKeys
