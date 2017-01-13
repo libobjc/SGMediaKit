@@ -95,9 +95,12 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 @property (nonatomic, copy) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSString * contentURLString;
 @property (nonatomic, copy) NSDictionary * metadata;
-@property (atomic, assign) BOOL endOfFile;
-@property (atomic, assign) BOOL decoding;
+@property (nonatomic, assign) CGSize presentationSize;
 @property (nonatomic, assign) NSTimeInterval position;
+
+@property (nonatomic, assign) BOOL endOfFile;
+@property (nonatomic, assign) BOOL decoding;
+@property (nonatomic, assign) BOOL prepareToDecode;
 
 @property (nonatomic, copy) NSArray <NSNumber *> * video_stream_indexs;
 @property (nonatomic, copy) NSArray <NSNumber *> * audio_stream_indexs;
@@ -194,6 +197,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
             return;
         }
         
+        self.prepareToDecode = YES;
         if ([self.delegate respondsToSelector:@selector(decoderDidPrepareToDecodeFrames:)]) {
             [self.delegate decoderDidPrepareToDecodeFrames:self];
         }
@@ -274,6 +278,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
     }
     
     _video_codec = stream->codec;
+    self.presentationSize = CGSizeMake(_video_codec->width, _video_codec->height);
     
     return error;
 }

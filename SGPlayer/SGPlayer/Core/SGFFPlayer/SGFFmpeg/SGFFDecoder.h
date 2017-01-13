@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import "SGFFFrame.h"
 
 typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
@@ -53,16 +54,18 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSDictionary * metadata;
-
-@property (nonatomic, assign, readonly) BOOL videoEnable;
-@property (nonatomic, assign, readonly) BOOL audioEnable;
-
-@property (atomic, assign, readonly) BOOL endOfFile;
-@property (atomic, assign, readonly) BOOL decoding;
+@property (nonatomic, assign, readonly) CGSize presentationSize;
 
 @property (nonatomic, assign, readonly) NSTimeInterval fps;
 @property (nonatomic, assign, readonly) NSTimeInterval position;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
+
+@property (nonatomic, assign, readonly) BOOL videoEnable;
+@property (nonatomic, assign, readonly) BOOL audioEnable;
+
+@property (nonatomic, assign, readonly) BOOL endOfFile;
+@property (nonatomic, assign, readonly) BOOL decoding;
+@property (nonatomic, assign, readonly) BOOL prepareToDecode;
 
 - (void)decodeFrames;
 - (void)decodeFramesWithDuration:(NSTimeInterval)duration;

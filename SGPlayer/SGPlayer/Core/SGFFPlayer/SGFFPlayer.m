@@ -216,6 +216,14 @@
     return self.decoder.duration;
 }
 
+- (CGSize)presentationSize
+{
+    if (self.decoder.prepareToDecode) {
+        return self.decoder.presentationSize;
+    }
+    return CGSizeZero;
+}
+
 - (void)reloadVolume
 {
 #warning ffplayer volume
