@@ -445,8 +445,8 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 {
     self.decoding = YES;
     
-//#define SWITCH1
-//#define SWITCH2 1
+#define SWITCH1
+#define SWITCH2 1
 #ifdef SWITCH1
     static dispatch_queue_t temp_queue = nil;
     static dispatch_once_t onceToken;
@@ -454,6 +454,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         temp_queue = dispatch_queue_create("ffmpeg", DISPATCH_QUEUE_SERIAL);
     });
     dispatch_async(temp_queue, ^{
+//    dispatch_async(dispatch_get_main_queue(), ^{
 #elif SWITCH2
     NSThread * thread = [[NSThread alloc] initWithBlock:^{
 #else
@@ -482,19 +483,24 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                 while (packet_size > 0)
                 {
                     int gotframe = 0;
+                    
                     NSDate * date = [NSDate date];
+                    
                     int lenght = avcodec_decode_video2(_video_codec, _video_frame, &gotframe, &packet);
-                    static NSTimeInterval decode_time = 0;
-                    decode_time += -date.timeIntervalSinceNow;
-                    NSLog(@"解码耗时 : %f", decode_time);
+                    
+                    static NSTimeInterval video_decode_time = 0;
+                    video_decode_time += -date.timeIntervalSinceNow;
+                    NSLog(@"Video --- 解码耗时 : %f", video_decode_time);
+                    
                     if (lenght < 0) break;
                     if (gotframe) {
                         SGFFVideoFrame * videoFrame = [self fetchVideoFrame];
                         if (videoFrame) {
                             [array addObject:videoFrame];
-                            static NSTimeInterval total_duration = 0;
-                            total_duration += videoFrame.duration;
-                            NSLog(@"视频时长 : %f", total_duration);
+                            
+                            static NSTimeInterval video_done_time = 0;
+                            video_done_time += videoFrame.duration;
+                            NSLog(@"Video --- 完成时长 : %f", video_done_time);
                         }
                     }
                     if (lenght == 0) break;
@@ -508,7 +514,15 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                 while (packet_size > 0)
                 {
                     int gotframe = 0;
+                    
+                    NSDate * date = [NSDate date];
+                    
                     int lenght = avcodec_decode_audio4(_audio_codec, _audio_frame, &gotframe, &packet);
+                    
+                    static NSTimeInterval audio_decode_time = 0;
+                    audio_decode_time += -date.timeIntervalSinceNow;
+                    NSLog(@"Audio +++ 解码耗时 : %f", audio_decode_time);
+                    
                     if (lenght < 0) break;
                     if (gotframe) {
                         SGFFAudioFrame * audioFrame = [self fetchAudioFrame];
@@ -517,6 +531,10 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                             self.position = audioFrame.position;
                             decodeDuration += audioFrame.duration;
                             if (decodeDuration > duration) finished = YES;
+                            
+                            static NSTimeInterval audio_done_time = 0;
+                            audio_done_time += audioFrame.duration;
+                            NSLog(@"Aduio +++ 完成时长 : %f", audio_done_time);
                         }
                     }
                     if (lenght == 0) break;
