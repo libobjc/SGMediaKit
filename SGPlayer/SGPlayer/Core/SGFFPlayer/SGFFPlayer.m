@@ -75,13 +75,14 @@
         case SGPlayerStateSuspend:
         case SGPlayerStateFailed:
         case SGPlayerStateFinished:
+        case SGPlayerStateBuffering:
         {
             self.state = SGPlayerStateBuffering;
         }
             break;
         case SGPlayerStateReadyToPlay:
         case SGPlayerStatePlaying:
-        case SGPlayerStateBuffering:
+            self.state = SGPlayerStatePlaying;
             break;
     }
 }
@@ -182,7 +183,6 @@
             bufferDuration = 0;
         }
         _bufferDuration = bufferDuration;
-//        NSLog(@"buffer duration %f", bufferDuration);
         if (!self.decoder.endOfFile) {
             NSTimeInterval playableTtime = self.playableTime;
             NSTimeInterval duration = self.duration;

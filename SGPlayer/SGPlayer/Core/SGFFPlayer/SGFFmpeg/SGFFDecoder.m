@@ -126,6 +126,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         self.delegate = delegate;
         self.ffmpegQueue = [[NSOperationQueue alloc] init];
         self.ffmpegQueue.maxConcurrentOperationCount = 1;
+        self.ffmpegQueue.qualityOfService = NSQualityOfServiceUserInteractive;
         
         _video_stream_index = -1;
         _audio_stream_index = -1;
@@ -331,7 +332,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         
         result = swr_init(_audio_swr_context);
         error = checkErrorCode(result, SGFFDecoderErrorCodeAuidoSwrInit);
-        if (error) {
+        if (error || !_audio_swr_context) {
             if (_audio_swr_context) {
                 swr_free(&_audio_swr_context);
             }
@@ -371,9 +372,21 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 {
     self.decoding = YES;
     
+#define SWITCH1
+#define SWITCH2 1
+#ifdef SWITCH1
+    static dispatch_queue_t temp_queue = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        temp_queue = dispatch_queue_create("ffmpeg", DISPATCH_QUEUE_SERIAL);
+    });
+    dispatch_async(temp_queue, ^{
+#elif SWITCH2
+    NSThread * thread = [[NSThread alloc] initWithBlock:^{
+#else
     NSBlockOperation * operation = [NSBlockOperation blockOperationWithBlock:^{
-        
-        NSMutableArray <SGFFFrame *> * frames = [NSMutableArray array];
+#endif
+        NSMutableArray <SGFFFrame *> * array = [[NSMutableArray alloc] init];
         AVPacket packet;
         BOOL finished = NO;
         NSTimeInterval decodeDuration = 0;
@@ -396,11 +409,15 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                 while (packet_size > 0)
                 {
                     int gotframe = 0;
+                    NSDate * date = [NSDate date];
                     int lenght = avcodec_decode_video2(_video_codec, _video_frame, &gotframe, &packet);
-                    if (lenght <= 0) break;
+                    static NSTimeInterval decode_time = 0;
+                    decode_time += -date.timeIntervalSinceNow;
+                    NSLog(@"解码耗时 : %f", decode_time);
+                    if (lenght < 0) break;
                     if (gotframe) {
                         if (!_video_frame->data[0]) break;
-#warning video frame
+                        
                         SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] init];
                         videoFrame.width = _video_codec->width;
                         videoFrame.height = _video_codec->height;
@@ -415,9 +432,18 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                         }
                         
                         if (videoFrame) {
-                            [frames addObject:videoFrame];
+                            [array addObject:videoFrame];
+                            self.position = videoFrame.position;
+                            decodeDuration += videoFrame.duration;
+                            if (decodeDuration > duration) {
+                                finished = YES;
+                            }
+                            static NSTimeInterval total_duration = 0;
+                            total_duration += videoFrame.duration;
+                            NSLog(@"视频时长 : %f", total_duration);
                         }
                     }
+                    if (lenght == 0) break;
                     packet_size -= lenght;
                 }
             }
@@ -428,7 +454,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                 {
                     int gotframe = 0;
                     int lenght = avcodec_decode_audio4(_audio_codec, _audio_frame, &gotframe, &packet);
-                    if (lenght <= 0) break;
+                    if (lenght < 0) break;
                     if (gotframe) {
                         if (!_audio_frame->data[0]) break;
                         
@@ -450,13 +476,13 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                             error = checkError(numberOfFrames);
                             if (error) {
                                 NSLog(@"audio codec error : %@", error);
-                                return;
+                                break;
                             }
                             audioDataBuffer = _audio_swr_buffer;
                         } else {
                             if (_audio_codec->sample_fmt != AV_SAMPLE_FMT_S16) {
                                 NSLog(@"audio format error");
-                                return;
+                                break;
                             }
                             audioDataBuffer = _audio_frame->data[0];
                             numberOfFrames = _audio_frame->nb_samples;
@@ -479,28 +505,41 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                         }
                         
                         if (audioFrame) {
-                            [frames addObject:audioFrame];
-                            self.position = audioFrame.position;
-                            decodeDuration += audioFrame.duration;
-                            if (decodeDuration > duration) {
-                                finished = YES;
-                            }
+                            [array addObject:audioFrame];
+//                            if (_video_stream_index == -1) {
+                                self.position = audioFrame.position;
+                                decodeDuration += audioFrame.duration;
+                                if (decodeDuration > duration) {
+                                    finished = YES;
+                                }
+//                            }
                         }
                     }
+                    if (lenght == 0) break;
                     packet_size -= lenght;
                 }
             }
+            av_free_packet(&packet);
         }
         
         if ([self.delegate respondsToSelector:@selector(decoder:didDecodeFrames:)]) {
-            [self.delegate decoder:self didDecodeFrames:frames];
+            [self.delegate decoder:self didDecodeFrames:array];
         }
-        av_packet_unref(&packet);
         
         self.decoding = NO;
-    }];
-    operation.queuePriority = NSOperationQueuePriorityVeryHigh;
-    [self.ffmpegQueue addOperation:operation];
+#ifdef SWITCH1
+        });
+#elif SWITCH2
+        }];
+        thread.name = @"ffmpeg NSThread";
+        thread.qualityOfService = NSQualityOfServiceUserInteractive;
+        [thread start];
+#else
+        }];
+        operation.queuePriority = NSOperationQueuePriorityVeryHigh;
+//        operation.qualityOfService = NSQualityOfServiceUserInteractive;
+        [self.ffmpegQueue addOperation:operation];
+#endif
 }
 
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler
