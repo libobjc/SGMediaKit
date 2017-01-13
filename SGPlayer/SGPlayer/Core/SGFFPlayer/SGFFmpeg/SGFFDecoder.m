@@ -363,6 +363,79 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 
 #pragma mark - decode frames
 
+- (SGFFVideoFrame *)fetchVideoFrame
+{
+    if (!_video_frame->data[0]) return nil;
+    
+    SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] init];
+    videoFrame.width = _video_codec->width;
+    videoFrame.height = _video_codec->height;
+    videoFrame.position = av_frame_get_best_effort_timestamp(_video_frame) * _video_timebase;
+    
+    const int64_t frame_duration = av_frame_get_pkt_duration(_video_frame);
+    if (frame_duration) {
+        videoFrame.duration = frame_duration * _video_timebase;
+        videoFrame.duration += _video_frame->repeat_pict * _video_timebase * 0.5;
+    } else {
+        videoFrame.duration = 1.0 / self.fps;
+    }
+    
+    return videoFrame;
+}
+
+- (SGFFAudioFrame *)fetchAudioFrame
+{
+    if (!_audio_frame->data[0]) return nil;
+    
+    SGAudioManager * audioManager = [SGAudioManager manager];
+    NSInteger numberOfFrames;
+    void * audioDataBuffer;
+    
+    if (_audio_swr_context) {
+        const NSUInteger ratio = MAX(1, audioManager.samplingRate / _audio_codec->sample_rate) * MAX(1, audioManager.numOutputChannels / _audio_codec->channels) * 2;
+        const int buffer_size = av_samples_get_buffer_size(NULL, audioManager.numOutputChannels, _audio_frame->nb_samples * ratio, AV_SAMPLE_FMT_S16, 1);
+        
+        if (!_audio_swr_buffer || _audio_swr_buffer_size < buffer_size) {
+            _audio_swr_buffer_size = buffer_size;
+            _audio_swr_buffer = realloc(_audio_swr_buffer, _audio_swr_buffer_size);
+        }
+        
+        Byte * outyput_buffer[2] = {_audio_swr_buffer, 0};
+        numberOfFrames = swr_convert(_audio_swr_context, outyput_buffer, _audio_frame->nb_samples * ratio, (const uint8_t **)_audio_frame->data, _audio_frame->nb_samples);
+        NSError * error = checkError(numberOfFrames);
+        if (error) {
+            NSLog(@"audio codec error : %@", error);
+            return nil;
+        }
+        audioDataBuffer = _audio_swr_buffer;
+    } else {
+        if (_audio_codec->sample_fmt != AV_SAMPLE_FMT_S16) {
+            NSLog(@"audio format error");
+            return nil;
+        }
+        audioDataBuffer = _audio_frame->data[0];
+        numberOfFrames = _audio_frame->nb_samples;
+    }
+    
+    const NSUInteger numberOfElements = numberOfFrames * audioManager.numOutputChannels;
+    NSMutableData *data = [NSMutableData dataWithLength:numberOfElements * sizeof(float)];
+    
+    float scale = 1.0 / (float)INT16_MAX ;
+    vDSP_vflt16((SInt16 *)audioDataBuffer, 1, data.mutableBytes, 1, numberOfElements);
+    vDSP_vsmul(data.mutableBytes, 1, &scale, data.mutableBytes, 1, numberOfElements);
+    
+    SGFFAudioFrame * audioFrame = [[SGFFAudioFrame alloc] init];
+    audioFrame.position = av_frame_get_best_effort_timestamp(_audio_frame) * _audio_timebase;
+    audioFrame.duration = av_frame_get_pkt_duration(_audio_frame) * _audio_timebase;
+    audioFrame.samples = data;
+    
+    if (audioFrame.duration == 0) {
+        audioFrame.duration = audioFrame.samples.length / (sizeof(float) * audioManager.numOutputChannels * audioManager.samplingRate);
+    }
+    
+    return audioFrame;
+}
+
 - (void)decodeFrames
 {
     [self decodeFramesWithDuration:decode_frames_min_duration];
@@ -372,8 +445,8 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 {
     self.decoding = YES;
     
-#define SWITCH1
-#define SWITCH2 1
+//#define SWITCH1
+//#define SWITCH2 1
 #ifdef SWITCH1
     static dispatch_queue_t temp_queue = nil;
     static dispatch_once_t onceToken;
@@ -416,28 +489,9 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                     NSLog(@"解码耗时 : %f", decode_time);
                     if (lenght < 0) break;
                     if (gotframe) {
-                        if (!_video_frame->data[0]) break;
-                        
-                        SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] init];
-                        videoFrame.width = _video_codec->width;
-                        videoFrame.height = _video_codec->height;
-                        videoFrame.position = av_frame_get_best_effort_timestamp(_video_frame) * _video_timebase;
-                        
-                        const int64_t frame_duration = av_frame_get_pkt_duration(_video_frame);
-                        if (frame_duration) {
-                            videoFrame.duration = frame_duration * _video_timebase;
-                            videoFrame.duration += _video_frame->repeat_pict * _video_timebase * 0.5;
-                        } else {
-                            videoFrame.duration = 1.0 / self.fps;
-                        }
-                        
+                        SGFFVideoFrame * videoFrame = [self fetchVideoFrame];
                         if (videoFrame) {
                             [array addObject:videoFrame];
-                            self.position = videoFrame.position;
-                            decodeDuration += videoFrame.duration;
-                            if (decodeDuration > duration) {
-                                finished = YES;
-                            }
                             static NSTimeInterval total_duration = 0;
                             total_duration += videoFrame.duration;
                             NSLog(@"视频时长 : %f", total_duration);
@@ -446,6 +500,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                     if (lenght == 0) break;
                     packet_size -= lenght;
                 }
+                finished = YES;
             }
             else if (packet.stream_index == _audio_stream_index)
             {
@@ -456,63 +511,12 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                     int lenght = avcodec_decode_audio4(_audio_codec, _audio_frame, &gotframe, &packet);
                     if (lenght < 0) break;
                     if (gotframe) {
-                        if (!_audio_frame->data[0]) break;
-                        
-                        SGAudioManager * audioManager = [SGAudioManager manager];
-                        NSInteger numberOfFrames;
-                        void * audioDataBuffer;
-                        
-                        if (_audio_swr_context) {
-                            const NSUInteger ratio = MAX(1, audioManager.samplingRate / _audio_codec->sample_rate) * MAX(1, audioManager.numOutputChannels / _audio_codec->channels) * 2;
-                            const int buffer_size = av_samples_get_buffer_size(NULL, audioManager.numOutputChannels, _audio_frame->nb_samples * ratio, AV_SAMPLE_FMT_S16, 1);
-                            
-                            if (!_audio_swr_buffer || _audio_swr_buffer_size < buffer_size) {
-                                _audio_swr_buffer_size = buffer_size;
-                                _audio_swr_buffer = realloc(_audio_swr_buffer, _audio_swr_buffer_size);
-                            }
-                            
-                            Byte * outyput_buffer[2] = {_audio_swr_buffer, 0};
-                            numberOfFrames = swr_convert(_audio_swr_context, outyput_buffer, _audio_frame->nb_samples * ratio, (const uint8_t **)_audio_frame->data, _audio_frame->nb_samples);
-                            error = checkError(numberOfFrames);
-                            if (error) {
-                                NSLog(@"audio codec error : %@", error);
-                                break;
-                            }
-                            audioDataBuffer = _audio_swr_buffer;
-                        } else {
-                            if (_audio_codec->sample_fmt != AV_SAMPLE_FMT_S16) {
-                                NSLog(@"audio format error");
-                                break;
-                            }
-                            audioDataBuffer = _audio_frame->data[0];
-                            numberOfFrames = _audio_frame->nb_samples;
-                        }
-                        
-                        const NSUInteger numberOfElements = numberOfFrames * audioManager.numOutputChannels;
-                        NSMutableData *data = [NSMutableData dataWithLength:numberOfElements * sizeof(float)];
-                        
-                        float scale = 1.0 / (float)INT16_MAX ;
-                        vDSP_vflt16((SInt16 *)audioDataBuffer, 1, data.mutableBytes, 1, numberOfElements);
-                        vDSP_vsmul(data.mutableBytes, 1, &scale, data.mutableBytes, 1, numberOfElements);
-                        
-                        SGFFAudioFrame * audioFrame = [[SGFFAudioFrame alloc] init];
-                        audioFrame.position = av_frame_get_best_effort_timestamp(_audio_frame) * _audio_timebase;
-                        audioFrame.duration = av_frame_get_pkt_duration(_audio_frame) * _audio_timebase;
-                        audioFrame.samples = data;
-                        
-                        if (audioFrame.duration == 0) {
-                            audioFrame.duration = audioFrame.samples.length / (sizeof(float) * audioManager.numOutputChannels * audioManager.samplingRate);
-                        }
-                        
+                        SGFFAudioFrame * audioFrame = [self fetchAudioFrame];
                         if (audioFrame) {
                             [array addObject:audioFrame];
-//                            if (_video_stream_index == -1) {
-                                self.position = audioFrame.position;
-                                decodeDuration += audioFrame.duration;
-                                if (decodeDuration > duration) {
-                                    finished = YES;
-                                }
-//                            }
+                            self.position = audioFrame.position;
+                            decodeDuration += audioFrame.duration;
+                            if (decodeDuration > duration) finished = YES;
                         }
                     }
                     if (lenght == 0) break;
@@ -537,7 +541,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 #else
         }];
         operation.queuePriority = NSOperationQueuePriorityVeryHigh;
-//        operation.qualityOfService = NSQualityOfServiceUserInteractive;
+        operation.qualityOfService = NSQualityOfServiceUserInteractive;
         [self.ffmpegQueue addOperation:operation];
 #endif
 }
@@ -571,6 +575,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         }
     }];
     operation.queuePriority = NSOperationQueuePriorityVeryHigh;
+    operation.qualityOfService = NSQualityOfServiceUserInteractive;
     [self.ffmpegQueue addOperation:operation];
 }
 
