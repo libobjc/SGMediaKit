@@ -489,9 +489,9 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                         if (videoFrame) {
                             [array addObject:videoFrame];
                             
-                            static NSTimeInterval video_done_time = 0;
-                            video_done_time += videoFrame.duration;
-                            NSLog(@"Video --- 完成时长 : %f", video_done_time);
+//                            static NSTimeInterval video_done_time = 0;
+//                            video_done_time += videoFrame.duration;
+//                            NSLog(@"Video --- 完成时长 : %f", video_done_time);
                         }
                     }
                     if (lenght == 0) break;
@@ -523,9 +523,9 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                             decodeDuration += audioFrame.duration;
                             if (decodeDuration > duration) finished = YES;
                             
-                            static NSTimeInterval audio_done_time = 0;
-                            audio_done_time += audioFrame.duration;
-                            NSLog(@"Aduio +++ 完成时长 : %f", audio_done_time);
+//                            static NSTimeInterval audio_done_time = 0;
+//                            audio_done_time += audioFrame.duration;
+//                            NSLog(@"Aduio +++ 完成时长 : %f", audio_done_time);
                         }
                     }
                     if (lenght == 0) break;
