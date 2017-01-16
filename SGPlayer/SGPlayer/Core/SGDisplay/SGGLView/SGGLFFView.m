@@ -7,6 +7,7 @@
 //
 
 #import "SGGLFFView.h"
+#import "SGGLFFProgram.h"
 
 @interface SGGLFFView ()
 
@@ -18,8 +19,9 @@
 
 - (void)setupProgram
 {
-    self.program = [SGGLProgram ffmpegProgram];
-    [self.program prepare];
+    self.program = [SGGLFFProgram program];
+    [self.program use];
+    [self.program bindVariable];
 }
 
 - (void)setupSubClass

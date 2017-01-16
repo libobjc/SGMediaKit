@@ -8,32 +8,34 @@
 
 #import "SGGLProgram.h"
 #import "SGPlayerMacro.h"
-#import "SGAVGLShader.h"
 
 @interface SGGLProgram ()
 
 {
-    GLuint _program_id;
     GLuint _vertexShader_id;
     GLuint _fragmentShader_id;
-    
-    GLuint _pSamplerY;
-    GLuint _pSamplerUV;
-    GLuint _pColorConversionMatrix;
 }
+
+@property (nonatomic, copy) NSString * vertexShaderString;
+@property (nonatomic, copy) NSString * fragmentShaderString;
 
 @end
 
 @implementation SGGLProgram
 
-+ (SGGLProgram *)avplayerProgram
++ (instancetype)programWithVertexShader:(NSString *)vertexShader fragmentShader:(NSString *)fragmentShader
 {
-    return [[self alloc] init];
+    return [[self alloc] initWithVertexShader:vertexShader fragmentShader:fragmentShader];
 }
 
-+ (SGGLProgram *)ffmpegProgram
+- (instancetype)initWithVertexShader:(NSString *)vertexShader fragmentShader:(NSString *)fragmentShader
 {
-    return [[self alloc] init];
+    if (self = [super init]) {
+        self.vertexShaderString = vertexShader;
+        self.fragmentShaderString = fragmentShader;
+        [self setup];
+    }
+    return self;
 }
 
 - (void)use
@@ -41,33 +43,9 @@
     glUseProgram(_program_id);
 }
 
-- (void)prepare
-{
-    static GLfloat colorConversion709[] = {
-        1.164,    1.164,     1.164,
-        0.0,      -0.213,    2.112,
-        1.793,    -0.533,    0.0,
-    };
-    glUniformMatrix3fv(_pColorConversionMatrix, 1, GL_FALSE, colorConversion709);
-    
-    glEnableVertexAttribArray(_position_location);
-    glEnableVertexAttribArray(_texture_coord_location);
-    
-    glUniform1i(_pSamplerY, 0);
-    glUniform1i(_pSamplerUV, 1);
-}
-
 - (void)setMatrix:(GLKMatrix4)matrix
 {
     glUniformMatrix4fv(self.matrix_location, 1, GL_FALSE, matrix.m);
-}
-
-- (instancetype)init
-{
-    if (self = [super init]) {
-        [self setup];
-    }
-    return self;
 }
 
 - (void)setup
@@ -75,6 +53,7 @@
     [self setupProgram];
     [self setupShader];
     [self linkProgram];
+    [self use];
     [self setupVariable];
 }
 
@@ -86,11 +65,11 @@
 - (void)setupShader
 {
     // setup shader
-    if (![self compileShader:&_vertexShader_id type:GL_VERTEX_SHADER string:vertexShaderString])
+    if (![self compileShader:&_vertexShader_id type:GL_VERTEX_SHADER string:self.vertexShaderString.UTF8String])
     {
         SGPlayerLog(@"load vertex shader failure");
     }
-    if (![self compileShader:&_fragmentShader_id type:GL_FRAGMENT_SHADER string:fragmentShaderString])
+    if (![self compileShader:&_fragmentShader_id type:GL_FRAGMENT_SHADER string:self.fragmentShaderString.UTF8String])
     {
         SGPlayerLog(@"load fragment shader failure");
     }
@@ -110,16 +89,6 @@
     [self clearShader];
     
     return YES;
-}
-
-- (void)setupVariable
-{
-    _position_location = glGetAttribLocation(_program_id, "position");
-    _texture_coord_location = glGetAttribLocation(_program_id, "textureCoord");
-    _matrix_location = glGetUniformLocation(_program_id, "mvpMatrix");
-    _pSamplerY = glGetUniformLocation(_program_id, "SamplerY");
-    _pSamplerUV = glGetUniformLocation(_program_id, "SamplerUV");
-    _pColorConversionMatrix = glGetUniformLocation(_program_id, "colorConversionMatrix");
 }
 
 - (BOOL)compileShader:(GLuint *)shader type:(GLenum)type string:(const char *)shaderString
@@ -177,5 +146,10 @@
     [self clearShader];
     [self clearProgram];
 }
+
+#pragma mark - subclass override
+
+- (void)bindVariable {}
+- (void)setupVariable {}
 
 @end

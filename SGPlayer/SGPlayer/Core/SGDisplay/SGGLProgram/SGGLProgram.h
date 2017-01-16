@@ -10,15 +10,23 @@
 
 @interface SGGLProgram : NSObject
 
-+ (SGGLProgram *)avplayerProgram;
-+ (SGGLProgram *)ffmpegProgram;
++ (instancetype)new NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
 
-@property (nonatomic, assign, readonly) GLint position_location;
-@property (nonatomic, assign, readonly) GLint texture_coord_location;
-@property (nonatomic, assign, readonly) GLint matrix_location;
++ (instancetype)programWithVertexShader:(NSString *)vertexShader fragmentShader:(NSString *)fragmentShader;
+
+@property (nonatomic, assign) GLint program_id;
+
+@property (nonatomic, assign) GLint position_location;
+@property (nonatomic, assign) GLint texture_coord_location;
+@property (nonatomic, assign) GLint matrix_location;
+
+- (void)use;
+
+#pragma mark - subclass override
 
 - (void)setMatrix:(GLKMatrix4)matrix;
-- (void)prepare;
-- (void)use;
+- (void)setupVariable;
+- (void)bindVariable;
 
 @end

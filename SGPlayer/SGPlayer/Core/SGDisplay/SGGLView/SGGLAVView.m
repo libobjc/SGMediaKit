@@ -8,6 +8,7 @@
 
 #import "SGGLAVView.h"
 #import "SGAVPlayer.h"
+#import "SGGLAVProgram.h"
 #import "SGGLAVTexture.h"
 
 @interface SGGLAVView ()
@@ -27,16 +28,16 @@
     
     [self.program use];
     [self.texture updateTextureWithPixelBuffer:pixelBuffer];
-    [self.program prepare];
+    [self.program bindVariable];
     
     return YES;
 }
 
 - (void)setupProgram
 {
-    self.program = [SGGLProgram avplayerProgram];
+    self.program = [SGGLAVProgram program];
     [self.program use];
-    [self.program prepare];
+    [self.program bindVariable];
 }
 
 - (void)setupSubClass
