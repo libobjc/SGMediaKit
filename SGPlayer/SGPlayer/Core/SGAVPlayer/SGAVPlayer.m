@@ -264,7 +264,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     }
 }
 
-- (CVPixelBufferRef)displayViewFetchPixelBuffer:(SGDisplayView *)displayView
+- (CVPixelBufferRef)pixelBufferAtCurrentTime
 {
     if (self.seeking) return nil;
     

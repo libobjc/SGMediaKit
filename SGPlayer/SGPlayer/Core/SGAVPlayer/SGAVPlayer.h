@@ -7,10 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
 #import "SGPlayer.h"
-#import "SGDisplayView.h"
 
-@interface SGAVPlayer : NSObject <SGDisplayViewAVPlayerOutputDelgate>
+@interface SGAVPlayer : NSObject
 
 + (instancetype)new NS_UNAVAILABLE;
 + (instancetype)init NS_UNAVAILABLE;
@@ -37,5 +37,6 @@
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void(^)(BOOL finished))completeHandler;
 
 - (UIImage *)snapshotAtCurrentTime;
+- (CVPixelBufferRef)pixelBufferAtCurrentTime;
 
 @end

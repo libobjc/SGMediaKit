@@ -22,6 +22,11 @@ typedef NS_ENUM(NSUInteger, SGFFFrameType) {
 @end
 
 @interface SGFFVideoFrame : SGFFFrame
+
+@property (nonatomic, strong) NSData * luma;
+@property (nonatomic, strong) NSData * chromaB;
+@property (nonatomic, strong) NSData * chromaR;
+
 @property (nonatomic, assign) NSUInteger width;
 @property (nonatomic, assign) NSUInteger height;
 @end

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import "SGPlayerDefine.h"
-#import "SGDisplayFrame.h"
+#import "SGFFFrame.h"
 
 @class SGPlayer;
 @class SGAVPlayer;
@@ -23,10 +23,6 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
     SGDisplayRendererTypeFFmpegPexelBufferVR,
 };
 
-@protocol SGDisplayViewAVPlayerOutputDelgate <NSObject>
-- (CVPixelBufferRef)displayViewFetchPixelBuffer:(SGDisplayView *)displayView;
-@end
-
 @interface SGDisplayView : UIView
 
 + (instancetype)new NS_UNAVAILABLE;
@@ -35,14 +31,15 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
 
 + (instancetype)displayViewWithAbstractPlayer:(SGPlayer *)abstractPlayer;
 
+@property (nonatomic, weak, readonly) SGPlayer * abstractPlayer;
+
 @property (nonatomic, weak) SGAVPlayer * sgavplayer;
 @property (nonatomic, assign) SGDisplayRendererType rendererType;
 
 //- (void)pause;
 //- (void)resume;
 - (void)cleanEmptyBuffer;
-- (void)renderFrame:(SGDisplayFrame *)displayFrame;
-- (void)reloadDisplayMode;
+- (void)renderFrame:(SGFFVideoFrame *)displayFrame;
 
 - (UIImage *)snapshot;
 

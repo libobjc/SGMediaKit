@@ -30,7 +30,7 @@
 - (SGVideoFormat)formatForContentURL:(NSURL *)contentURL
 {
     if (!contentURL) return SGVideoFormatError;
-    return SGVideoFormatUnknown;
+    return SGVideoFormatMPEG4;
 }
 
 - (SGDecoderType)decoderTypeForContentURL:(NSURL *)contentURL

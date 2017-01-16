@@ -9,14 +9,16 @@
 #import "SGDisplayView.h"
 #import "SGPlayer.h"
 #import "SGAVPlayer.h"
-#import "SGAVGLView.h"
+#import "SGGLAVView.h"
+#import "KxMovieGLView.h"
 
-@interface SGDisplayView () <SGAVGLViewDataSource>
+@interface SGDisplayView ()
 
 @property (nonatomic, weak) SGPlayer * abstractPlayer;
 
 @property (nonatomic, strong) AVPlayerLayer * avplayerLayer;
-@property (nonatomic, strong) SGAVGLView * glView;
+@property (nonatomic, strong) SGGLAVView * avplayerView;
+@property (nonatomic, strong) KxMovieGLView * ffplayerView;
 
 @end
 
@@ -51,19 +53,28 @@
             [self.avplayerLayer removeAllAnimations];
         }
     }
-    if (self.glView) {
+    if (self.avplayerView) {
         CGSize size = layer.bounds.size;
         if (size.width < size.height) {
-            self.glView.frame = CGRectMake(0, (size.height-size.width/16*9)/2, size.width, size.width/16*9);
+            self.avplayerView.frame = CGRectMake(0, (size.height-size.width/16*9)/2, size.width, size.width/16*9);
         } else {
-            self.glView.frame = layer.bounds;
+            self.avplayerView.frame = layer.bounds;
+        }
+    }
+    if (self.ffplayerView) {
+        CGSize size = layer.bounds.size;
+        if (size.width < size.height) {
+            self.ffplayerView.frame = CGRectMake(0, (size.height-size.width/16*9)/2, size.width, size.width/16*9);
+        } else {
+            self.ffplayerView.frame = layer.bounds;
         }
     }
 }
 
-- (void)renderFrame:(SGDisplayFrame *)displayFrame
+- (void)renderFrame:(SGFFVideoFrame *)displayFrame
 {
     NSLog(@"%s", __func__);
+    [self.ffplayerView render:displayFrame];
 }
 
 - (void)setRendererType:(SGDisplayRendererType)rendererType
@@ -87,15 +98,18 @@
             }
             break;
         case SGDisplayRendererTypeAVPlayerPixelBufferVR:
-            if (!self.glView) {
-                self.glView = [[SGAVGLView alloc] initWithFrame:CGRectZero];
-                self.glView.dataSource = self;
-                [self reloadDisplayMode];
-                [self insertSubview:self.glView atIndex:0];
+            if (!self.avplayerView) {
+                self.avplayerView = [SGGLAVView viewWithDisplayView:self];
+                [self insertSubview:self.avplayerView atIndex:0];
             }
             break;
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
+            if (!self.ffplayerView) {
+                self.ffplayerView = [[KxMovieGLView alloc] initWithFrame:CGRectZero];
+                [self insertSubview:self.ffplayerView atIndex:0];
+                NSLog(@"%@", self.ffplayerView);
+            }
             break;
     }
 }
@@ -130,10 +144,10 @@
         [self.avplayerLayer removeFromSuperlayer];
         self.avplayerLayer = nil;
     }
-    if (cleanView && self.glView) {
-        [self.glView invalidate];
-        [self.glView removeFromSuperview];
-        self.glView = nil;
+    if (cleanView && self.avplayerView) {
+        [self.avplayerView invalidate];
+        [self.avplayerView removeFromSuperview];
+        self.avplayerView = nil;
     }
 }
 
@@ -152,18 +166,6 @@
     NSLog(@"%s", __func__);
 }
 
-- (void)reloadDisplayMode
-{
-    if (self.glView) {
-        self.glView.displayMode = self.abstractPlayer.displayMode;
-    }
-}
-
-- (CVPixelBufferRef)sgav_glViewPixelBufferToDraw:(SGAVGLView *)glView
-{
-    return [self.sgavplayer displayViewFetchPixelBuffer:self];
-}
-
 - (UIImage *)snapshot
 {
     switch (self.rendererType) {
@@ -172,7 +174,7 @@
         case SGDisplayRendererTypeAVPlayerLayer:
             return self.sgavplayer.snapshotAtCurrentTime;
         case SGDisplayRendererTypeAVPlayerPixelBufferVR:
-            return self.glView.snapshot;
+            return self.avplayerView.snapshot;
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
             return nil;

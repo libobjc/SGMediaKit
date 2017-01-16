@@ -380,6 +380,13 @@
 
 - (void)audioCallbackFillData:(float *)outData numFrames:(UInt32) numFrames numChannels:(UInt32)numChannels
 {
+    static NSTimeInterval video_time_token = 0;
+    if (self.videoFrames.count > 0 && [NSDate date].timeIntervalSince1970 - video_time_token > 0.1) {
+        video_time_token = [NSDate date].timeIntervalSince1970;
+        [self.abstractPlayer.displayView renderFrame:self.videoFrames.firstObject];
+        [self.videoFrames removeAllObjects];
+    }
+    
     if (self.decoder.endOfFile) {
         if (self.audioFrames.count <= 0) {
             self.progress = self.duration;

@@ -158,12 +158,6 @@
     }
 }
 
-- (void)setDisplayMode:(SGDisplayMode)displayMode
-{
-    _displayMode = displayMode;
-    [self.displayView reloadDisplayMode];
-}
-
 - (SGPlayerState)state
 {
     switch (self.decoderType) {

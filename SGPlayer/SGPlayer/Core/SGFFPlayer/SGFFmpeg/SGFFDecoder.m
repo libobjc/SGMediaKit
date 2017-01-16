@@ -11,6 +11,7 @@
 #import "NSDictionary+SGFFmpeg.h"
 #import "avformat.h"
 #import "swresample.h"
+#import "swscale.h"
 #import <Accelerate/Accelerate.h>
 
 static NSTimeInterval decode_frames_min_duration = 0.0;
@@ -71,6 +72,19 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
     }
 }
 
+static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
+{
+    width = MIN(linesize, width);
+    NSMutableData *md = [NSMutableData dataWithLength: width * height];
+    Byte *dst = md.mutableBytes;
+    for (NSUInteger i = 0; i < height; ++i) {
+        memcpy(dst, src, width);
+        dst += width;
+        src += linesize;
+    }
+    return md;
+}
+
 @interface SGFFDecoder ()
 
 {
@@ -84,6 +98,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
     NSTimeInterval _video_timebase;
     NSTimeInterval _audio_timebase;
     
+    struct SwsContext * _video_sws_context;
     SwrContext * _audio_swr_context;
     void * _audio_swr_buffer;
     NSUInteger _audio_swr_buffer_size;
@@ -280,6 +295,8 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
     _video_codec = stream->codec;
     self.presentationSize = CGSizeMake(_video_codec->width, _video_codec->height);
     
+//    sws_getCachedContext(_video_sws_context, _video_codec->width, _video_codec->height, _video_codec->pix_fmt, _video_codec->width, _video_codec->height, AV_PIX_FMT_YUV420P, SWS_FAST_BILINEAR, NULL, NULL, NULL);
+    
     return error;
 }
 
@@ -373,6 +390,20 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
     if (!_video_frame->data[0]) return nil;
     
     SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] init];
+    
+    videoFrame.luma = copyFrameData(_video_frame->data[0],
+                                  _video_frame->linesize[0],
+                                  _video_codec->width,
+                                  _video_codec->height);
+    videoFrame.chromaB = copyFrameData(_video_frame->data[1],
+                                     _video_frame->linesize[1],
+                                     _video_codec->width / 2,
+                                     _video_codec->height / 2);
+    videoFrame.chromaR = copyFrameData(_video_frame->data[2],
+                                     _video_frame->linesize[2],
+                                     _video_codec->width / 2,
+                                     _video_codec->height / 2);
+    
     videoFrame.width = _video_codec->width;
     videoFrame.height = _video_codec->height;
     videoFrame.position = av_frame_get_best_effort_timestamp(_video_frame) * _video_timebase;
@@ -497,7 +528,6 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                     if (lenght == 0) break;
                     packet_size -= lenght;
                 }
-                finished = YES;
             }
             else if (packet.stream_index == _audio_stream_index)
             {
