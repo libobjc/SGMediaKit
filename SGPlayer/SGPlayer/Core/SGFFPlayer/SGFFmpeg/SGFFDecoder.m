@@ -479,9 +479,9 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                     
                     int lenght = avcodec_decode_video2(_video_codec, _video_frame, &gotframe, &packet);
                     
-                    static NSTimeInterval video_decode_time = 0;
-                    video_decode_time += -date.timeIntervalSinceNow;
-                    NSLog(@"Video --- 解码耗时 : %f", video_decode_time);
+//                    static NSTimeInterval video_decode_time = 0;
+//                    video_decode_time += -date.timeIntervalSinceNow;
+//                    NSLog(@"Video --- 解码耗时 : %f", video_decode_time);
                     
                     if (lenght < 0) break;
                     if (gotframe) {
@@ -510,9 +510,9 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
                     
                     int lenght = avcodec_decode_audio4(_audio_codec, _audio_frame, &gotframe, &packet);
                     
-                    static NSTimeInterval audio_decode_time = 0;
-                    audio_decode_time += -date.timeIntervalSinceNow;
-                    NSLog(@"Audio +++ 解码耗时 : %f", audio_decode_time);
+//                    static NSTimeInterval audio_decode_time = 0;
+//                    audio_decode_time += -date.timeIntervalSinceNow;
+//                    NSLog(@"Audio +++ 解码耗时 : %f", audio_decode_time);
                     
                     if (lenght < 0) break;
                     if (gotframe) {
