@@ -87,14 +87,15 @@
             }
             break;
         case SGDisplayRendererTypeAVPlayerPixelBufferVR:
-        case SGDisplayRendererTypeFFmpegPexelBuffer:
-        case SGDisplayRendererTypeFFmpegPexelBufferVR:
             if (!self.glView) {
                 self.glView = [[SGAVGLView alloc] initWithFrame:CGRectZero];
                 self.glView.dataSource = self;
                 [self reloadDisplayMode];
                 [self insertSubview:self.glView atIndex:0];
             }
+            break;
+        case SGDisplayRendererTypeFFmpegPexelBuffer:
+        case SGDisplayRendererTypeFFmpegPexelBufferVR:
             break;
     }
 }
@@ -114,9 +115,11 @@
             [self cleanViewCleanAVPlayerLayer:NO cleanView:YES];
             break;
         case SGDisplayRendererTypeAVPlayerPixelBufferVR:
+            [self cleanViewCleanAVPlayerLayer:YES cleanView:NO];
+            break;
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
-            [self cleanViewCleanAVPlayerLayer:YES cleanView:NO];
+            [self cleanViewCleanAVPlayerLayer:YES cleanView:YES];
             break;
     }
 }
@@ -169,9 +172,10 @@
         case SGDisplayRendererTypeAVPlayerLayer:
             return self.sgavplayer.snapshotAtCurrentTime;
         case SGDisplayRendererTypeAVPlayerPixelBufferVR:
+            return self.glView.snapshot;
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
-            return self.glView.snapshot;
+            return nil;
     }
 }
 

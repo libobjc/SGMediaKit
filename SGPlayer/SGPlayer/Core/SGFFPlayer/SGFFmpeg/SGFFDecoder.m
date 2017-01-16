@@ -450,21 +450,7 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
 {
     self.decoding = YES;
     
-#define SWITCH1
-#define SWITCH2 1
-#ifdef SWITCH1
-    static dispatch_queue_t temp_queue = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        temp_queue = dispatch_queue_create("ffmpeg", DISPATCH_QUEUE_SERIAL);
-    });
-    dispatch_async(temp_queue, ^{
-//    dispatch_async(dispatch_get_main_queue(), ^{
-#elif SWITCH2
-    NSThread * thread = [[NSThread alloc] initWithBlock:^{
-#else
     NSBlockOperation * operation = [NSBlockOperation blockOperationWithBlock:^{
-#endif
         NSMutableArray <SGFFFrame *> * array = [[NSMutableArray alloc] init];
         AVPacket packet;
         BOOL finished = NO;
@@ -554,19 +540,10 @@ static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTi
         }
         
         self.decoding = NO;
-#ifdef SWITCH1
-        });
-#elif SWITCH2
-        }];
-        thread.name = @"ffmpeg NSThread";
-        thread.qualityOfService = NSQualityOfServiceUserInteractive;
-        [thread start];
-#else
-        }];
-        operation.queuePriority = NSOperationQueuePriorityVeryHigh;
-        operation.qualityOfService = NSQualityOfServiceUserInteractive;
-        [self.ffmpegQueue addOperation:operation];
-#endif
+    }];
+    operation.queuePriority = NSOperationQueuePriorityVeryHigh;
+    operation.qualityOfService = NSQualityOfServiceUserInteractive;
+    [self.ffmpegQueue addOperation:operation];
 }
 
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler
