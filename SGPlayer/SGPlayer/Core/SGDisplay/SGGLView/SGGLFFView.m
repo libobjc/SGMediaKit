@@ -28,7 +28,7 @@
     [self display];
 }
 
-- (BOOL)updateTexture
+- (BOOL)updateTextureAspect:(CGFloat *)aspect
 {
     if (!self.videoFrame) return NO;
     
@@ -38,6 +38,7 @@
     
     const NSUInteger frameWidth = self.videoFrame.width;
     const NSUInteger frameHeight = self.videoFrame.height;
+    * aspect = (frameWidth * 1.0) / (frameHeight * 1.0);
     
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     

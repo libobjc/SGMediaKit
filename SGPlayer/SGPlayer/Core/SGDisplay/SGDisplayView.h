@@ -40,6 +40,7 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
 
 //- (void)pause;
 //- (void)resume;
+- (void)reloadGravityMode;
 - (void)cleanEmptyBuffer;
 - (void)renderFrame:(SGFFVideoFrame *)displayFrame;
 

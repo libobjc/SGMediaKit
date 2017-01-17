@@ -58,6 +58,13 @@ typedef NS_ENUM(NSUInteger, SGDisplayMode) {
     SGDisplayModeBox,
 };
 
+// video content mode
+typedef NS_ENUM(NSUInteger, SGGravityMode) {
+    SGGravityModeResize,
+    SGGravityModeResizeAspect,
+    SGGravityModeResizeAspectFill,
+};
+
 // background mode
 typedef NS_ENUM(NSUInteger, SGPlayerBackgroundMode) {
     SGPlayerBackgroundModeNothing,

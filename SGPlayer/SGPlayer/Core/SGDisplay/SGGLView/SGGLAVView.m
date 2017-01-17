@@ -21,12 +21,12 @@
 
 @implementation SGGLAVView
 
-- (BOOL)updateTexture
+- (BOOL)updateTextureAspect:(CGFloat *)aspect
 {
     CVPixelBufferRef pixelBuffer = [self.displayView.sgavplayer pixelBufferAtCurrentTime];
     if (!pixelBuffer && !self.texture.hasTexture) return NO;
     
-    [self.texture updateTextureWithPixelBuffer:pixelBuffer];
+    [self.texture updateTextureWithPixelBuffer:pixelBuffer aspect:aspect];
     return YES;
 }
 

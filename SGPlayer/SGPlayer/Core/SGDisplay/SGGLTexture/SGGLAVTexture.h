@@ -13,6 +13,6 @@
 @property (nonatomic, assign, readonly) BOOL hasTexture;
 
 - (instancetype)initWithContext:(EAGLContext *)context;
-- (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer;
+- (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer aspect:(CGFloat *)aspect;
 
 @end

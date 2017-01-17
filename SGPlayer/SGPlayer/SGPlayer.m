@@ -39,6 +39,7 @@
         self.videoType = SGVideoTypeNormal;
         self.backgroundMode = SGPlayerBackgroundModeAutoPlayAndPause;
         self.displayMode = SGDisplayModeNormal;
+        self.viewGravityMode = SGGravityModeResizeAspect;
         self.playableBufferInterval = 2.f;
         self.viewAnimationHidden = NO;
         self.volume = 1;
@@ -151,6 +152,12 @@
     if (_ffPlayer) {
         [self.ffPlayer reloadVolume];
     }
+}
+
+- (void)setViewGravityMode:(SGGravityMode)viewGravityMode
+{
+    _viewGravityMode = viewGravityMode;
+    [self.displayView reloadGravityMode];
 }
 
 - (SGPlayerState)state

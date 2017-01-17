@@ -57,20 +57,10 @@
         }
     }
     if (self.avplayerView) {
-        CGSize size = layer.bounds.size;
-        if (size.width < size.height) {
-            self.avplayerView.frame = CGRectMake(0, (size.height-size.width/16*9)/2, size.width, size.width/16*9);
-        } else {
-            self.avplayerView.frame = layer.bounds;
-        }
+        self.avplayerView.frame = layer.bounds;
     }
     if (self.ffplayerView) {
-        CGSize size = layer.bounds.size;
-        if (size.width < size.height) {
-            self.ffplayerView.frame = CGRectMake(0, (size.height-size.width/16*9)/2, size.width, size.width/16*9);
-        } else {
-            self.ffplayerView.frame = layer.bounds;
-        }
+        self.ffplayerView.frame = layer.bounds;
     }
 }
 
@@ -97,6 +87,7 @@
             if (!self.avplayerLayer) {
                 self.avplayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.sgavplayer.avPlayer];
                 [self.layer insertSublayer:self.avplayerLayer atIndex:0];
+                [self reloadGravityMode];
             }
             break;
         case SGDisplayRendererTypeAVPlayerPixelBufferVR:
@@ -165,6 +156,23 @@
 - (void)pause
 {
     NSLog(@"%s", __func__);
+}
+
+- (void)reloadGravityMode
+{
+    if (self.avplayerLayer) {
+        switch (self.abstractPlayer.viewGravityMode) {
+            case SGGravityModeResize:
+                self.avplayerLayer.videoGravity = AVLayerVideoGravityResize;
+                break;
+            case SGGravityModeResizeAspect:
+                self.avplayerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+                break;
+            case SGGravityModeResizeAspectFill:
+                self.avplayerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+                break;
+        }
+    }
 }
 
 - (void)cleanEmptyBuffer

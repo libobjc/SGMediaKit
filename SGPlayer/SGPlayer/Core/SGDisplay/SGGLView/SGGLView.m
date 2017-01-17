@@ -58,6 +58,7 @@
 
 - (void)setup
 {
+    self.backgroundColor = [UIColor blackColor];
     [self setupGLKView];
     [self setupProgram];
     [self setupModel];
@@ -102,12 +103,14 @@
     
     SGVideoType videoType = self.displayView.abstractPlayer.videoType;
     SGDisplayMode displayMode = self.displayView.abstractPlayer.displayMode;
+    SGGravityMode gravityMode = self.displayView.abstractPlayer.viewGravityMode;
     
     if (videoType == SGVideoTypeVR && displayMode == SGDisplayModeBox) {
         [self.distorionRenderer beforDrawFrame];
     }
 
-    BOOL success = [self updateTexture];
+    CGFloat aspect = 16.0/9.0;
+    BOOL success = [self updateTextureAspect:&aspect];
     if (!success) return;
     
     [self.program use];
@@ -115,12 +118,37 @@
     
     NSInteger scale = [UIScreen mainScreen].scale;
     CGRect rect = self.bounds;
+    CGFloat rectAspect = rect.size.width / rect.size.height;
+    if (videoType == SGVideoTypeVR) aspect = 16.0/9.0;
+    switch (gravityMode) {
+        case SGGravityModeResize:
+            break;
+        case SGGravityModeResizeAspect:
+            if (rectAspect < aspect) {
+                CGFloat height = rect.size.width / aspect;
+                rect = CGRectMake(0, (rect.size.height - height) / 2, rect.size.width, height);
+            } else if (rectAspect > aspect) {
+                CGFloat width = rect.size.height * aspect;
+                rect = CGRectMake((rect.size.width - width) / 2, 0, width, rect.size.height);
+            }
+            break;
+        case SGGravityModeResizeAspectFill:
+            if (rectAspect < aspect) {
+                CGFloat width = rect.size.height * aspect;
+                rect = CGRectMake(-(width - rect.size.width) / 2, 0, width, rect.size.height);
+            } else if (rectAspect > aspect) {
+                CGFloat height = rect.size.width / aspect;
+                rect = CGRectMake(0, -(height - rect.size.height) / 2, rect.size.width, height);
+            }
+            break;
+    }
+    rect = CGRectMake(CGRectGetMinX(rect) * scale, CGRectGetMinY(rect) * scale, CGRectGetWidth(rect) * scale, CGRectGetHeight(rect) * scale);
     
     switch (videoType) {
         case SGVideoTypeNormal:
         {
             [self.normalModel bindPositionLocation:self.program.position_location textureCoordLocation:self.program.texture_coord_location];
-            glViewport(0, 0, CGRectGetWidth(rect) * scale, CGRectGetHeight(rect) * scale);
+            glViewport(rect.origin.x, rect.origin.y, CGRectGetWidth(rect), CGRectGetHeight(rect));
             [self.program updateMatrix:GLKMatrix4Identity];
             glDrawElements(GL_TRIANGLES, self.normalModel.index_count, GL_UNSIGNED_SHORT, 0);
         }
@@ -132,9 +160,9 @@
                 case SGDisplayModeNormal:
                 {
                     GLKMatrix4 matrix;
-                    BOOL success = [self.matrix singleMatrixWithSize:self.bounds.size matrix:&matrix fingerRotation:self.displayView.fingerRotation];
+                    BOOL success = [self.matrix singleMatrixWithSize:rect.size matrix:&matrix fingerRotation:self.displayView.fingerRotation];
                     if (success) {
-                        glViewport(0, 0, CGRectGetWidth(rect) * scale, CGRectGetHeight(rect) * scale);
+                        glViewport(rect.origin.x, rect.origin.y, CGRectGetWidth(rect), CGRectGetHeight(rect));
                         [self.program updateMatrix:matrix];
                         glDrawElements(GL_TRIANGLES, self.vrModel.index_count, GL_UNSIGNED_SHORT, 0);
                     }
@@ -144,13 +172,13 @@
                 {
                     GLKMatrix4 leftMatrix;
                     GLKMatrix4 rightMatrix;
-                    BOOL success = [self.matrix doubleMatrixWithSize:self.bounds.size leftMatrix:&leftMatrix rightMatrix:&rightMatrix];
+                    BOOL success = [self.matrix doubleMatrixWithSize:rect.size leftMatrix:&leftMatrix rightMatrix:&rightMatrix];
                     if (success) {
-                        glViewport(0, 0, CGRectGetWidth(rect)/2 * scale, CGRectGetHeight(rect) * scale);
+                        glViewport(rect.origin.x, rect.origin.y, CGRectGetWidth(rect)/2, CGRectGetHeight(rect));
                         [self.program updateMatrix:leftMatrix];
                         glDrawElements(GL_TRIANGLES, self.vrModel.index_count, GL_UNSIGNED_SHORT, 0);
                         
-                        glViewport(CGRectGetWidth(rect)/2 * scale, 0, CGRectGetWidth(rect)/2 * scale, CGRectGetHeight(rect) * scale);
+                        glViewport(CGRectGetWidth(rect)/2 + rect.origin.x, rect.origin.y, CGRectGetWidth(rect)/2, CGRectGetHeight(rect));
                         [self.program updateMatrix:rightMatrix];
                         glDrawElements(GL_TRIANGLES, self.vrModel.index_count, GL_UNSIGNED_SHORT, 0);
                     }
@@ -194,7 +222,7 @@
 
 - (void)setupProgram {}
 - (void)setupSubClass {}
-- (BOOL)updateTexture {return NO;}
+- (BOOL)updateTextureAspect:(CGFloat *)aspect {return NO;}
 - (SGGLProgram *)program {return nil;}
 - (void)willDealloc {}
 

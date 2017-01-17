@@ -29,7 +29,7 @@
 
 - (void)setupProgram;
 - (void)setupSubClass;
-- (BOOL)updateTexture;
+- (BOOL)updateTextureAspect:(CGFloat *)aspect;
 
 - (void)willDealloc;
 

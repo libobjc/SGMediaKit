@@ -18,6 +18,8 @@
 @property (nonatomic, assign) CVOpenGLESTextureRef chromaTexture;
 @property (nonatomic, assign) CVOpenGLESTextureCacheRef videoTextureCache;
 
+@property (nonatomic, assign) CGFloat textureAspect;
+
 @end
 
 @implementation SGGLAVTexture
@@ -42,16 +44,18 @@
     }
 }
 
-- (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer
+- (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer aspect:(CGFloat *)aspect
 {
     if (pixelBuffer == nil) {
         if (self.lumaTexture) {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(CVOpenGLESTextureGetTarget(self.lumaTexture), CVOpenGLESTextureGetName(self.lumaTexture));
+            * aspect = self.textureAspect;
         }
         if (self.chromaTexture) {
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(CVOpenGLESTextureGetTarget(self.chromaTexture), CVOpenGLESTextureGetName(self.chromaTexture));
+            * aspect = self.textureAspect;
         }
         return;
     }
@@ -60,6 +64,8 @@
     
     GLsizei textureWidth = (GLsizei)CVPixelBufferGetWidth(pixelBuffer);
     GLsizei textureHeight = (GLsizei)CVPixelBufferGetHeight(pixelBuffer);
+    self.textureAspect = (textureWidth * 1.0) / (textureHeight * 1.0);
+    * aspect = self.textureAspect;
     
     if (!self.videoTextureCache) {
         SGPlayerLog(@"no video texture cache");
@@ -147,6 +153,7 @@
         self.chromaTexture = NULL;
     }
     
+    self.textureAspect = 16.0 / 9.0;
     CVOpenGLESTextureCacheFlush(_videoTextureCache, 0);
 }
 
