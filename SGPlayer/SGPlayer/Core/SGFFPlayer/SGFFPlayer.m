@@ -351,6 +351,7 @@
 
 - (void)decoder:(SGFFDecoder *)decoder didDecodeFrames:(NSArray<SGFFFrame *> *)frames
 {
+    if (!self.decoder) return;
     if (self.seeking) return;
     if (frames.count > 0) {
         [self addFrames:frames];
