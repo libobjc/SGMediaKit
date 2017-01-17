@@ -450,9 +450,9 @@
 
 - (void)clean
 {
-    [self cleanPlayer];
-    [self cleanFrames];
     [self cleanDecoder];
+    [self cleanFrames];
+    [self cleanPlayer];
 }
 
 - (void)cleanPlayer
