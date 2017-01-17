@@ -94,7 +94,10 @@
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     
-    if (self.displayView.abstractPlayer.displayMode == SGDisplayModeBox) {
+    SGVideoType videoType = self.displayView.abstractPlayer.videoType;
+    SGDisplayMode displayMode = self.displayView.abstractPlayer.displayMode;
+    
+    if (videoType == SGVideoTypeVR && displayMode == SGDisplayModeBox) {
         [self.distorionRenderer beforDrawFrame];
     }
 
@@ -107,7 +110,7 @@
     NSInteger scale = [UIScreen mainScreen].scale;
     CGRect rect = self.bounds;
     
-    switch (self.displayView.abstractPlayer.videoType) {
+    switch (videoType) {
         case SGVideoTypeNormal:
         {
             [self.normalModel bindPositionLocation:self.program.position_location textureCoordLocation:self.program.texture_coord_location];
@@ -152,7 +155,7 @@
             break;
     }
     
-    if (self.displayView.abstractPlayer.displayMode == SGDisplayModeBox) {
+    if (videoType == SGVideoTypeVR && displayMode == SGDisplayModeBox) {
         [self bindDrawable];
         [self.distorionRenderer afterDrawFrame];
     }
