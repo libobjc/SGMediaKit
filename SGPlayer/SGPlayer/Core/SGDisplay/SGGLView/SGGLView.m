@@ -83,10 +83,8 @@
 
 - (void)cleanEmptyBuffer
 {
-    [EAGLContext setCurrentContext:self.context];
-    
-    glClearColor(0, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
+    [self cleanTexture];
+    [self display];
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
@@ -214,15 +212,14 @@
 - (void)dealloc
 {
     [self willDealloc];
-    if ([EAGLContext currentContext] == self.context) {
-        [EAGLContext setCurrentContext:nil];
-    }
-    SGPlayerLog(@"SGGLView release");
+    [EAGLContext setCurrentContext:nil];
+    SGPlayerLog(@"%@ release", self.class);
 }
 
 - (void)setupProgram {}
 - (void)setupSubClass {}
 - (BOOL)updateTextureAspect:(CGFloat *)aspect {return NO;}
+- (void)cleanTexture {}
 - (SGGLProgram *)program {return nil;}
 - (void)willDealloc {}
 

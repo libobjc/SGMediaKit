@@ -67,6 +67,11 @@
     return _texture;
 }
 
+-  (void)cleanTexture
+{
+    self.texture = nil;
+}
+
 - (void)invalidate
 {
     [self.displayLink invalidate];

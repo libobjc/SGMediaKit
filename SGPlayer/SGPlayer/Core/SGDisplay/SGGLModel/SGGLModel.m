@@ -59,7 +59,7 @@
 - (void)dealloc
 {
     [self clear];
-    SGPlayerLog(@"SGAVGLModel release");
+    SGPlayerLog(@"%@ release", self.class);
 }
 
 #pragma mark - subclass override

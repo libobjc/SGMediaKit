@@ -465,6 +465,8 @@
     self.progress = 0;
     self.lastPostProgressTime = 0;
     self.lastPostPlayableTime = 0;
+    [self.abstractPlayer.displayView cleanEmptyBuffer];
+    [[KxAudioManager audioManager] pause];
 }
 
 - (void)cleanFrames

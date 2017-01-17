@@ -79,6 +79,11 @@
     return YES;
 }
 
+- (void)cleanTexture
+{
+    self.videoFrame = nil;
+}
+
 - (void)setupProgram
 {
     self.program = [SGGLFFProgram program];

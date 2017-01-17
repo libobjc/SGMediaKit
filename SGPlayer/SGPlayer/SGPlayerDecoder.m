@@ -31,7 +31,6 @@
 {
     if (!contentURL) return SGVideoFormatError;
     return SGVideoFormatUnknown;
-//    return SGVideoFormatMPEG4;
 }
 
 - (SGDecoderType)decoderTypeForContentURL:(NSURL *)contentURL
@@ -41,15 +40,15 @@
         case SGVideoFormatError:
             return SGDecoderTypeError;
         case SGVideoFormatUnknown:
-            return SGDecoderTypeFFmpeg;
+            return self.unkonwnFormat;
         case SGVideoFormatMPEG4:
-            return SGDecoderTypeAVPlayer;
+            return self.mpeg4Format;
         case SGVideoFormatFLV:
-            return SGDecoderTypeFFmpeg;
+            return self.flvFormat;
         case SGVideoFormatM3U8:
-            return SGDecoderTypeAVPlayer;
+            return self.m3u8Format;
         case SGVideoFormatRTMP:
-            return SGDecoderTypeFFmpeg;
+            return self.rtmpFormat;
     }
 }
 

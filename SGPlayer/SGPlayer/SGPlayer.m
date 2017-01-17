@@ -47,6 +47,11 @@
     return self;
 }
 
+- (void)replaceEmpty
+{
+    [self replaceVideoWithURL:nil];
+}
+
 - (void)replaceVideoWithURL:(NSURL *)contentURL
 {
     [self replaceVideoWithURL:contentURL videoType:SGVideoTypeNormal];
@@ -60,18 +65,24 @@
     
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
-            [self.avPlayer replaceVideo];
             if (_ffPlayer) {
                 [self.ffPlayer stop];
             }
+            [self.avPlayer replaceVideo];
             break;
         case SGDecoderTypeFFmpeg:
-            [self.ffPlayer replaceVideo];
             if (_avPlayer) {
                 [self.avPlayer stop];
             }
+            [self.ffPlayer replaceVideo];
             break;
         case SGDecoderTypeError:
+            if (_avPlayer) {
+                [self.avPlayer stop];
+            }
+            if (_ffPlayer) {
+                [self.ffPlayer stop];
+            }
             break;
     }
 }

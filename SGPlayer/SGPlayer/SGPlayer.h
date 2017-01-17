@@ -21,6 +21,8 @@
 
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 @property (nonatomic, assign, readonly) SGVideoType videoType;
+
+- (void)replaceEmpty;
 - (void)replaceVideoWithURL:(NSURL *)contentURL;
 - (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType;
 

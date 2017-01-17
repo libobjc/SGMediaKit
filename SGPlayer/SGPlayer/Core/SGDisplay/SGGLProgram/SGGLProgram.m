@@ -142,10 +142,9 @@
 
 - (void)dealloc
 {
-    SGPlayerLog(@"SGAVGLProgram release");
-    
     [self clearShader];
     [self clearProgram];
+    SGPlayerLog(@"%@ release", self.class);
 }
 
 #pragma mark - subclass override

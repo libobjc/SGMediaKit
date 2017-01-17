@@ -30,6 +30,7 @@
 - (void)setupProgram;
 - (void)setupSubClass;
 - (BOOL)updateTextureAspect:(CGFloat *)aspect;
+- (void)cleanTexture;
 
 - (void)willDealloc;
 
