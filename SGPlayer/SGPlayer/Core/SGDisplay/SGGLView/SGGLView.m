@@ -80,6 +80,14 @@
     self.vrModel = [SGGLVRModel model];
 }
 
+- (void)cleanEmptyBuffer
+{
+    [EAGLContext setCurrentContext:self.context];
+    
+    glClearColor(0, 0, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
     [self render];
@@ -124,7 +132,7 @@
                 case SGDisplayModeNormal:
                 {
                     GLKMatrix4 matrix;
-                    BOOL success = [self.matrix singleMatrixWithSize:self.bounds.size matrix:&matrix];
+                    BOOL success = [self.matrix singleMatrixWithSize:self.bounds.size matrix:&matrix fingerRotation:self.displayView.fingerRotation];
                     if (success) {
                         glViewport(0, 0, CGRectGetWidth(rect) * scale, CGRectGetHeight(rect) * scale);
                         [self.program updateMatrix:matrix];

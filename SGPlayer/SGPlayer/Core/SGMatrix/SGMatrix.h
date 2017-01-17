@@ -7,15 +7,11 @@
 //
 
 #import <GLKit/GLKit.h>
-
-#define default_degrees 60.0
+#import "SGFingerRotation.h"
 
 @interface SGMatrix : NSObject
 
-@property (assign, nonatomic) CGFloat fingerRotationX;
-@property (assign, nonatomic) CGFloat fingerRotationY;
-
-- (BOOL)singleMatrixWithSize:(CGSize)size matrix:(GLKMatrix4 *)matrix;
+- (BOOL)singleMatrixWithSize:(CGSize)size matrix:(GLKMatrix4 *)matrix fingerRotation:(SGFingerRotation *)fingerRotation;
 - (BOOL)doubleMatrixWithSize:(CGSize)size leftMatrix:(GLKMatrix4 *)leftMatrix rightMatrix:(GLKMatrix4 *)rightMatrix;
 
 @end

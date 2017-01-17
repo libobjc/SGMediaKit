@@ -22,7 +22,6 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        
         [self setupSensors];
     }
     return self;
@@ -36,18 +35,18 @@
     [self.sensors start];
 }
 
-- (BOOL)singleMatrixWithSize:(CGSize)size matrix:(GLKMatrix4 *)matrix
+- (BOOL)singleMatrixWithSize:(CGSize)size matrix:(GLKMatrix4 *)matrix fingerRotation:(SGFingerRotation *)fingerRotation
 {
     if (!self.sensors.isReady) return NO;
     
     GLKMatrix4 modelViewMatrix = GLKMatrix4Identity;
-    modelViewMatrix = GLKMatrix4RotateX(modelViewMatrix, -self.fingerRotationX);
+    modelViewMatrix = GLKMatrix4RotateX(modelViewMatrix, -fingerRotation.x);
     modelViewMatrix = GLKMatrix4Multiply(modelViewMatrix, self.sensors.modelView);
-    modelViewMatrix = GLKMatrix4RotateY(modelViewMatrix, self.fingerRotationY);
+    modelViewMatrix = GLKMatrix4RotateY(modelViewMatrix, fingerRotation.y);
     
     float aspect = fabs(size.width / size.height);
     GLKMatrix4 mvpMatrix = GLKMatrix4Identity;
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(default_degrees), aspect, 0.1f, 400.0f);
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians([SGFingerRotation degress]), aspect, 0.1f, 400.0f);
     GLKMatrix4 viewMatrix = GLKMatrix4MakeLookAt(0, 0, 0.0, 0, 0, -1000, 0, 1, 0);
     mvpMatrix = GLKMatrix4Multiply(projectionMatrix, viewMatrix);
     mvpMatrix = GLKMatrix4Multiply(mvpMatrix, modelViewMatrix);
@@ -64,7 +63,7 @@
     GLKMatrix4 modelViewMatrix = self.sensors.modelView;
     
     float aspect = fabs(size.width / 2 / size.height);
-    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(default_degrees), aspect, 0.1f, 400.0f);
+    GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians([SGFingerRotation degress]), aspect, 0.1f, 400.0f);
     
     CGFloat distance = 0.012;
     

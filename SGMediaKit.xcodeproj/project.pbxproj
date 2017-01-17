@@ -58,6 +58,10 @@
 		9C3335671E1B633800E4DDCC /* SGPlayerDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3335641E1B633800E4DDCC /* SGPlayerDecoder.m */; };
 		9C3335681E1B633800E4DDCC /* SGPlayerDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3335641E1B633800E4DDCC /* SGPlayerDecoder.m */; };
 		9C390EFB1DFFDF570053DE4A /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C390EF91DFFDF430053DE4A /* AVFoundation.framework */; };
+		9C65E8C21E2DC9C3007D81A9 /* SGFingerRotation.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C65E8C01E2DC9C3007D81A9 /* SGFingerRotation.h */; };
+		9C65E8C31E2DC9C3007D81A9 /* SGFingerRotation.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C65E8C01E2DC9C3007D81A9 /* SGFingerRotation.h */; };
+		9C65E8C41E2DC9C3007D81A9 /* SGFingerRotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65E8C11E2DC9C3007D81A9 /* SGFingerRotation.m */; };
+		9C65E8C51E2DC9C3007D81A9 /* SGFingerRotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65E8C11E2DC9C3007D81A9 /* SGFingerRotation.m */; };
 		9C6E6D401E2C7F6A003D62D5 /* KxMovieGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C6E6D3E1E2C7F6A003D62D5 /* KxMovieGLView.h */; };
 		9C6E6D411E2C7F6A003D62D5 /* KxMovieGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C6E6D3E1E2C7F6A003D62D5 /* KxMovieGLView.h */; };
 		9C6E6D421E2C7F6A003D62D5 /* KxMovieGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C6E6D3F1E2C7F6A003D62D5 /* KxMovieGLView.m */; };
@@ -430,6 +434,8 @@
 		9C3335631E1B633800E4DDCC /* SGPlayerDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPlayerDecoder.h; sourceTree = "<group>"; };
 		9C3335641E1B633800E4DDCC /* SGPlayerDecoder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPlayerDecoder.m; sourceTree = "<group>"; };
 		9C390EF91DFFDF430053DE4A /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		9C65E8C01E2DC9C3007D81A9 /* SGFingerRotation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGFingerRotation.h; sourceTree = "<group>"; };
+		9C65E8C11E2DC9C3007D81A9 /* SGFingerRotation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGFingerRotation.m; sourceTree = "<group>"; };
 		9C6E6D3E1E2C7F6A003D62D5 /* KxMovieGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KxMovieGLView.h; sourceTree = "<group>"; };
 		9C6E6D3F1E2C7F6A003D62D5 /* KxMovieGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KxMovieGLView.m; sourceTree = "<group>"; };
 		9C6E6D7B1E2CC8D7003D62D5 /* SGMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGMatrix.h; sourceTree = "<group>"; };
@@ -728,6 +734,8 @@
 				9C6E6D7C1E2CC8D7003D62D5 /* SGMatrix.m */,
 				9C6E6D811E2CC8F7003D62D5 /* SGSensors.h */,
 				9C6E6D821E2CC8F7003D62D5 /* SGSensors.m */,
+				9C65E8C01E2DC9C3007D81A9 /* SGFingerRotation.h */,
+				9C65E8C11E2DC9C3007D81A9 /* SGFingerRotation.m */,
 			);
 			path = SGMatrix;
 			sourceTree = "<group>";
@@ -1246,6 +1254,7 @@
 				9CB2D7C51E1CA9A700C5F3F0 /* replaygain.h in Headers */,
 				9CB2D7511E1CA9A700C5F3F0 /* aes.h in Headers */,
 				9CB2D7E91E1CA9A700C5F3F0 /* version.h in Headers */,
+				9C65E8C31E2DC9C3007D81A9 /* SGFingerRotation.h in Headers */,
 				9CB2D7BF1E1CA9A700C5F3F0 /* random_seed.h in Headers */,
 				9CB2D7B51E1CA9A700C5F3F0 /* opt.h in Headers */,
 				9CB2D78B1E1CA9A700C5F3F0 /* hash.h in Headers */,
@@ -1327,6 +1336,7 @@
 				9CB2D7DA1E1CA9A700C5F3F0 /* tree.h in Headers */,
 				9CB2D76A1E1CA9A700C5F3F0 /* camellia.h in Headers */,
 				9C13B1961DF661B200F67D62 /* SGFormat.h in Headers */,
+				9C65E8C21E2DC9C3007D81A9 /* SGFingerRotation.h in Headers */,
 				9C8820DD1E274B0E00EBEA93 /* SGPlayer+DisplayView.h in Headers */,
 				9CB2D73E1E1CA9A700C5F3F0 /* avfilter.h in Headers */,
 				9CB2D7601E1CA9A700C5F3F0 /* base64.h in Headers */,
@@ -1553,6 +1563,7 @@
 				9C7C71451DF904180098E2E7 /* SGPlayer.m in Sources */,
 				9C7C712B1DF904180098E2E7 /* SGAVGLTexture.m in Sources */,
 				9C2161B61E2CD929005FAF08 /* SGGLView.m in Sources */,
+				9C65E8C51E2DC9C3007D81A9 /* SGFingerRotation.m in Sources */,
 				9C7C71211DF904180098E2E7 /* SGAVGLProgram.m in Sources */,
 				9CE418491E2DB383009BCFB6 /* SGGLNormalModel.m in Sources */,
 				9C3335681E1B633800E4DDCC /* SGPlayerDecoder.m in Sources */,
@@ -1611,6 +1622,7 @@
 				9C2161AD1E2CD929005FAF08 /* SGGLAVView.m in Sources */,
 				9C2161D01E2CDCA9005FAF08 /* SGGLFFProgram.m in Sources */,
 				9C2161B11E2CD929005FAF08 /* SGGLFFView.m in Sources */,
+				9C65E8C41E2DC9C3007D81A9 /* SGFingerRotation.m in Sources */,
 				9C7C71361DF904180098E2E7 /* SGAVView.m in Sources */,
 				9C7C713A1DF904180098E2E7 /* SGNotification.m in Sources */,
 				9C2161B51E2CD929005FAF08 /* SGGLView.m in Sources */,

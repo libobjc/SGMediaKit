@@ -138,6 +138,7 @@
 
 - (void)cleanViewCleanAVPlayerLayer:(BOOL)cleanAVPlayerLayer cleanAVPlayerView:(BOOL)cleanAVPlayerView cleanFFPlayerView:(BOOL)cleanFFPlayerView
 {
+    [self cleanEmptyBuffer];
     if (cleanAVPlayerLayer && self.avplayerLayer) {
         [self.avplayerLayer removeFromSuperlayer];
         self.avplayerLayer = nil;
@@ -165,7 +166,21 @@
 
 - (void)cleanEmptyBuffer
 {
-    NSLog(@"%s", __func__);
+    [self.fingerRotation clean];
+    if (self.avplayerView) {
+        [self.avplayerView cleanEmptyBuffer];
+    }
+    if (self.ffplayerView) {
+        [self.ffplayerView cleanEmptyBuffer];
+    }
+}
+
+- (SGFingerRotation *)fingerRotation
+{
+    if (!_fingerRotation) {
+        _fingerRotation = [SGFingerRotation fingerRotation];
+    }
+    return _fingerRotation;
 }
 
 - (UIImage *)snapshot
@@ -180,6 +195,27 @@
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
             return self.ffplayerView.snapshot;
+    }
+}
+
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    if (self.abstractPlayer.displayMode == SGDisplayModeBox) return;
+    switch (self.rendererType) {
+        case SGDisplayRendererTypeEmpty:
+        case SGDisplayRendererTypeAVPlayerLayer:
+            return;
+        default:
+        {
+            UITouch * touch = [touches anyObject];
+            float distanceX = [touch locationInView:touch.view].x - [touch previousLocationInView:touch.view].x;
+            float distanceY = [touch locationInView:touch.view].y - [touch previousLocationInView:touch.view].y;
+            distanceX *= 0.005;
+            distanceY *= 0.005;
+            self.fingerRotation.x += distanceY *  [SGFingerRotation degress] / 100;
+            self.fingerRotation.y -= distanceX *  [SGFingerRotation degress] / 100;
+        }
+            break;
     }
 }
 

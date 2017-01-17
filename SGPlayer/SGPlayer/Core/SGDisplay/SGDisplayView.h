@@ -10,6 +10,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import "SGPlayerDefine.h"
 #import "SGFFFrame.h"
+#import "SGFingerRotation.h"
 
 @class SGPlayer;
 @class SGAVPlayer;
@@ -35,6 +36,7 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
 
 @property (nonatomic, weak) SGAVPlayer * sgavplayer;
 @property (nonatomic, assign) SGDisplayRendererType rendererType;
+@property (nonatomic, strong) SGFingerRotation * fingerRotation;
 
 //- (void)pause;
 //- (void)resume;

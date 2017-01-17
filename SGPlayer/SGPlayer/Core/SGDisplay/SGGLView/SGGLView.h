@@ -21,6 +21,8 @@
 
 @property (nonatomic, weak, readonly) SGDisplayView * displayView;
 
+- (void)cleanEmptyBuffer;
+
 #pragma mark - subclass override
 
 - (SGGLProgram *)program;
