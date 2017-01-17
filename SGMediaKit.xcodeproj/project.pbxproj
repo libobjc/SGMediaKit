@@ -84,40 +84,10 @@
 		9C758E411E238FCE00B0CFB3 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C758E341E238FCD00B0CFB3 /* libswresample.a */; };
 		9C758E421E238FCE00B0CFB3 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C758E351E238FCD00B0CFB3 /* libswscale.a */; };
 		9C758E431E238FCE00B0CFB3 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C758E351E238FCD00B0CFB3 /* libswscale.a */; };
-		9C7C71161DF904180098E2E7 /* SGAVGLMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C70FC1DF904180098E2E7 /* SGAVGLMatrix.h */; };
-		9C7C71171DF904180098E2E7 /* SGAVGLMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C70FC1DF904180098E2E7 /* SGAVGLMatrix.h */; };
-		9C7C71181DF904180098E2E7 /* SGAVGLMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C70FD1DF904180098E2E7 /* SGAVGLMatrix.m */; };
-		9C7C71191DF904180098E2E7 /* SGAVGLMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C70FD1DF904180098E2E7 /* SGAVGLMatrix.m */; };
-		9C7C711A1DF904180098E2E7 /* SGAVGLModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C70FE1DF904180098E2E7 /* SGAVGLModel.h */; };
-		9C7C711B1DF904180098E2E7 /* SGAVGLModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C70FE1DF904180098E2E7 /* SGAVGLModel.h */; };
-		9C7C711C1DF904180098E2E7 /* SGAVGLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C70FF1DF904180098E2E7 /* SGAVGLModel.m */; };
-		9C7C711D1DF904180098E2E7 /* SGAVGLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C70FF1DF904180098E2E7 /* SGAVGLModel.m */; };
-		9C7C711E1DF904180098E2E7 /* SGAVGLProgram.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71001DF904180098E2E7 /* SGAVGLProgram.h */; };
-		9C7C711F1DF904180098E2E7 /* SGAVGLProgram.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71001DF904180098E2E7 /* SGAVGLProgram.h */; };
-		9C7C71201DF904180098E2E7 /* SGAVGLProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C71011DF904180098E2E7 /* SGAVGLProgram.m */; };
-		9C7C71211DF904180098E2E7 /* SGAVGLProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C71011DF904180098E2E7 /* SGAVGLProgram.m */; };
-		9C7C71221DF904180098E2E7 /* SGAVGLSensors.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71021DF904180098E2E7 /* SGAVGLSensors.h */; };
-		9C7C71231DF904180098E2E7 /* SGAVGLSensors.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71021DF904180098E2E7 /* SGAVGLSensors.h */; };
-		9C7C71241DF904180098E2E7 /* SGAVGLSensors.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C71031DF904180098E2E7 /* SGAVGLSensors.m */; };
-		9C7C71251DF904180098E2E7 /* SGAVGLSensors.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C71031DF904180098E2E7 /* SGAVGLSensors.m */; };
-		9C7C71261DF904180098E2E7 /* SGAVGLShader.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71041DF904180098E2E7 /* SGAVGLShader.h */; };
-		9C7C71271DF904180098E2E7 /* SGAVGLShader.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71041DF904180098E2E7 /* SGAVGLShader.h */; };
-		9C7C71281DF904180098E2E7 /* SGAVGLTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71051DF904180098E2E7 /* SGAVGLTexture.h */; };
-		9C7C71291DF904180098E2E7 /* SGAVGLTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71051DF904180098E2E7 /* SGAVGLTexture.h */; };
-		9C7C712A1DF904180098E2E7 /* SGAVGLTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C71061DF904180098E2E7 /* SGAVGLTexture.m */; };
-		9C7C712B1DF904180098E2E7 /* SGAVGLTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C71061DF904180098E2E7 /* SGAVGLTexture.m */; };
-		9C7C712C1DF904180098E2E7 /* SGAVGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71071DF904180098E2E7 /* SGAVGLView.h */; };
-		9C7C712D1DF904180098E2E7 /* SGAVGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71071DF904180098E2E7 /* SGAVGLView.h */; };
-		9C7C712E1DF904180098E2E7 /* SGAVGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C71081DF904180098E2E7 /* SGAVGLView.m */; };
-		9C7C712F1DF904180098E2E7 /* SGAVGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C71081DF904180098E2E7 /* SGAVGLView.m */; };
 		9C7C71301DF904180098E2E7 /* SGAVPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71091DF904180098E2E7 /* SGAVPlayer.h */; };
 		9C7C71311DF904180098E2E7 /* SGAVPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71091DF904180098E2E7 /* SGAVPlayer.h */; };
 		9C7C71321DF904180098E2E7 /* SGAVPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710A1DF904180098E2E7 /* SGAVPlayer.m */; };
 		9C7C71331DF904180098E2E7 /* SGAVPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710A1DF904180098E2E7 /* SGAVPlayer.m */; };
-		9C7C71341DF904180098E2E7 /* SGAVView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710B1DF904180098E2E7 /* SGAVView.h */; };
-		9C7C71351DF904180098E2E7 /* SGAVView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710B1DF904180098E2E7 /* SGAVView.h */; };
-		9C7C71361DF904180098E2E7 /* SGAVView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710C1DF904180098E2E7 /* SGAVView.m */; };
-		9C7C71371DF904180098E2E7 /* SGAVView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710C1DF904180098E2E7 /* SGAVView.m */; };
 		9C7C71381DF904180098E2E7 /* SGNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710D1DF904180098E2E7 /* SGNotification.h */; };
 		9C7C71391DF904180098E2E7 /* SGNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710D1DF904180098E2E7 /* SGNotification.h */; };
 		9C7C713A1DF904180098E2E7 /* SGNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710E1DF904180098E2E7 /* SGNotification.m */; };
@@ -446,23 +416,8 @@
 		9C7C70EF1DF9020A0098E2E7 /* SGPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SGPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C7C70F11DF9020A0098E2E7 /* SGPlayerHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SGPlayerHeader.h; sourceTree = "<group>"; };
 		9C7C70F21DF9020A0098E2E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		9C7C70FC1DF904180098E2E7 /* SGAVGLMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVGLMatrix.h; sourceTree = "<group>"; };
-		9C7C70FD1DF904180098E2E7 /* SGAVGLMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAVGLMatrix.m; sourceTree = "<group>"; };
-		9C7C70FE1DF904180098E2E7 /* SGAVGLModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVGLModel.h; sourceTree = "<group>"; };
-		9C7C70FF1DF904180098E2E7 /* SGAVGLModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAVGLModel.m; sourceTree = "<group>"; };
-		9C7C71001DF904180098E2E7 /* SGAVGLProgram.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVGLProgram.h; sourceTree = "<group>"; };
-		9C7C71011DF904180098E2E7 /* SGAVGLProgram.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAVGLProgram.m; sourceTree = "<group>"; };
-		9C7C71021DF904180098E2E7 /* SGAVGLSensors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVGLSensors.h; sourceTree = "<group>"; };
-		9C7C71031DF904180098E2E7 /* SGAVGLSensors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAVGLSensors.m; sourceTree = "<group>"; };
-		9C7C71041DF904180098E2E7 /* SGAVGLShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVGLShader.h; sourceTree = "<group>"; };
-		9C7C71051DF904180098E2E7 /* SGAVGLTexture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVGLTexture.h; sourceTree = "<group>"; };
-		9C7C71061DF904180098E2E7 /* SGAVGLTexture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAVGLTexture.m; sourceTree = "<group>"; };
-		9C7C71071DF904180098E2E7 /* SGAVGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVGLView.h; sourceTree = "<group>"; };
-		9C7C71081DF904180098E2E7 /* SGAVGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAVGLView.m; sourceTree = "<group>"; };
 		9C7C71091DF904180098E2E7 /* SGAVPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVPlayer.h; sourceTree = "<group>"; };
 		9C7C710A1DF904180098E2E7 /* SGAVPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAVPlayer.m; sourceTree = "<group>"; };
-		9C7C710B1DF904180098E2E7 /* SGAVView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVView.h; sourceTree = "<group>"; };
-		9C7C710C1DF904180098E2E7 /* SGAVView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAVView.m; sourceTree = "<group>"; };
 		9C7C710D1DF904180098E2E7 /* SGNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGNotification.h; sourceTree = "<group>"; };
 		9C7C710E1DF904180098E2E7 /* SGNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGNotification.m; sourceTree = "<group>"; };
 		9C7C710F1DF904180098E2E7 /* SGPlayerMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPlayerMacro.h; sourceTree = "<group>"; };
@@ -780,33 +735,10 @@
 		9C7C70FA1DF904180098E2E7 /* SGAVPlayer */ = {
 			isa = PBXGroup;
 			children = (
-				9C7C70FB1DF904180098E2E7 /* SGAVGLView */,
 				9C7C71091DF904180098E2E7 /* SGAVPlayer.h */,
 				9C7C710A1DF904180098E2E7 /* SGAVPlayer.m */,
-				9C7C710B1DF904180098E2E7 /* SGAVView.h */,
-				9C7C710C1DF904180098E2E7 /* SGAVView.m */,
 			);
 			path = SGAVPlayer;
-			sourceTree = "<group>";
-		};
-		9C7C70FB1DF904180098E2E7 /* SGAVGLView */ = {
-			isa = PBXGroup;
-			children = (
-				9C7C70FC1DF904180098E2E7 /* SGAVGLMatrix.h */,
-				9C7C70FD1DF904180098E2E7 /* SGAVGLMatrix.m */,
-				9C7C70FE1DF904180098E2E7 /* SGAVGLModel.h */,
-				9C7C70FF1DF904180098E2E7 /* SGAVGLModel.m */,
-				9C7C71001DF904180098E2E7 /* SGAVGLProgram.h */,
-				9C7C71011DF904180098E2E7 /* SGAVGLProgram.m */,
-				9C7C71021DF904180098E2E7 /* SGAVGLSensors.h */,
-				9C7C71031DF904180098E2E7 /* SGAVGLSensors.m */,
-				9C7C71041DF904180098E2E7 /* SGAVGLShader.h */,
-				9C7C71051DF904180098E2E7 /* SGAVGLTexture.h */,
-				9C7C71061DF904180098E2E7 /* SGAVGLTexture.m */,
-				9C7C71071DF904180098E2E7 /* SGAVGLView.h */,
-				9C7C71081DF904180098E2E7 /* SGAVGLView.m */,
-			);
-			path = SGAVGLView;
 			sourceTree = "<group>";
 		};
 		9C8820C71E27359E00EBEA93 /* SGDisplay */ = {
@@ -1197,7 +1129,6 @@
 				9C6E6D841E2CC8F7003D62D5 /* SGSensors.h in Headers */,
 				9C7C71391DF904180098E2E7 /* SGNotification.h in Headers */,
 				9CB2D7471E1CA9A700C5F3F0 /* version.h in Headers */,
-				9C7C712D1DF904180098E2E7 /* SGAVGLView.h in Headers */,
 				9CB2D7DB1E1CA9A700C5F3F0 /* tree.h in Headers */,
 				9CB2D7B11E1CA9A700C5F3F0 /* motion_vector.h in Headers */,
 				9CB2D7831E1CA9A700C5F3F0 /* ffversion.h in Headers */,
@@ -1212,7 +1143,6 @@
 				9CB2D7351E1CA9A700C5F3F0 /* videotoolbox.h in Headers */,
 				9CB2D7451E1CA9A700C5F3F0 /* buffersrc.h in Headers */,
 				9CE418471E2DB383009BCFB6 /* SGGLNormalModel.h in Headers */,
-				9C7C71291DF904180098E2E7 /* SGAVGLTexture.h in Headers */,
 				9CB2D7CB1E1CA9A700C5F3F0 /* sha.h in Headers */,
 				9CB2D79F1E1CA9A700C5F3F0 /* intreadwrite.h in Headers */,
 				9CB2D7C31E1CA9A700C5F3F0 /* rc4.h in Headers */,
@@ -1224,7 +1154,6 @@
 				9CB2D7871E1CA9A700C5F3F0 /* file.h in Headers */,
 				9CB2D7D51E1CA9A700C5F3F0 /* time.h in Headers */,
 				9CB2D7711E1CA9A700C5F3F0 /* common.h in Headers */,
-				9C7C711F1DF904180098E2E7 /* SGAVGLProgram.h in Headers */,
 				9CB2D71F1E1CA9A700C5F3F0 /* d3d11va.h in Headers */,
 				9C6E6D7E1E2CC8D7003D62D5 /* SGMatrix.h in Headers */,
 				9CB2D7291E1CA9A700C5F3F0 /* mediacodec.h in Headers */,
@@ -1235,13 +1164,10 @@
 				9CB2D7D71E1CA9A700C5F3F0 /* timecode.h in Headers */,
 				9CB2D7AD1E1CA9A700C5F3F0 /* md5.h in Headers */,
 				9CB2D7911E1CA9A700C5F3F0 /* hwcontext_cuda.h in Headers */,
-				9C7C71231DF904180098E2E7 /* SGAVGLSensors.h in Headers */,
 				9CB2D7E71E1CA9A700C5F3F0 /* swscale.h in Headers */,
 				9CB2D7B91E1CA9A700C5F3F0 /* pixdesc.h in Headers */,
-				9C7C71351DF904180098E2E7 /* SGAVView.h in Headers */,
 				9CB2D7A71E1CA9A700C5F3F0 /* macros.h in Headers */,
 				9CB2D7251E1CA9A700C5F3F0 /* dxva2.h in Headers */,
-				9C7C711B1DF904180098E2E7 /* SGAVGLModel.h in Headers */,
 				9CB2D7231E1CA9A700C5F3F0 /* dv_profile.h in Headers */,
 				9CB2D7C51E1CA9A700C5F3F0 /* replaygain.h in Headers */,
 				9CB2D7511E1CA9A700C5F3F0 /* aes.h in Headers */,
@@ -1255,7 +1181,6 @@
 				9CB2D77D1E1CA9A700C5F3F0 /* downmix_info.h in Headers */,
 				9C2161C91E2CD99C005FAF08 /* SGGLAVTexture.h in Headers */,
 				9C2161C51E2CD99C005FAF08 /* SGGLModel.h in Headers */,
-				9C7C71171DF904180098E2E7 /* SGAVGLMatrix.h in Headers */,
 				9CB2D7651E1CA9A700C5F3F0 /* bprint.h in Headers */,
 				9CB2D71D1E1CA9A700C5F3F0 /* avfft.h in Headers */,
 				9CB2D7331E1CA9A700C5F3F0 /* version.h in Headers */,
@@ -1266,7 +1191,6 @@
 				9CB2D77B1E1CA9A700C5F3F0 /* display.h in Headers */,
 				9CB2D7411E1CA9A700C5F3F0 /* avfiltergraph.h in Headers */,
 				9CB2D73D1E1CA9A700C5F3F0 /* version.h in Headers */,
-				9C7C71271DF904180098E2E7 /* SGAVGLShader.h in Headers */,
 				9CEC9A8F1E2340F400657B35 /* KxAudioManager.h in Headers */,
 				9CA377FA1E13AAD9001C923C /* SGDistortionRenderer.h in Headers */,
 				9C2161B01E2CD929005FAF08 /* SGGLFFView.h in Headers */,
@@ -1318,10 +1242,8 @@
 				9CA377F91E13AAD9001C923C /* SGDistortionRenderer.h in Headers */,
 				9CE418461E2DB383009BCFB6 /* SGGLNormalModel.h in Headers */,
 				9CB2D7E01E1CA9A700C5F3F0 /* xtea.h in Headers */,
-				9C7C712C1DF904180098E2E7 /* SGAVGLView.h in Headers */,
 				9C3335651E1B633800E4DDCC /* SGPlayerDecoder.h in Headers */,
 				9CB2D72A1E1CA9A700C5F3F0 /* qsv.h in Headers */,
-				9C7C711A1DF904180098E2E7 /* SGAVGLModel.h in Headers */,
 				9CB2D7441E1CA9A700C5F3F0 /* buffersrc.h in Headers */,
 				9CB2D7DA1E1CA9A700C5F3F0 /* tree.h in Headers */,
 				9CB2D76A1E1CA9A700C5F3F0 /* camellia.h in Headers */,
@@ -1386,13 +1308,11 @@
 				9CB2D7CA1E1CA9A700C5F3F0 /* sha.h in Headers */,
 				9CEC9A881E233A6D00657B35 /* SGAudioManager.h in Headers */,
 				9CB2D7AE1E1CA9A700C5F3F0 /* mem.h in Headers */,
-				9C7C711E1DF904180098E2E7 /* SGAVGLProgram.h in Headers */,
 				9C13B1FB1DF6C2AD00F67D62 /* SGFormatFactory.h in Headers */,
 				9CB2D77C1E1CA9A700C5F3F0 /* downmix_info.h in Headers */,
 				9CB2D7A61E1CA9A700C5F3F0 /* macros.h in Headers */,
 				9CE4184C1E2DB390009BCFB6 /* SGGLVRModel.h in Headers */,
 				9CB2D7BE1E1CA9A700C5F3F0 /* random_seed.h in Headers */,
-				9C7C71161DF904180098E2E7 /* SGAVGLMatrix.h in Headers */,
 				9CB2D7401E1CA9A700C5F3F0 /* avfiltergraph.h in Headers */,
 				9CDEFA9E1E1D050B005510C9 /* NSDictionary+SGFFmpeg.h in Headers */,
 				9CB2D7921E1CA9A700C5F3F0 /* hwcontext_dxva2.h in Headers */,
@@ -1403,7 +1323,6 @@
 				9C2161AF1E2CD929005FAF08 /* SGGLFFView.h in Headers */,
 				9CB2D7521E1CA9A700C5F3F0 /* aes_ctr.h in Headers */,
 				9CB2D76C1E1CA9A700C5F3F0 /* cast5.h in Headers */,
-				9C7C71281DF904180098E2E7 /* SGAVGLTexture.h in Headers */,
 				9C2161D41E2CDCBC005FAF08 /* SGGLAVProgram.h in Headers */,
 				9C2161AB1E2CD929005FAF08 /* SGGLAVView.h in Headers */,
 				9CB2D7261E1CA9A700C5F3F0 /* jni.h in Headers */,
@@ -1419,10 +1338,8 @@
 				9CB2D7821E1CA9A700C5F3F0 /* ffversion.h in Headers */,
 				9CA476761DE53D3300B1B0D1 /* SGVideoCapture.h in Headers */,
 				9C982C2E1DEE88CF00ED9BBA /* SGLiveSession.h in Headers */,
-				9C7C71341DF904180098E2E7 /* SGAVView.h in Headers */,
 				9CB2D7A41E1CA9A700C5F3F0 /* lzo.h in Headers */,
 				9CB2D7181E1CA9A700C5F3F0 /* avcodec.h in Headers */,
-				9C7C71221DF904180098E2E7 /* SGAVGLSensors.h in Headers */,
 				9CB2D71C1E1CA9A700C5F3F0 /* avfft.h in Headers */,
 				9CB2D7C41E1CA9A700C5F3F0 /* replaygain.h in Headers */,
 				9CB2D73C1E1CA9A700C5F3F0 /* version.h in Headers */,
@@ -1430,7 +1347,6 @@
 				9CB2D7D41E1CA9A700C5F3F0 /* time.h in Headers */,
 				9CB2D7BA1E1CA9A700C5F3F0 /* pixelutils.h in Headers */,
 				9CA2D9131DEBE35700AEC8A9 /* SGAudioConfiguration.h in Headers */,
-				9C7C71261DF904180098E2E7 /* SGAVGLShader.h in Headers */,
 				9CB2D7A81E1CA9A700C5F3F0 /* mastering_display_metadata.h in Headers */,
 				9CB2D7A21E1CA9A700C5F3F0 /* log.h in Headers */,
 				9CB2D7621E1CA9A700C5F3F0 /* blowfish.h in Headers */,
@@ -1541,7 +1457,6 @@
 				9C7C713B1DF904180098E2E7 /* SGNotification.m in Sources */,
 				9C7C71491DF904180098E2E7 /* SGPlayerDefine.m in Sources */,
 				9C31006D1E1E50A2003C6611 /* SGFFDecoder.m in Sources */,
-				9C7C71191DF904180098E2E7 /* SGAVGLMatrix.m in Sources */,
 				9C8820E01E274B0E00EBEA93 /* SGPlayer+DisplayView.m in Sources */,
 				9C2161D11E2CDCA9005FAF08 /* SGGLFFProgram.m in Sources */,
 				9C3335561E1B51CD00E4DDCC /* SGFFPlayer.m in Sources */,
@@ -1549,16 +1464,11 @@
 				9C2161BD1E2CD964005FAF08 /* SGGLProgram.m in Sources */,
 				9C3100721E1F6E9C003C6611 /* SGFFFrame.m in Sources */,
 				9CA377FC1E13AAD9001C923C /* SGDistortionRenderer.m in Sources */,
-				9C7C71371DF904180098E2E7 /* SGAVView.m in Sources */,
 				9C7C71451DF904180098E2E7 /* SGPlayer.m in Sources */,
-				9C7C712B1DF904180098E2E7 /* SGAVGLTexture.m in Sources */,
 				9C2161B61E2CD929005FAF08 /* SGGLView.m in Sources */,
 				9C65E8C51E2DC9C3007D81A9 /* SGFingerRotation.m in Sources */,
-				9C7C71211DF904180098E2E7 /* SGAVGLProgram.m in Sources */,
 				9CE418491E2DB383009BCFB6 /* SGGLNormalModel.m in Sources */,
 				9C3335681E1B633800E4DDCC /* SGPlayerDecoder.m in Sources */,
-				9C7C711D1DF904180098E2E7 /* SGAVGLModel.m in Sources */,
-				9C7C712F1DF904180098E2E7 /* SGAVGLView.m in Sources */,
 				9C6E6D801E2CC8D7003D62D5 /* SGMatrix.m in Sources */,
 				9C7C71331DF904180098E2E7 /* SGAVPlayer.m in Sources */,
 				9CEC9A911E2340F400657B35 /* KxAudioManager.m in Sources */,
@@ -1567,7 +1477,6 @@
 				9CDEFAA11E1D050B005510C9 /* NSDictionary+SGFFmpeg.m in Sources */,
 				9C2161C71E2CD99C005FAF08 /* SGGLModel.m in Sources */,
 				9C2161B21E2CD929005FAF08 /* SGGLFFView.m in Sources */,
-				9C7C71251DF904180098E2E7 /* SGAVGLSensors.m in Sources */,
 				9CE4184F1E2DB390009BCFB6 /* SGGLVRModel.m in Sources */,
 				9C8820CD1E2735B000EBEA93 /* SGDisplayView.m in Sources */,
 				9C6E6D861E2CC8F7003D62D5 /* SGSensors.m in Sources */,
@@ -1591,12 +1500,8 @@
 				9C7C71481DF904180098E2E7 /* SGPlayerDefine.m in Sources */,
 				9C6E6D7F1E2CC8D7003D62D5 /* SGMatrix.m in Sources */,
 				9CE418481E2DB383009BCFB6 /* SGGLNormalModel.m in Sources */,
-				9C7C71181DF904180098E2E7 /* SGAVGLMatrix.m in Sources */,
-				9C7C712A1DF904180098E2E7 /* SGAVGLTexture.m in Sources */,
-				9C7C712E1DF904180098E2E7 /* SGAVGLView.m in Sources */,
 				9C7C71321DF904180098E2E7 /* SGAVPlayer.m in Sources */,
 				9CA2D9101DEBE34800AEC8A9 /* SGVideoConfiguration.m in Sources */,
-				9C7C711C1DF904180098E2E7 /* SGAVGLModel.m in Sources */,
 				9C3335551E1B51CD00E4DDCC /* SGFFPlayer.m in Sources */,
 				9C2161CA1E2CD99C005FAF08 /* SGGLAVTexture.m in Sources */,
 				9CA2D9141DEBE35700AEC8A9 /* SGAudioConfiguration.m in Sources */,
@@ -1604,15 +1509,12 @@
 				9CDEFAA01E1D050B005510C9 /* NSDictionary+SGFFmpeg.m in Sources */,
 				9C7C71401DF904180098E2E7 /* SGPlayer+Extension.m in Sources */,
 				9C7C71441DF904180098E2E7 /* SGPlayer.m in Sources */,
-				9C7C71241DF904180098E2E7 /* SGAVGLSensors.m in Sources */,
 				9CEC9A8A1E233A6D00657B35 /* SGAudioManager.m in Sources */,
-				9C7C71201DF904180098E2E7 /* SGAVGLProgram.m in Sources */,
 				9C8820CC1E2735B000EBEA93 /* SGDisplayView.m in Sources */,
 				9C2161AD1E2CD929005FAF08 /* SGGLAVView.m in Sources */,
 				9C2161D01E2CDCA9005FAF08 /* SGGLFFProgram.m in Sources */,
 				9C2161B11E2CD929005FAF08 /* SGGLFFView.m in Sources */,
 				9C65E8C41E2DC9C3007D81A9 /* SGFingerRotation.m in Sources */,
-				9C7C71361DF904180098E2E7 /* SGAVView.m in Sources */,
 				9C7C713A1DF904180098E2E7 /* SGNotification.m in Sources */,
 				9C2161B51E2CD929005FAF08 /* SGGLView.m in Sources */,
 				9C2161D61E2CDCBC005FAF08 /* SGGLAVProgram.m in Sources */,
