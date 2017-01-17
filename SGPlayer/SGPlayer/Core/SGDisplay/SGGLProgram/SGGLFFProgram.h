@@ -12,6 +12,8 @@
 
 + (instancetype)program;
 
-@property (nonatomic, assign) GLint sampler_location;
+@property (nonatomic, assign) GLint samplerY_location;
+@property (nonatomic, assign) GLint samplerU_location;
+@property (nonatomic, assign) GLint samplerV_location;
 
 @end
