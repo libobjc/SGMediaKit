@@ -34,6 +34,8 @@
         self.vertexShaderString = vertexShader;
         self.fragmentShaderString = fragmentShader;
         [self setup];
+        [self use];
+        [self bindVariable];
     }
     return self;
 }
@@ -43,7 +45,7 @@
     glUseProgram(_program_id);
 }
 
-- (void)setMatrix:(GLKMatrix4)matrix
+- (void)updateMatrix:(GLKMatrix4)matrix
 {
     glUniformMatrix4fv(self.matrix_location, 1, GL_FALSE, matrix.m);
 }
@@ -53,7 +55,6 @@
     [self setupProgram];
     [self setupShader];
     [self linkProgram];
-    [self use];
     [self setupVariable];
 }
 

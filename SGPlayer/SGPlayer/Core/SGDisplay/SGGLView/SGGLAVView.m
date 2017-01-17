@@ -14,7 +14,7 @@
 @interface SGGLAVView ()
 
 @property (nonatomic, strong) CADisplayLink * displayLink;
-@property (nonatomic, strong) SGGLProgram * program;
+@property (nonatomic, strong) SGGLAVProgram * program;
 @property (nonatomic, strong) SGGLAVTexture * texture;
 
 @end
@@ -26,18 +26,13 @@
     CVPixelBufferRef pixelBuffer = [self.displayView.sgavplayer pixelBufferAtCurrentTime];
     if (!pixelBuffer && !self.texture.hasTexture) return NO;
     
-    [self.program use];
     [self.texture updateTextureWithPixelBuffer:pixelBuffer];
-    [self.program bindVariable];
-    
     return YES;
 }
 
 - (void)setupProgram
 {
     self.program = [SGGLAVProgram program];
-    [self.program use];
-    [self.program bindVariable];
 }
 
 - (void)setupSubClass

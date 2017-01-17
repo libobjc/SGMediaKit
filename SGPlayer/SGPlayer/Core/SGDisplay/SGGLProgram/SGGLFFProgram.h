@@ -12,4 +12,6 @@
 
 + (instancetype)program;
 
+@property (nonatomic, assign) GLint sampler_location;
+
 @end

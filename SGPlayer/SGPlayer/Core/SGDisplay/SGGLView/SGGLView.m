@@ -100,6 +100,9 @@
     BOOL success = [self updateTexture];
     if (!success) return;
     
+    [self.program use];
+    [self.program bindVariable];
+    
     NSInteger scale = [UIScreen mainScreen].scale;
     CGRect rect = self.bounds;
     
@@ -107,7 +110,7 @@
         case SGVideoTypeNormal:
         {
             [self.normalModel bindPositionLocation:self.program.position_location textureCoordLocation:self.program.texture_coord_location];
-            [self.program setMatrix:GLKMatrix4Identity];
+            [self.program updateMatrix:GLKMatrix4Identity];
         }
             break;
         case SGVideoTypeVR:
@@ -120,7 +123,7 @@
                     BOOL success = [self.matrix singleMatrixWithSize:self.bounds.size matrix:&matrix];
                     if (success) {
                         glViewport(0, 0, CGRectGetWidth(rect) * scale, CGRectGetHeight(rect) * scale);
-                        [self.program setMatrix:matrix];
+                        [self.program updateMatrix:matrix];
                         glDrawElements(GL_TRIANGLES, self.vrModel.index_count, GL_UNSIGNED_SHORT, 0);
                     }
                 }
@@ -132,11 +135,11 @@
                     BOOL success = [self.matrix doubleMatrixWithSize:self.bounds.size leftMatrix:&leftMatrix rightMatrix:&rightMatrix];
                     if (success) {
                         glViewport(0, 0, CGRectGetWidth(rect)/2 * scale, CGRectGetHeight(rect) * scale);
-                        [self.program setMatrix:leftMatrix];
+                        [self.program updateMatrix:leftMatrix];
                         glDrawElements(GL_TRIANGLES, self.vrModel.index_count, GL_UNSIGNED_SHORT, 0);
                         
                         glViewport(CGRectGetWidth(rect)/2 * scale, 0, CGRectGetWidth(rect)/2 * scale, CGRectGetHeight(rect) * scale);
-                        [self.program setMatrix:rightMatrix];
+                        [self.program updateMatrix:rightMatrix];
                         glDrawElements(GL_TRIANGLES, self.vrModel.index_count, GL_UNSIGNED_SHORT, 0);
                     }
                 }

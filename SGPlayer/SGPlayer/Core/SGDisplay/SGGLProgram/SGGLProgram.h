@@ -22,10 +22,10 @@
 @property (nonatomic, assign) GLint matrix_location;
 
 - (void)use;
+- (void)updateMatrix:(GLKMatrix4)matrix;
 
 #pragma mark - subclass override
 
-- (void)setMatrix:(GLKMatrix4)matrix;
 - (void)setupVariable;
 - (void)bindVariable;
 
