@@ -15,12 +15,12 @@
 
 @interface SGPlayer ()
 
-@property (nonatomic, copy) void(^playerViewTapAction)();
-
 @property (nonatomic, strong) SGDisplayView * displayView;
 @property (nonatomic, assign) SGDecoderType decoderType;
 @property (nonatomic, strong) SGAVPlayer * avPlayer;
 @property (nonatomic, strong) SGFFPlayer * ffPlayer;
+
+@property (nonatomic, assign) BOOL needAutoPlay;
 
 @end
 
@@ -34,6 +34,7 @@
 - (instancetype)init
 {
     if (self = [super init]) {
+        [self setupNotification];
         self.decoder = [SGPlayerDecoder defaultDecoder];
         self.contentURL = nil;
         self.videoType = SGVideoTypeNormal;
@@ -261,14 +262,6 @@
     return _displayView;
 }
 
-- (void)tapAction
-{
-    if (self.playerViewTapAction) {
-        SGPlayerLog(@"SGPlayer tap action");
-        self.playerViewTapAction();
-    }
-}
-
 - (SGAVPlayer *)avPlayer
 {
     if (!_avPlayer) {
@@ -317,6 +310,7 @@
     }
     [self cleanPlayerView];
     [UIApplication sharedApplication].idleTimerDisabled = NO;
+    self.needAutoPlay = NO;
 }
 
 - (void)cleanPlayerView
@@ -330,6 +324,64 @@
 {
     SGPlayerLog(@"SGPlayer release");
     [self cleanPlayer];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
+#pragma mark - background mode
+
+- (void)setupNotification
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification
+{
+    switch (self.backgroundMode) {
+        case SGPlayerBackgroundModeNothing:
+        case SGPlayerBackgroundModeContinue:
+            break;
+        case SGPlayerBackgroundModeAutoPlayAndPause:
+        {
+            switch (self.state) {
+                case SGPlayerStatePlaying:
+                case SGPlayerStateBuffering:
+                {
+                    self.needAutoPlay = YES;
+                    [self pause];
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+            break;
+    }
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification
+{
+    switch (self.backgroundMode) {
+        case SGPlayerBackgroundModeNothing:
+        case SGPlayerBackgroundModeContinue:
+            break;
+        case SGPlayerBackgroundModeAutoPlayAndPause:
+        {
+            switch (self.state) {
+                case SGPlayerStateSuspend:
+                {
+                    if (self.needAutoPlay) {
+                        self.needAutoPlay = NO;
+                        [self play];
+                    }
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+            break;
+    }
 }
 
 @end

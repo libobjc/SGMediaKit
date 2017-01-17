@@ -7,6 +7,7 @@
 //
 
 #import "SGDisplayView.h"
+#import "SGPlayerMacro.h"
 #import "SGPlayer.h"
 #import "SGAVPlayer.h"
 #import "SGGLAVView.h"
@@ -16,9 +17,13 @@
 
 @property (nonatomic, weak) SGPlayer * abstractPlayer;
 
+@property (nonatomic, assign) BOOL backgroundToken;
+
 @property (nonatomic, assign) BOOL avplayerLayerToken;
 @property (nonatomic, strong) AVPlayerLayer * avplayerLayer;
+@property (nonatomic, assign) BOOL autoPauseAVPlayerView;
 @property (nonatomic, strong) SGGLAVView * avplayerView;
+@property (nonatomic, assign) BOOL autoPauseFFPlayerView;
 @property (nonatomic, strong) SGGLFFView * ffplayerView;
 @property (nonatomic, strong) UITapGestureRecognizer * tapGestureRecigbuzer;
 
@@ -34,6 +39,7 @@
 - (instancetype)initWithAbstractPlayer:(SGPlayer *)abstractPlayer
 {
     if (self = [super initWithFrame:CGRectZero]) {
+        [self setupNotification];
         self.abstractPlayer = abstractPlayer;
         [self UILayout];
     }
@@ -68,6 +74,7 @@
 
 - (void)renderFrame:(SGFFVideoFrame *)displayFrame
 {
+    if (self.autoPauseFFPlayerView) return;
     [self.ffplayerView renderFrame:displayFrame];
 }
 
@@ -107,6 +114,7 @@
             }
             break;
     }
+    [self checkBackgorundMode];
 }
 
 - (void)cleanView
@@ -139,7 +147,6 @@
     if (cleanAVPlayerLayer && self.avplayerLayer) {
         [self.avplayerLayer removeFromSuperlayer];
         self.avplayerLayer = nil;
-        self.avplayerLayerToken = NO;
     }
     if (cleanAVPlayerView && self.avplayerView) {
         [self.avplayerView invalidate];
@@ -150,6 +157,9 @@
         [self.ffplayerView removeFromSuperview];
         self.ffplayerView = nil;
     }
+    self.avplayerLayerToken = NO;
+    self.autoPauseAVPlayerView = NO;
+    self.autoPauseFFPlayerView = NO;
 }
 
 - (void)resume
@@ -239,6 +249,68 @@
     if (self.abstractPlayer.viewTapAction) {
         self.abstractPlayer.viewTapAction(self.abstractPlayer, self.abstractPlayer.view);
     }
+}
+
+#pragma mark - background mode
+
+- (void)setupNotification
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+        self.backgroundToken = YES;
+    }
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)notification
+{
+    self.backgroundToken = YES;
+    [self checkBackgorundMode];
+}
+
+- (void)applicationWillEnterForeground:(NSNotification *)notification
+{
+    self.backgroundToken = NO;
+    [self checkForegroundMode];
+}
+
+- (void)checkBackgorundMode
+{
+    if (!self.backgroundToken) return;
+
+    if (_avplayerLayer) {
+        _avplayerLayer.player = nil;
+    }
+    if (_avplayerView) {
+        if (!_avplayerView.paused) {
+            self.autoPauseAVPlayerView = YES;
+            _avplayerView.paused = YES;
+        }
+    }
+    self.autoPauseFFPlayerView = YES;
+}
+
+- (void)checkForegroundMode
+{
+    if (self.backgroundToken) return;
+    
+    if (_avplayerLayer) {
+        _avplayerLayer.player = self.sgavplayer.avPlayer;
+    }
+    if (_avplayerView) {
+        if (self.autoPauseAVPlayerView) {
+            self.autoPauseAVPlayerView = NO;
+            _avplayerView.paused = NO;
+        }
+    }
+    self.autoPauseFFPlayerView = NO;
+}
+
+-(void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    SGPlayerLog(@"SGDisplayView release");
 }
 
 @end

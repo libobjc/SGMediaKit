@@ -25,7 +25,9 @@
 - (void)renderFrame:(SGFFVideoFrame *)frame
 {
     self.videoFrame = frame;
-    [self display];
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+        [self display];
+    }
 }
 
 - (BOOL)updateTextureAspect:(CGFloat *)aspect
