@@ -10,7 +10,7 @@
 #import "SGPlayer.h"
 #import "SGAVPlayer.h"
 #import "SGGLAVView.h"
-#import "KxMovieGLView.h"
+#import "SGGLFFView.h"
 
 @interface SGDisplayView ()
 
@@ -18,7 +18,7 @@
 
 @property (nonatomic, strong) AVPlayerLayer * avplayerLayer;
 @property (nonatomic, strong) SGGLAVView * avplayerView;
-@property (nonatomic, strong) KxMovieGLView * ffplayerView;
+@property (nonatomic, strong) SGGLFFView * ffplayerView;
 
 @end
 
@@ -73,8 +73,7 @@
 
 - (void)renderFrame:(SGFFVideoFrame *)displayFrame
 {
-    NSLog(@"%s", __func__);
-    [self.ffplayerView render:displayFrame];
+    [self.ffplayerView renderFrame:displayFrame];
 }
 
 - (void)setRendererType:(SGDisplayRendererType)rendererType
@@ -106,9 +105,8 @@
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
             if (!self.ffplayerView) {
-                self.ffplayerView = [[KxMovieGLView alloc] initWithFrame:CGRectZero];
+                self.ffplayerView = [SGGLFFView viewWithDisplayView:self];
                 [self insertSubview:self.ffplayerView atIndex:0];
-                NSLog(@"%@", self.ffplayerView);
             }
             break;
     }
@@ -116,38 +114,42 @@
 
 - (void)cleanView
 {
-    [self cleanViewCleanAVPlayerLayer:YES cleanView:YES];
+    [self cleanViewCleanAVPlayerLayer:YES cleanAVPlayerView:YES cleanFFPlayerView:YES];
 }
 
 - (void)cleanViewIgnore
 {
     switch (self.rendererType) {
         case SGDisplayRendererTypeEmpty:
-            [self cleanViewCleanAVPlayerLayer:YES cleanView:YES];
+            [self cleanView];
             break;
         case SGDisplayRendererTypeAVPlayerLayer:
-            [self cleanViewCleanAVPlayerLayer:NO cleanView:YES];
+            [self cleanViewCleanAVPlayerLayer:NO cleanAVPlayerView:YES cleanFFPlayerView:YES];
             break;
         case SGDisplayRendererTypeAVPlayerPixelBufferVR:
-            [self cleanViewCleanAVPlayerLayer:YES cleanView:NO];
+            [self cleanViewCleanAVPlayerLayer:YES cleanAVPlayerView:NO cleanFFPlayerView:YES];
             break;
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
-            [self cleanViewCleanAVPlayerLayer:YES cleanView:YES];
+            [self cleanViewCleanAVPlayerLayer:YES cleanAVPlayerView:YES cleanFFPlayerView:NO];
             break;
     }
 }
 
-- (void)cleanViewCleanAVPlayerLayer:(BOOL)cleanAVPlayerLayer cleanView:(BOOL)cleanView
+- (void)cleanViewCleanAVPlayerLayer:(BOOL)cleanAVPlayerLayer cleanAVPlayerView:(BOOL)cleanAVPlayerView cleanFFPlayerView:(BOOL)cleanFFPlayerView
 {
     if (cleanAVPlayerLayer && self.avplayerLayer) {
         [self.avplayerLayer removeFromSuperlayer];
         self.avplayerLayer = nil;
     }
-    if (cleanView && self.avplayerView) {
+    if (cleanAVPlayerView && self.avplayerView) {
         [self.avplayerView invalidate];
         [self.avplayerView removeFromSuperview];
         self.avplayerView = nil;
+    }
+    if (cleanFFPlayerView && self.ffplayerView) {
+        [self.ffplayerView removeFromSuperview];
+        self.ffplayerView = nil;
     }
 }
 
@@ -177,7 +179,7 @@
             return self.avplayerView.snapshot;
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
-            return nil;
+            return self.ffplayerView.snapshot;
     }
 }
 

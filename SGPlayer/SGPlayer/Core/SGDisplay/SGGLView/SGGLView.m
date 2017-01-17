@@ -111,7 +111,9 @@
         case SGVideoTypeNormal:
         {
             [self.normalModel bindPositionLocation:self.program.position_location textureCoordLocation:self.program.texture_coord_location];
+            glViewport(0, 0, CGRectGetWidth(rect) * scale, CGRectGetHeight(rect) * scale);
             [self.program updateMatrix:GLKMatrix4Identity];
+            glDrawElements(GL_TRIANGLES, self.normalModel.index_count, GL_UNSIGNED_SHORT, 0);
         }
             break;
         case SGVideoTypeVR:
