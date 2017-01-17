@@ -16,6 +16,7 @@
 
 @property (nonatomic, weak) SGPlayer * abstractPlayer;
 
+@property (nonatomic, assign) BOOL avplayerLayerToken;
 @property (nonatomic, strong) AVPlayerLayer * avplayerLayer;
 @property (nonatomic, strong) SGGLAVView * avplayerView;
 @property (nonatomic, strong) SGGLFFView * ffplayerView;
@@ -52,8 +53,9 @@
     
     if (self.avplayerLayer) {
         self.avplayerLayer.frame = layer.bounds;
-        if (self.abstractPlayer.viewAnimationHidden) {
+        if (self.abstractPlayer.viewAnimationHidden || !self.avplayerLayerToken) {
             [self.avplayerLayer removeAllAnimations];
+            self.avplayerLayerToken = YES;
         }
     }
     if (self.avplayerView) {
@@ -86,6 +88,7 @@
         case SGDisplayRendererTypeAVPlayerLayer:
             if (!self.avplayerLayer) {
                 self.avplayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.sgavplayer.avPlayer];
+                self.avplayerLayerToken = NO;
                 [self.layer insertSublayer:self.avplayerLayer atIndex:0];
                 [self reloadGravityMode];
             }
@@ -136,6 +139,7 @@
     if (cleanAVPlayerLayer && self.avplayerLayer) {
         [self.avplayerLayer removeFromSuperlayer];
         self.avplayerLayer = nil;
+        self.avplayerLayerToken = NO;
     }
     if (cleanAVPlayerView && self.avplayerView) {
         [self.avplayerView invalidate];
