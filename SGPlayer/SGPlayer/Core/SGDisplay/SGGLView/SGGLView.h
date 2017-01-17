@@ -29,4 +29,6 @@
 - (void)setupSubClass;
 - (BOOL)updateTexture;
 
+- (void)willDealloc;
+
 @end

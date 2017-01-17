@@ -72,4 +72,9 @@
     [self.displayLink invalidate];
 }
 
+- (void)willDealloc
+{
+    [self invalidate];
+}
+
 @end

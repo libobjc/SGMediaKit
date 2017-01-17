@@ -7,6 +7,7 @@
 //
 
 #import "SGGLView.h"
+#import "SGPlayerMacro.h"
 #import "SGPlayer.h"
 #import "SGGLNormalModel.h"
 #import "SGGLVRModel.h"
@@ -79,11 +80,6 @@
     self.vrModel = [SGGLVRModel model];
 }
 
-- (void)setupProgram {};
-- (void)setupSubClass {}
-- (BOOL)updateTexture {return NO;}
-- (SGGLProgram *)program {return nil;}
-
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
     [self render];
@@ -91,6 +87,8 @@
 
 - (void)render
 {
+    [EAGLContext setCurrentContext:self.context];
+    
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -122,7 +120,7 @@
         case SGVideoTypeVR:
         {
             [self.vrModel bindPositionLocation:self.program.position_location textureCoordLocation:self.program.texture_coord_location];
-            switch (self.displayView.abstractPlayer.displayMode) {
+            switch (displayMode) {
                 case SGDisplayModeNormal:
                 {
                     GLKMatrix4 matrix;
@@ -176,5 +174,20 @@
     }
     return _distorionRenderer;
 }
+
+- (void)dealloc
+{
+    [self willDealloc];
+    if ([EAGLContext currentContext] == self.context) {
+        [EAGLContext setCurrentContext:nil];
+    }
+    SGPlayerLog(@"SGGLView release");
+}
+
+- (void)setupProgram {}
+- (void)setupSubClass {}
+- (BOOL)updateTexture {return NO;}
+- (SGGLProgram *)program {return nil;}
+- (void)willDealloc {}
 
 @end

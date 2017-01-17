@@ -88,7 +88,7 @@
     glGenTextures(3, _textures);
 }
 
-- (void)dealloc
+- (void)willDealloc
 {
     glDeleteTextures(3, _textures);
 }
