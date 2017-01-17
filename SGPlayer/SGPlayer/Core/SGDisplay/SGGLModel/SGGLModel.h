@@ -10,11 +10,23 @@
 
 @interface SGGLModel : NSObject
 
-@property (nonatomic, assign) int index_count;
++ (instancetype)new NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
 
-+ (SGGLModel *)normalModel;
-+ (SGGLModel *)vrModel;
++ (instancetype)model;
+
+@property (nonatomic, assign) GLuint index_id;
+@property (nonatomic, assign) GLuint vertex_id;
+@property (nonatomic, assign) GLuint texture_id;
+
+@property (nonatomic, assign) int index_count;
+@property (nonatomic, assign) int vertex_count;
 
 - (void)bindPositionLocation:(GLint)position_location textureCoordLocation:(GLint)textureCoordLocation;
+
+#pragma mark - subclass override
+
+- (void)setupModel;
+- (void)setupBuffer;
 
 @end

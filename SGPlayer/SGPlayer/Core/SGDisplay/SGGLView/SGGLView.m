@@ -8,7 +8,8 @@
 
 #import "SGGLView.h"
 #import "SGPlayer.h"
-#import "SGGLModel.h"
+#import "SGGLNormalModel.h"
+#import "SGGLVRModel.h"
 #import "SGMatrix.h"
 #import "SGDistortionRenderer.h"
 
@@ -16,8 +17,8 @@
 
 @property (nonatomic, weak) SGDisplayView * displayView;
 
-@property (nonatomic, strong) SGGLModel * normalModel;
-@property (nonatomic, strong) SGGLModel * vrModel;
+@property (nonatomic, strong) SGGLNormalModel * normalModel;
+@property (nonatomic, strong) SGGLVRModel * vrModel;
 @property (nonatomic, strong) SGMatrix * matrix;
 @property (nonatomic, strong) SGDistortionRenderer * distorionRenderer;
 
@@ -74,8 +75,8 @@
 
 - (void)setupModel
 {
-    self.normalModel = [SGGLModel normalModel];
-    self.vrModel = [SGGLModel vrModel];
+    self.normalModel = [SGGLNormalModel model];
+    self.vrModel = [SGGLVRModel model];
 }
 
 - (void)setupProgram {};
