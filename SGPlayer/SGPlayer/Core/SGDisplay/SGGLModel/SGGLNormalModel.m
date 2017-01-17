@@ -20,10 +20,10 @@ static GLushort index_buffer_data[] = {
 };
 
 static GLKVector2 texture_buffer_data[] = {
-    {0.0, 1.0},
-    {1.0, 1.0},
-    {1.0, 0.0},
     {0.0, 0.0},
+    {1.0, 0.0},
+    {1.0, 1.0},
+    {0.0, 1.0},
 };
 
 @implementation SGGLNormalModel
