@@ -142,11 +142,6 @@
     }
 }
 
-- (void)setViewTapBlock:(void (^)())block
-{
-    self.playerViewTapAction = block;
-}
-
 - (void)setVolume:(CGFloat)volume
 {
     _volume = volume;

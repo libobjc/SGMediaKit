@@ -28,8 +28,8 @@
 @property (nonatomic, assign) SGDisplayMode displayMode;
 @property (nonatomic, strong, readonly) UIView * view;      // graphics view
 @property (nonatomic, assign) BOOL viewAnimationHidden;     // default is NO;
+@property (nonatomic, copy) void (^viewTapAction)(SGPlayer * player, UIView * view);
 - (UIImage *)snapshot;
-- (void)setViewTapBlock:(void(^)())block;   // view tap action
 
 // control
 @property (nonatomic, assign) SGPlayerBackgroundMode backgroundMode;    // background mode

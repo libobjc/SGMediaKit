@@ -19,6 +19,7 @@
 @property (nonatomic, strong) AVPlayerLayer * avplayerLayer;
 @property (nonatomic, strong) SGGLAVView * avplayerView;
 @property (nonatomic, strong) SGGLFFView * ffplayerView;
+@property (nonatomic, strong) UITapGestureRecognizer * tapGestureRecigbuzer;
 
 @end
 
@@ -41,6 +42,8 @@
 - (void)UILayout
 {
     self.backgroundColor = [UIColor blackColor];
+    self.tapGestureRecigbuzer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecigbuzerAction:)];
+    [self addGestureRecognizer:self.tapGestureRecigbuzer];
 }
 
 - (void)layoutSublayersOfLayer:(CALayer *)layer
@@ -216,6 +219,13 @@
             self.fingerRotation.y -= distanceX *  [SGFingerRotation degress] / 100;
         }
             break;
+    }
+}
+
+- (void)tapGestureRecigbuzerAction:(UITapGestureRecognizer *)tapGestureRecognizer
+{
+    if (self.abstractPlayer.viewTapAction) {
+        self.abstractPlayer.viewTapAction(self.abstractPlayer, self.abstractPlayer.view);
     }
 }
 
