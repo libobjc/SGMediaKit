@@ -64,11 +64,12 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, assign, readonly) BOOL audioEnable;
 
 @property (nonatomic, assign, readonly) BOOL endOfFile;
+@property (nonatomic, assign, readonly) BOOL reading;
 @property (nonatomic, assign, readonly) BOOL decoding;
 @property (nonatomic, assign, readonly) BOOL prepareToDecode;
 
-- (void)decodeFrames;
-- (void)decodeFramesWithDuration:(NSTimeInterval)duration;
+- (SGFFVideoFrame *)fetchVideoFrame;
+- (SGFFAudioFrame *)fetchAudioFrame;
 
 @property (nonatomic, assign, readonly) BOOL seekEnable;
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler;

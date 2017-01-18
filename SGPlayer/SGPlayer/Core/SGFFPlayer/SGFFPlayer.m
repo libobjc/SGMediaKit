@@ -30,6 +30,7 @@
 @property (nonatomic, assign) SGPlayerState state;
 @property (nonatomic, assign) NSTimeInterval progress;
 @property (nonatomic, assign) NSTimeInterval bufferDuration;
+@property (nonatomic, assign) NSTimeInterval maxBufferDuration;
 
 @property (nonatomic, assign) BOOL prepareToPlay;
 @property (nonatomic, assign) BOOL seeking;
@@ -51,6 +52,7 @@
 - (instancetype)initWithAbstractPlayer:(SGPlayer *)abstractPlayer
 {
     if (self = [super init]) {
+        self.maxBufferDuration = 4;
         self.abstractPlayer = abstractPlayer;
         self.lock = [[NSLock alloc] init];
         
@@ -200,6 +202,12 @@
             }
         }
     }
+    NSLog(@"buffer duration : %f", _bufferDuration);
+    if (_bufferDuration > self.maxBufferDuration / 2) {
+        [self pauseDecodeTimer];
+    } else {
+        [self resumeDecodeTimer];
+    }
     [self.lock unlock];
 }
 
@@ -233,53 +241,54 @@
 
 - (void)addFrames:(NSArray <SGFFFrame *> *)frames
 {
-    for (SGFFFrame * frame in frames) {
-        switch (frame.type) {
-            case SGFFFrameTypeVideo:
-            {
-                @synchronized (self.videoFrames) {
-                    [self.videoFrames addObject:frame];
-                }
-            }
-                break;
-            case SGFFFrameTypeAudio:
-            {
-                @synchronized (self.audioFrames) {
-                    [self.audioFrames addObject:frame];
-                    self.bufferDuration += frame.duration;
-                }
-            }
-                break;
-            default:
-                break;
-        }
-    }
-    
-    if (self.buffering) {
-        if (self.bufferDuration > self.abstractPlayer.playableBufferInterval || self.decoder.endOfFile) {
-            self.buffering = NO;
-            if (self.playing) {
-                self.state = SGPlayerStatePlaying;
-            } else {
-                switch (self.state) {
-                    case SGPlayerStateNone:
-                    case SGPlayerStateBuffering:
-                    case SGPlayerStatePlaying:
-                        self.state = SGPlayerStateReadyToPlay;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    } else {
-        if (self.bufferDuration <= 0 && !self.decoder.endOfFile) {
-            self.buffering = YES;
-            if (self.playing) {
-                self.state = SGPlayerStateBuffering;
-            }
-        }
-    }
+//    for (SGFFFrame * frame in frames) {
+//        switch (frame.type) {
+//            case SGFFFrameTypeVideo:
+//            {
+//                @synchronized (self.videoFrames) {
+////                    [self.videoFrames addObject:frame];
+//                }
+//                [self.abstractPlayer.displayView renderFrame:frame];
+//            }
+//                break;
+//            case SGFFFrameTypeAudio:
+//            {
+//                @synchronized (self.audioFrames) {
+////                    [self.audioFrames addObject:frame];
+////                    self.bufferDuration += frame.duration;
+//                }
+//            }
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+//    
+//    if (self.buffering) {
+//        if (self.bufferDuration > self.abstractPlayer.playableBufferInterval || self.decoder.endOfFile) {
+//            self.buffering = NO;
+//            if (self.playing) {
+//                self.state = SGPlayerStatePlaying;
+//            } else {
+//                switch (self.state) {
+//                    case SGPlayerStateNone:
+//                    case SGPlayerStateBuffering:
+//                    case SGPlayerStatePlaying:
+//                        self.state = SGPlayerStateReadyToPlay;
+//                        break;
+//                    default:
+//                        break;
+//                }
+//            }
+//        }
+//    } else {
+//        if (self.bufferDuration <= 0 && !self.decoder.endOfFile) {
+//            self.buffering = YES;
+//            if (self.playing) {
+//                self.state = SGPlayerStateBuffering;
+//            }
+//        }
+//    }
 }
 
 #pragma mark - replace video
@@ -306,33 +315,40 @@
 
 - (void)setupDecodeTimer
 {
-    __weak typeof(self) weakSelf = self;
-    self.decodeTimer = [NSTimer scheduledTimerWithTimeInterval:0.001 repeats:YES block:^(NSTimer * _Nonnull timer) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        [strongSelf decodeTimerHandler];
-    }];
-    [[NSRunLoop mainRunLoop] addTimer:self.decodeTimer forMode:NSRunLoopCommonModes];
-    [self pauseDecodeTimer];
+//    __weak typeof(self) weakSelf = self;
+//    self.decodeTimer = [NSTimer scheduledTimerWithTimeInterval:0.001 repeats:YES block:^(NSTimer * _Nonnull timer) {
+//        __strong typeof(weakSelf) strongSelf = weakSelf;
+////        [strongSelf decodeTimerHandler];
+//    }];
+//    [[NSRunLoop mainRunLoop] addTimer:self.decodeTimer forMode:NSRunLoopCommonModes];
+//    [self pauseDecodeTimer];
 }
 
 - (void)pauseDecodeTimer
 {
-    self.decodeTimer.fireDate = [NSDate distantFuture];
+//    if (self.decodeTimer.fireDate.timeIntervalSince1970 < [NSDate date].timeIntervalSince1970) {
+//        self.decodeTimer.fireDate = [NSDate distantFuture];
+//    }
 }
 
 - (void)resumeDecodeTimer
 {
-    if (self.decodeTimer.fireDate.timeIntervalSince1970 > [NSDate date].timeIntervalSince1970) {
-        self.decodeTimer.fireDate = [NSDate distantPast];
-    }
+//    if (self.decodeTimer.fireDate.timeIntervalSince1970 > [NSDate date].timeIntervalSince1970) {
+//        self.decodeTimer.fireDate = [NSDate distantPast];
+//    }
 }
 
 - (void)decodeTimerHandler
 {
-    if (self.seeking) return;
-    if (!self.decoder.endOfFile && !self.decoder.decoding) {
-        [self.decoder decodeFrames];
-    }
+//    if (self.seeking) return;
+//    if (!self.decoder.endOfFile && !self.decoder.decoding) {
+//        if (self.bufferDuration < self.abstractPlayer.playableBufferInterval * 2) {
+//            [self.decoder decodeFramesWithDuration:self.abstractPlayer.playableBufferInterval];
+//        } else {
+//            [self.decoder decodeFramesWithDuration:self.maxBufferDuration-self.bufferDuration];
+//        }
+//        [self.decoder decodeFramesWithDuration:2];
+//    }
 }
 
 #pragma mark - SGFFDecoderDelegate
@@ -345,24 +361,26 @@
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder
 {
     self.prepareToPlay = YES;
-    [self resumeDecodeTimer];
+//    [self resumeDecodeTimer];
     self.state = SGPlayerStateReadyToPlay;
+//    [self decodeTimerHandler];
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didDecodeFrames:(NSArray<SGFFFrame *> *)frames
 {
-    if (!self.decoder) return;
-    if (self.seeking) return;
-    if (frames.count > 0) {
-        [self addFrames:frames];
-    }
+//    if (!self.decoder) return;
+//    if (self.seeking) return;
+//    if (frames.count > 0) {
+//        [self addFrames:frames];
+//    }
+//    [self decodeTimerHandler];
 }
 
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder
 {
-    NSTimeInterval duration = decoder.duration;
-    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(1) current:@(duration) total:@(duration)];
-    [self pauseDecodeTimer];
+//    NSTimeInterval duration = decoder.duration;
+//    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(1) current:@(duration) total:@(duration)];
+//    [self pauseDecodeTimer];
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error
@@ -381,42 +399,18 @@
 
 - (void)audioCallbackFillData:(float *)outData numFrames:(UInt32) numFrames numChannels:(UInt32)numChannels
 {
-    static NSTimeInterval video_time_token = 0;
-    if (self.videoFrames.count > 0 && [NSDate date].timeIntervalSince1970 - video_time_token > 0.1) {
-        video_time_token = [NSDate date].timeIntervalSince1970;
-        [self.abstractPlayer.displayView renderFrame:self.videoFrames.firstObject];
-        [self.videoFrames removeAllObjects];
-    }
-    
-    if (self.decoder.endOfFile) {
-        if (self.audioFrames.count <= 0) {
-            self.progress = self.duration;
-            self.state = SGPlayerStateFinished;
-            self.playing = NO;
-            memset(outData, 0, numFrames * numChannels * sizeof(float));
-            return;
-        }
-    } else {
-        if (self.buffering) {
-            memset(outData, 0, numFrames * numChannels * sizeof(float));
-            return;
-        }
-    }
-    
     while (numFrames > 0) {
         if (!self.currentAudioFrameSamples) {
-            @synchronized (self.audioFrames) {
-                if (self.audioFrames.count > 0) {
-                    SGFFAudioFrame * frame = self.audioFrames[0];
-                    
-                    [self.audioFrames removeObjectAtIndex:0];
-                    self.progress = frame.position;
-                    self.bufferDuration -= frame.duration;
-                    
-                    self.currentAudioFramePosition = 0;
-                    self.currentAudioFrameSamples = frame.samples;
-                }
+            SGFFAudioFrame * frame = [self.decoder fetchAudioFrame];
+            
+            if (!frame) {
+                memset(outData, 0, numFrames * numChannels * sizeof(float));
+                [[KxAudioManager audioManager] pause];
+                return;
             }
+            
+            self.currentAudioFramePosition = 0;
+            self.currentAudioFrameSamples = frame.samples;
         }
         if (self.currentAudioFrameSamples) {
             const void *bytes = (Byte *)self.currentAudioFrameSamples.bytes + self.currentAudioFramePosition;
@@ -467,7 +461,7 @@
     self.lastPostProgressTime = 0;
     self.lastPostPlayableTime = 0;
     [self.abstractPlayer.displayView cleanEmptyBuffer];
-    [[KxAudioManager audioManager] pause];
+//    [[KxAudioManager audioManager] pause];
 }
 
 - (void)cleanFrames

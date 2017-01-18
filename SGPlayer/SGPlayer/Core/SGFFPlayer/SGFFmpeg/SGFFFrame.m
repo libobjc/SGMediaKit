@@ -19,6 +19,11 @@
     return SGFFFrameTypeVideo;
 }
 
+- (void)dealloc
+{
+    NSLog(@"SGFFVideoFrame release");
+}
+
 @end
 
 @implementation SGFFAudioFrame
