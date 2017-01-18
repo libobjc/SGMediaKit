@@ -57,7 +57,6 @@
     self.size -= packet.size;
     self.duration -= packet.duration;
     [self.condition unlock];
-    NSLog(@"queue duration : %d", self.duration);
     return packet;
 }
 

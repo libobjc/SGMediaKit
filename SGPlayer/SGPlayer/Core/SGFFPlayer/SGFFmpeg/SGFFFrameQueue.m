@@ -11,7 +11,7 @@
 @interface SGFFFrameQueue ()
 
 @property (nonatomic, assign) int count;
-@property (nonatomic, assign) int duration;
+@property (nonatomic, assign) NSTimeInterval duration;
 
 @property (nonatomic, strong) NSCondition * condition;
 @property (nonatomic, strong) NSMutableArray <SGFFFrame *> * frames;
@@ -69,7 +69,7 @@
 
 + (int)videoMaxDuration
 {
-    return 2;
+    return 1;
 }
 
 + (int)audioMaxDuration
