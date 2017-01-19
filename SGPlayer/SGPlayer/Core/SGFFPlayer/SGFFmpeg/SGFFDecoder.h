@@ -69,6 +69,12 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, assign, readonly) BOOL videoEnable;
 @property (nonatomic, assign, readonly) BOOL audioEnable;
 
+@property (nonatomic, assign, readonly) NSInteger videoStreamIndex;
+@property (nonatomic, assign, readonly) NSInteger audioStreamIndex;
+
+@property (nonatomic, copy, readonly) NSArray <NSNumber *> * videoStreamIndexs;
+@property (nonatomic, copy, readonly) NSArray <NSNumber *> * audioStreamIndexs;
+
 @property (nonatomic, assign, readonly) BOOL endOfFile;
 @property (nonatomic, assign, readonly) BOOL reading;
 @property (nonatomic, assign, readonly) BOOL decoding;

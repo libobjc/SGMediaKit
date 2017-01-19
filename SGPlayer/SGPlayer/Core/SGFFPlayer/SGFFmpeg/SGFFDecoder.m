@@ -91,8 +91,6 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 
 {
     AVFormatContext * _format_context;
-    NSInteger _video_stream_index;
-    NSInteger _audio_stream_index;
     AVCodecContext * _video_codec;
     AVCodecContext * _audio_codec;
     AVFrame * _video_frame;
@@ -109,7 +107,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 @property (nonatomic, weak) id <SGFFDecoderDelegate> delegate;
 @property (nonatomic, weak) id <SGFFDecoderOutput> output;
 
-@property (nonatomic, strong) NSOperationQueue * ffmpegQueue;
+@property (nonatomic, strong) NSOperationQueue * ffmpegOperationQueue;
 @property (nonatomic, strong) NSInvocationOperation * openFileOperation;
 @property (nonatomic, strong) NSInvocationOperation * readPacketOperation;
 @property (nonatomic, strong) NSInvocationOperation * decodeFrameOperation;
@@ -130,8 +128,14 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 @property (nonatomic, assign) BOOL decoding;
 @property (nonatomic, assign) BOOL prepareToDecode;
 
-@property (nonatomic, copy) NSArray <NSNumber *> * video_stream_indexs;
-@property (nonatomic, copy) NSArray <NSNumber *> * audio_stream_indexs;
+@property (nonatomic, assign) BOOL videoEnable;
+@property (nonatomic, assign) BOOL audioEnable;
+
+@property (nonatomic, assign) NSInteger videoStreamIndex;
+@property (nonatomic, assign) NSInteger audioStreamIndex;
+
+@property (nonatomic, copy) NSArray <NSNumber *> * videoStreamIndexs;
+@property (nonatomic, copy) NSArray <NSNumber *> * audioStreamIndexs;
 
 @end
 
@@ -157,8 +161,8 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
         self.delegate = delegate;
         self.output = output;
         
-        _video_stream_index = -1;
-        _audio_stream_index = -1;
+        self.videoStreamIndex = -1;
+        self.audioStreamIndex = -1;
         
         [self setupOperationQueue];
     }
@@ -167,9 +171,9 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 
 - (void)setupOperationQueue
 {
-    self.ffmpegQueue = [[NSOperationQueue alloc] init];
-    self.ffmpegQueue.maxConcurrentOperationCount = 3;
-    self.ffmpegQueue.qualityOfService = NSQualityOfServiceUserInteractive;
+    self.ffmpegOperationQueue = [[NSOperationQueue alloc] init];
+    self.ffmpegOperationQueue.maxConcurrentOperationCount = 3;
+    self.ffmpegOperationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
     
     self.openFileOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(openFile) object:nil];
     self.openFileOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
@@ -190,10 +194,10 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     self.displayOperation.qualityOfService = NSQualityOfServiceUserInteractive;
     [self.displayOperation addDependency:self.openFileOperation];
     
-    [self.ffmpegQueue addOperation:self.openFileOperation];
-    [self.ffmpegQueue addOperation:self.readPacketOperation];
-    [self.ffmpegQueue addOperation:self.decodeFrameOperation];
-    [self.ffmpegQueue addOperation:self.displayOperation];
+    [self.ffmpegOperationQueue addOperation:self.openFileOperation];
+    [self.ffmpegOperationQueue addOperation:self.readPacketOperation];
+    [self.ffmpegOperationQueue addOperation:self.decodeFrameOperation];
+    [self.ffmpegOperationQueue addOperation:self.displayOperation];
 }
 
 #pragma mark - open stream
@@ -277,17 +281,18 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 - (NSError *)fetchVideoStream
 {
     NSError * error = nil;
-    self.video_stream_indexs = [self fetchStreamsForMediaType:AVMEDIA_TYPE_VIDEO];
+    self.videoStreamIndexs = [self fetchStreamsForMediaType:AVMEDIA_TYPE_VIDEO];
     
-    if (self.video_stream_indexs.count > 0) {
-        for (NSNumber * number in self.video_stream_indexs) {
+    if (self.videoStreamIndexs.count > 0) {
+        for (NSNumber * number in self.videoStreamIndexs) {
             NSInteger index = number.integerValue;
             if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0) {
                 error = [self openVideoStream:index];
                 if (!error) {
-                    _video_stream_index = index;
+                    self.videoStreamIndex = index;
                     _video_frame = av_frame_alloc();
-                    fetchAVStreamFPSTimeBase(_format_context->streams[_video_stream_index], 0.04, &_fps, &_video_timebase);
+                    self.videoEnable = YES;
+                    fetchAVStreamFPSTimeBase(_format_context->streams[self.videoStreamIndex], 0.04, &_fps, &_video_timebase);
                     break;
                 }
             }
@@ -326,16 +331,17 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 - (NSError *)fetchAutioStream
 {
     NSError * error = nil;
-    self.audio_stream_indexs = [self fetchStreamsForMediaType:AVMEDIA_TYPE_AUDIO];
+    self.audioStreamIndexs = [self fetchStreamsForMediaType:AVMEDIA_TYPE_AUDIO];
     
-    if (self.audio_stream_indexs.count > 0) {
-        for (NSNumber * number in self.audio_stream_indexs) {
+    if (self.audioStreamIndexs.count > 0) {
+        for (NSNumber * number in self.audioStreamIndexs) {
             NSInteger index = number.integerValue;
             error = [self openAudioStream:index];
             if (!error) {
-                _audio_stream_index = index;
+                self.audioStreamIndex = index;
                 _audio_frame = av_frame_alloc();
-                fetchAVStreamFPSTimeBase(_format_context->streams[_audio_stream_index], 0.025, 0, &_audio_timebase);
+                self.audioEnable = YES;
+                fetchAVStreamFPSTimeBase(_format_context->streams[self.audioStreamIndex], 0.025, 0, &_audio_timebase);
                 break;
             }
         }
@@ -596,10 +602,10 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             }
             break;
         }
-        if (packet.stream_index == _video_stream_index) {
+        if (packet.stream_index == self.videoStreamIndex) {
             [self.videoPacketQueue putPacket:packet];
 //            av_packet_unref(&packet);
-        } else if (packet.stream_index == _audio_stream_index) {
+        } else if (packet.stream_index == self.audioStreamIndex) {
             [self.audioPacketQueue putPacket:packet];
         }
     }
@@ -657,14 +663,14 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     NSBlockOperation * operation = [NSBlockOperation blockOperationWithBlock:^{
         self.position = time;
         self.endOfFile = NO;
-        if (_video_stream_index != -1) {
+        if (self.videoStreamIndex != -1) {
             int64_t ts = (int64_t)(time / _video_timebase);
-            avformat_seek_file(_format_context, _video_stream_index, ts, ts, ts, AVSEEK_FLAG_FRAME);
+            avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
             avcodec_flush_buffers(_video_codec);
         }
-        if (_audio_stream_index != -1) {
+        if (self.audioStreamIndex != -1) {
             int64_t ts = (int64_t)(time / _audio_timebase);
-            avformat_seek_file(_format_context, _audio_stream_index, ts, ts, ts, AVSEEK_FLAG_FRAME);
+            avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
             avcodec_flush_buffers(_audio_codec);
         }
         if (completeHandler) {
@@ -675,7 +681,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     }];
     operation.queuePriority = NSOperationQueuePriorityVeryHigh;
     operation.qualityOfService = NSQualityOfServiceUserInteractive;
-    [self.ffmpegQueue addOperation:operation];
+    [self.ffmpegOperationQueue addOperation:operation];
 }
 
 #pragma mark - close stream
@@ -689,15 +695,15 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 {
     if (async) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
-            [self.ffmpegQueue cancelAllOperations];
-            [self.ffmpegQueue waitUntilAllOperationsAreFinished];
+            [self.ffmpegOperationQueue cancelAllOperations];
+            [self.ffmpegOperationQueue waitUntilAllOperationsAreFinished];
             [self closeAudioStream];
             [self closeVideoStream];
             [self closeInputStream];
         });
     } else {
-        [self.ffmpegQueue cancelAllOperations];
-        [self.ffmpegQueue waitUntilAllOperationsAreFinished];
+        [self.ffmpegOperationQueue cancelAllOperations];
+        [self.ffmpegOperationQueue waitUntilAllOperationsAreFinished];
         [self closeAudioStream];
         [self closeVideoStream];
         [self closeInputStream];
@@ -706,7 +712,8 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 
 - (void)closeVideoStream
 {
-    _video_stream_index = -1;
+    self.videoEnable = NO;
+    self.videoStreamIndex = -1;
     
     if (_video_frame) {
         av_free(_video_frame);
@@ -720,7 +727,8 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 
 - (void)closeAudioStream
 {
-    _audio_stream_index = -1;
+    self.audioEnable = NO;
+    self.audioStreamIndex = -1;
     
     if (_audio_swr_buffer) {
         free(_audio_swr_buffer);
@@ -743,8 +751,8 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 
 - (void)closeInputStream
 {
-    self.audio_stream_indexs = nil;
-    self.video_stream_indexs = nil;
+    self.audioStreamIndexs = nil;
+    self.videoStreamIndexs = nil;
     
     if (_format_context) {
         avformat_close_input(&_format_context);
@@ -773,16 +781,6 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     } else {
         return [self.contentURL absoluteString];
     }
-}
-
-- (BOOL)videoEnable
-{
-    return _video_stream_index != -1;
-}
-
-- (BOOL)audioEnable
-{
-    return _audio_stream_index != -1;
 }
 
 #pragma mark - delegate callback
