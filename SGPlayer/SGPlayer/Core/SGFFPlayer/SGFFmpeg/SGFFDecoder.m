@@ -175,29 +175,41 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     self.ffmpegOperationQueue.maxConcurrentOperationCount = 3;
     self.ffmpegOperationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
     
+    [self setupOpenFileOperation];
+}
+
+- (void)setupOpenFileOperation
+{
     self.openFileOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(openFile) object:nil];
     self.openFileOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
     self.openFileOperation.qualityOfService = NSQualityOfServiceUserInteractive;
     
+    [self.ffmpegOperationQueue addOperation:self.openFileOperation];
+}
+
+- (void)setupReadPacketOperation
+{
     self.readPacketOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(readPacketThread) object:nil];
     self.readPacketOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
     self.readPacketOperation.qualityOfService = NSQualityOfServiceUserInteractive;
     [self.readPacketOperation addDependency:self.openFileOperation];
     
-    self.decodeFrameOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(decodeFrameThread) object:nil];
-    self.decodeFrameOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
-    self.decodeFrameOperation.qualityOfService = NSQualityOfServiceUserInteractive;
-    [self.decodeFrameOperation addDependency:self.openFileOperation];
-    
-    self.displayOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(displayThread) object:nil];
-    self.displayOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
-    self.displayOperation.qualityOfService = NSQualityOfServiceUserInteractive;
-    [self.displayOperation addDependency:self.openFileOperation];
-    
-    [self.ffmpegOperationQueue addOperation:self.openFileOperation];
     [self.ffmpegOperationQueue addOperation:self.readPacketOperation];
-    [self.ffmpegOperationQueue addOperation:self.decodeFrameOperation];
-    [self.ffmpegOperationQueue addOperation:self.displayOperation];
+    
+    if (self.videoEnable) {
+        self.decodeFrameOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(decodeFrameThread) object:nil];
+        self.decodeFrameOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+        self.decodeFrameOperation.qualityOfService = NSQualityOfServiceUserInteractive;
+        [self.decodeFrameOperation addDependency:self.openFileOperation];
+        
+        self.displayOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(displayThread) object:nil];
+        self.displayOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+        self.displayOperation.qualityOfService = NSQualityOfServiceUserInteractive;
+        [self.displayOperation addDependency:self.openFileOperation];
+        
+        [self.ffmpegOperationQueue addOperation:self.decodeFrameOperation];
+        [self.ffmpegOperationQueue addOperation:self.displayOperation];
+    }
 }
 
 #pragma mark - open stream
@@ -248,6 +260,8 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     if ([self.delegate respondsToSelector:@selector(decoderDidPrepareToDecodeFrames:)]) {
         [self.delegate decoderDidPrepareToDecodeFrames:self];
     }
+    
+    [self setupReadPacketOperation];
 }
 
 - (NSError *)openStream
