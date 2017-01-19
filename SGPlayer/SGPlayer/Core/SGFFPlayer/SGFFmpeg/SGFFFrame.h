@@ -29,6 +29,7 @@ typedef NS_ENUM(NSUInteger, SGFFFrameType) {
 
 @property (nonatomic, assign) NSUInteger width;
 @property (nonatomic, assign) NSUInteger height;
+
 @end
 
 @interface SGFFAudioFrame : SGFFFrame

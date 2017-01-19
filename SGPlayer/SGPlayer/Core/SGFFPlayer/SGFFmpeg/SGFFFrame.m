@@ -21,6 +21,15 @@
 
 - (void)dealloc
 {
+    if (self.luma.bytes) {
+        free(self.luma.bytes);
+    }
+    if (self.chromaB.bytes) {
+        free(self.chromaB.bytes);
+    }
+    if (self.chromaR.bytes) {
+        free(self.chromaR.bytes);
+    }
     NSLog(@"SGFFVideoFrame release");
 }
 

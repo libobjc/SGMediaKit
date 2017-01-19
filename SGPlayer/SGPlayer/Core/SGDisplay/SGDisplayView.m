@@ -75,7 +75,7 @@
 - (void)decoder:(SGFFDecoder *)decoder renderVideoFrame:(SGFFVideoFrame *)videoFrame
 {
     if (self.autoPauseFFPlayerView) return;
-//    [self.ffplayerView renderFrame:videoFrame];
+    [self.ffplayerView renderFrame:videoFrame];
 }
 
 - (void)setRendererType:(SGDisplayRendererType)rendererType

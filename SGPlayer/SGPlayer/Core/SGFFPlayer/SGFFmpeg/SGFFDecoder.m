@@ -193,7 +193,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     [self.ffmpegQueue addOperation:self.openFileOperation];
     [self.ffmpegQueue addOperation:self.readPacketOperation];
     [self.ffmpegQueue addOperation:self.decodeFrameOperation];
-//    [self.ffmpegQueue addOperation:self.displayOperation];
+    [self.ffmpegQueue addOperation:self.displayOperation];
 }
 
 #pragma mark - open stream
@@ -452,18 +452,18 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     
     SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] init];
     
-//    videoFrame.luma = copyFrameData(_video_frame->data[0],
-//                                  _video_frame->linesize[0],
-//                                  _video_codec->width,
-//                                  _video_codec->height);
-//    videoFrame.chromaB = copyFrameData(_video_frame->data[1],
-//                                     _video_frame->linesize[1],
-//                                     _video_codec->width / 2,
-//                                     _video_codec->height / 2);
-//    videoFrame.chromaR = copyFrameData(_video_frame->data[2],
-//                                     _video_frame->linesize[2],
-//                                     _video_codec->width / 2,
-//                                     _video_codec->height / 2);
+    videoFrame.luma = copyFrameData(_video_frame->data[0],
+                                  _video_frame->linesize[0],
+                                  _video_codec->width,
+                                  _video_codec->height);
+    videoFrame.chromaB = copyFrameData(_video_frame->data[1],
+                                     _video_frame->linesize[1],
+                                     _video_codec->width / 2,
+                                     _video_codec->height / 2);
+    videoFrame.chromaR = copyFrameData(_video_frame->data[2],
+                                     _video_frame->linesize[2],
+                                     _video_codec->width / 2,
+                                     _video_codec->height / 2);
     
     videoFrame.width = _video_codec->width;
     videoFrame.height = _video_codec->height;
@@ -597,8 +597,8 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             break;
         }
         if (packet.stream_index == _video_stream_index) {
-//            [self.videoPacketQueue putPacket:packet];
-            av_packet_unref(&packet);
+            [self.videoPacketQueue putPacket:packet];
+//            av_packet_unref(&packet);
         } else if (packet.stream_index == _audio_stream_index) {
             [self.audioPacketQueue putPacket:packet];
         }
