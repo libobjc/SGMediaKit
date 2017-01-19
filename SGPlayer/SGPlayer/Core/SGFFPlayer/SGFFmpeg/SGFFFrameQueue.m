@@ -69,7 +69,7 @@
 
 + (NSTimeInterval)sleepTimeInterval
 {
-    return 0.01;
+    return [self maxVideoDuration] / 2.0f;
 }
 
 @end

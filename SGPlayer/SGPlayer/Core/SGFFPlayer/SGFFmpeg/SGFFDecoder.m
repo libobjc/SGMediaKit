@@ -639,7 +639,8 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             if ([self.output respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
                 [self.output decoder:self renderVideoFrame:videoFrame];
             }
-            [NSThread sleepForTimeInterval:0.01];
+            [NSThread sleepForTimeInterval:0.03];
+            continue;
         }
     }
 }
