@@ -30,7 +30,6 @@
     if (self.chromaR.bytes) {
         free(self.chromaR.bytes);
     }
-    NSLog(@"SGFFVideoFrame release");
 }
 
 @end

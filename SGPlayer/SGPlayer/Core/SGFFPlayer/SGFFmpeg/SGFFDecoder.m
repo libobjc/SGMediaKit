@@ -462,7 +462,6 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
         }
         av_packet_unref(&packet);
     }
-    NSLog(@"视频 解码完成");
     return videoFrame;
 }
 
