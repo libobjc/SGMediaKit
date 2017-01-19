@@ -57,6 +57,8 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 + (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id <SGFFDecoderDelegate>)delegate output:(id <SGFFDecoderOutput>)output;
 
+@property (nonatomic, strong, readonly) NSError * error;
+
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSDictionary * metadata;
 @property (nonatomic, assign, readonly) CGSize presentationSize;

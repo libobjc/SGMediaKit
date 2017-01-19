@@ -47,6 +47,8 @@
 @property (nonatomic, strong) SGFFPacketQueue * videoPacketQueue;
 @property (nonatomic, strong) SGFFFrameQueue * videoFrameQueue;
 
+@property (nonatomic, strong) NSError * error;
+
 @property (nonatomic, copy) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSString * contentURLString;
 @property (nonatomic, copy) NSDictionary * metadata;
@@ -121,6 +123,11 @@
 
 - (void)setupReadPacketOperation
 {
+    if (self.error) {
+        [self delegateErrorCallback];
+        return;
+    }
+    
     self.readPacketOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(readPacketThread) object:nil];
     self.readPacketOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
     self.readPacketOperation.qualityOfService = NSQualityOfServiceUserInteractive;
@@ -152,9 +159,9 @@
         [self.delegate decoderWillOpenInputStream:self];
     }
     // input stream
-    NSError * openError = [self openStream];
-    if (openError) {
-        [self delegateErrorCallback:openError];
+    self.error = [self openStream];
+    if (self.error) {
+        [self delegateErrorCallback];
         return;
     } else {
         if ([self.delegate respondsToSelector:@selector(decoderDidOpenInputStream:)]) {
@@ -181,9 +188,11 @@
     // video and audio error
     if (videoError && audioError) {
         if (videoError.code == SGFFDecoderErrorCodeStreamNotFound && audioError.code != SGFFDecoderErrorCodeStreamNotFound) {
-            [self delegateErrorCallback:audioError];
+            self.error = audioError;
+            [self delegateErrorCallback];
         } else {
-            [self delegateErrorCallback:videoError];
+            self.error = videoError;
+            [self delegateErrorCallback];
         }
         return;
     }
@@ -744,11 +753,11 @@
 
 #pragma mark - delegate callback
 
-- (void)delegateErrorCallback:(NSError *)error
+- (void)delegateErrorCallback
 {
-    if (error) {
+    if (self.error) {
         if ([self.delegate respondsToSelector:@selector(decoder:didError:)]) {
-            [self.delegate decoder:self didError:error];
+            [self.delegate decoder:self didError:self.error];
         }
     }
 }
