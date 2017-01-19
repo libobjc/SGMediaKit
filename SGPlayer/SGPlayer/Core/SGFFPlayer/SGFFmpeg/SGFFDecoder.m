@@ -377,6 +377,21 @@
 
 - (void)readPacketThread
 {
+    if (self.videoEnable) {
+        if (self.videoPacketQueue) {
+            [self.videoPacketQueue flush];
+        } else {
+            self.videoPacketQueue = [SGFFPacketQueue packetQueue];
+        }
+    }
+    if (self.audioEnable) {
+        if (self.audioPacketQueue) {
+            [self.audioPacketQueue flush];
+        } else {
+            self.audioPacketQueue = [SGFFPacketQueue packetQueue];
+        }
+    }
+    
     self.reading = YES;
     BOOL finished = NO;
     AVPacket packet;
@@ -387,9 +402,11 @@
         }
         if (self.seeking) {
             self.endOfFile = NO;
+            NSLog(@"seek begin flush");
             [self.videoPacketQueue flush];
             [self.audioPacketQueue flush];
             [self.videoFrameQueue flush];
+            NSLog(@"seek after flush");
             if (self.videoEnable) {
                 int64_t ts = (int64_t)(self.seekToTime / _video_timebase);
                 avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
@@ -437,6 +454,12 @@
 
 - (void)decodeFrameThread
 {
+    if (self.videoFrameQueue) {
+        [self.videoFrameQueue flush];
+    } else {
+        self.videoFrameQueue = [SGFFFrameQueue frameQueue];
+    }
+    
     self.decoding = YES;
     BOOL finished = NO;
     AVPacket packet;
@@ -774,30 +797,6 @@
     } else {
         return [self.contentURL absoluteString];
     }
-}
-
-- (SGFFFrameQueue *)videoFrameQueue
-{
-    if (!_videoFrameQueue) {
-        _videoFrameQueue = [SGFFFrameQueue frameQueue];
-    }
-    return _videoFrameQueue;
-}
-
-- (SGFFPacketQueue *)videoPacketQueue
-{
-    if (!_videoPacketQueue) {
-        _videoPacketQueue = [SGFFPacketQueue packetQueue];
-    }
-    return _videoPacketQueue;
-}
-
-- (SGFFPacketQueue *)audioPacketQueue
-{
-    if (!_audioPacketQueue) {
-        _audioPacketQueue = [SGFFPacketQueue packetQueue];
-    }
-    return _audioPacketQueue;
 }
 
 #pragma mark - delegate callback
