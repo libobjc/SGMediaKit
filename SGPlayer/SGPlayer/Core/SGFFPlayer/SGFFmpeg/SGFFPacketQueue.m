@@ -65,34 +65,9 @@
     return self.packets.count;
 }
 
-+ (int)commonMaxSize
-{
-    return [self videoMaxSize] + [self audioMaxSize];
-}
-
-+ (int)videoMaxSize
++ (int)maxCommonSize
 {
     return 15 * 1024 * 1024;
-}
-
-+ (int)audioMaxSize
-{
-    return 1 * 1024 * 1024;
-}
-
-+ (int)commonMaxDuration
-{
-    return [self videoMaxDuration] + [self audioMaxDuration];
-}
-
-+ (int)videoMaxDuration
-{
-    return 5;
-}
-
-+ (int)audioMaxDuration
-{
-    return 10;
 }
 
 + (NSTimeInterval)sleepTimeInterval

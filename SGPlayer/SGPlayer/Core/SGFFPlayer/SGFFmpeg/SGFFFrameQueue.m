@@ -62,19 +62,9 @@
     return self.frames.count;
 }
 
-+ (int)commonMaxDuration
-{
-    return [self videoMaxDuration] + [self audioMaxDuration];
-}
-
-+ (int)videoMaxDuration
++ (int)maxVideoDuration
 {
     return 1;
-}
-
-+ (int)audioMaxDuration
-{
-    return 4;
 }
 
 + (NSTimeInterval)sleepTimeInterval

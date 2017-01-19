@@ -72,10 +72,10 @@
     }
 }
 
-- (void)renderFrame:(SGFFVideoFrame *)displayFrame
+- (void)decoder:(SGFFDecoder *)decoder renderVideoFrame:(SGFFVideoFrame *)videoFrame
 {
     if (self.autoPauseFFPlayerView) return;
-    [self.ffplayerView renderFrame:displayFrame];
+//    [self.ffplayerView renderFrame:videoFrame];
 }
 
 - (void)setRendererType:(SGDisplayRendererType)rendererType

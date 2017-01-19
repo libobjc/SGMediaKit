@@ -45,12 +45,18 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 @end
 
+@protocol SGFFDecoderOutput <NSObject>
+
+- (void)decoder:(SGFFDecoder *)decoder renderVideoFrame:(SGFFVideoFrame *)videoFrame;
+
+@end
+
 @interface SGFFDecoder : NSObject
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
-+ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id <SGFFDecoderDelegate>)delegate;
++ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id <SGFFDecoderDelegate>)delegate output:(id <SGFFDecoderOutput>)output;
 
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSDictionary * metadata;
@@ -68,7 +74,6 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, assign, readonly) BOOL decoding;
 @property (nonatomic, assign, readonly) BOOL prepareToDecode;
 
-- (SGFFVideoFrame *)fetchVideoFrame;
 - (SGFFAudioFrame *)fetchAudioFrame;
 
 @property (nonatomic, assign, readonly) BOOL seekEnable;

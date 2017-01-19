@@ -11,6 +11,7 @@
 #import "SGPlayerDefine.h"
 #import "SGFFFrame.h"
 #import "SGFingerRotation.h"
+#import "SGFFDecoder.h"
 
 @class SGPlayer;
 @class SGAVPlayer;
@@ -24,7 +25,7 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
     SGDisplayRendererTypeFFmpegPexelBufferVR,
 };
 
-@interface SGDisplayView : UIView
+@interface SGDisplayView : UIView <SGFFDecoderOutput>
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
@@ -42,7 +43,6 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
 //- (void)resume;
 - (void)reloadGravityMode;
 - (void)cleanEmptyBuffer;
-- (void)renderFrame:(SGFFVideoFrame *)displayFrame;
 
 - (UIImage *)snapshot;
 

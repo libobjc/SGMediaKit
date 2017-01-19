@@ -107,14 +107,16 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 }
 
 @property (nonatomic, weak) id <SGFFDecoderDelegate> delegate;
+@property (nonatomic, weak) id <SGFFDecoderOutput> output;
+
 @property (nonatomic, strong) NSOperationQueue * ffmpegQueue;
 @property (nonatomic, strong) NSInvocationOperation * openFileOperation;
 @property (nonatomic, strong) NSInvocationOperation * readPacketOperation;
 @property (nonatomic, strong) NSInvocationOperation * decodeFrameOperation;
+@property (nonatomic, strong) NSInvocationOperation * displayOperation;
 
 @property (nonatomic, strong) SGFFPacketQueue * audioPacketQueue;
 @property (nonatomic, strong) SGFFPacketQueue * videoPacketQueue;
-@property (nonatomic, strong) SGFFFrameQueue * audioFrameQueue;
 @property (nonatomic, strong) SGFFFrameQueue * videoFrameQueue;
 
 @property (nonatomic, copy) NSURL * contentURL;
@@ -135,12 +137,12 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 
 @implementation SGFFDecoder
 
-+ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate
++ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate output:(id<SGFFDecoderOutput>)output
 {
-    return [[self alloc] initWithContentURL:contentURL delegate:delegate];
+    return [[self alloc] initWithContentURL:contentURL delegate:delegate output:output];
 }
 
-- (instancetype)initWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate
+- (instancetype)initWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate output:(id<SGFFDecoderOutput>)output
 {
     if (self = [super init]) {
         
@@ -153,6 +155,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
         
         self.contentURL = contentURL;
         self.delegate = delegate;
+        self.output = output;
         
         _video_stream_index = -1;
         _audio_stream_index = -1;
@@ -182,9 +185,15 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     self.decodeFrameOperation.qualityOfService = NSQualityOfServiceUserInteractive;
     [self.decodeFrameOperation addDependency:self.openFileOperation];
     
+    self.displayOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(displayThread) object:nil];
+    self.displayOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+    self.displayOperation.qualityOfService = NSQualityOfServiceUserInteractive;
+    [self.displayOperation addDependency:self.openFileOperation];
+    
     [self.ffmpegQueue addOperation:self.openFileOperation];
     [self.ffmpegQueue addOperation:self.readPacketOperation];
     [self.ffmpegQueue addOperation:self.decodeFrameOperation];
+//    [self.ffmpegQueue addOperation:self.displayOperation];
 }
 
 #pragma mark - open stream
@@ -431,7 +440,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             }
             packet_size -= lenght;
         }
-        //        av_packet_free(&packet);
+        av_packet_unref(&packet);
     }
     NSLog(@"视频 解码完成");
     return videoFrame;
@@ -443,18 +452,18 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     
     SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] init];
     
-    videoFrame.luma = copyFrameData(_video_frame->data[0],
-                                  _video_frame->linesize[0],
-                                  _video_codec->width,
-                                  _video_codec->height);
-    videoFrame.chromaB = copyFrameData(_video_frame->data[1],
-                                     _video_frame->linesize[1],
-                                     _video_codec->width / 2,
-                                     _video_codec->height / 2);
-    videoFrame.chromaR = copyFrameData(_video_frame->data[2],
-                                     _video_frame->linesize[2],
-                                     _video_codec->width / 2,
-                                     _video_codec->height / 2);
+//    videoFrame.luma = copyFrameData(_video_frame->data[0],
+//                                  _video_frame->linesize[0],
+//                                  _video_codec->width,
+//                                  _video_codec->height);
+//    videoFrame.chromaB = copyFrameData(_video_frame->data[1],
+//                                     _video_frame->linesize[1],
+//                                     _video_codec->width / 2,
+//                                     _video_codec->height / 2);
+//    videoFrame.chromaR = copyFrameData(_video_frame->data[2],
+//                                     _video_frame->linesize[2],
+//                                     _video_codec->width / 2,
+//                                     _video_codec->height / 2);
     
     videoFrame.width = _video_codec->width;
     videoFrame.height = _video_codec->height;
@@ -473,7 +482,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 
 - (SGFFAudioFrame *)fetchAudioFrame
 {
-    return [self.audioFrameQueue getFrame];
+    return [self getAudioFrameFromPacketQueue];
 }
 
 - (SGFFAudioFrame *)getAudioFrameFromPacketQueue
@@ -504,9 +513,8 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             }
             packet_size -= lenght;
         }
-//        av_packet_free(&packet);
+        av_packet_unref(&packet);
     }
-    NSLog(@"音频 解码完成");
     return audioFrame;
 }
 
@@ -572,9 +580,9 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     BOOL finished = NO;
     AVPacket packet;
     while (!finished) {
-        if (self.audioPacketQueue.duration >= [SGFFPacketQueue audioMaxDuration] && self.videoPacketQueue.duration >= [SGFFPacketQueue videoMaxDuration]) {
+        if (self.audioPacketQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
             NSTimeInterval interval = [SGFFPacketQueue sleepTimeInterval];
-            NSLog(@"read thread sleep %f", interval);
+//            NSLog(@"read thread sleep %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
@@ -589,10 +597,9 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             break;
         }
         if (packet.stream_index == _video_stream_index) {
-//            NSLog(@"read thread put video packet");
-            [self.videoPacketQueue putPacket:packet];
+//            [self.videoPacketQueue putPacket:packet];
+            av_packet_unref(&packet);
         } else if (packet.stream_index == _audio_stream_index) {
-//            NSLog(@"read thread put audio packet");
             [self.audioPacketQueue putPacket:packet];
         }
     }
@@ -602,30 +609,39 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 - (void)decodeFrameThread
 {
     self.videoFrameQueue = [SGFFFrameQueue frameQueue];
-    self.audioFrameQueue = [SGFFFrameQueue frameQueue];
     
     self.decoding = YES;
     BOOL finished = NO;
     AVPacket packet;
     while (!finished) {
-        if (self.endOfFile && self.audioPacketQueue.count == 0 && self.videoPacketQueue.count == 0) {
+        if (self.endOfFile && self.videoPacketQueue.count == 0) {
             break;
         }
-        if (self.audioFrameQueue.duration >= [SGFFFrameQueue audioMaxDuration] && self.videoFrameQueue.duration >= [SGFFFrameQueue videoMaxDuration]) {
+        if (self.videoFrameQueue.duration >= [SGFFFrameQueue maxVideoDuration]) {
             NSTimeInterval interval = [SGFFFrameQueue sleepTimeInterval];
-            NSLog(@"decode thread sleep %f", interval);
+//            NSLog(@"decode thread sleep %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
-        if (self.audioFrameQueue.duration < [SGFFFrameQueue audioMaxDuration]) {
-            NSLog(@"decode put audio");
-            [self.audioFrameQueue putFrame:[self getAudioFrameFromPacketQueue]];
-        } else if (self.videoFrameQueue.duration < [SGFFFrameQueue videoMaxDuration]) {
-            NSLog(@"decode put video");
-            [self.videoFrameQueue putFrame:[self getVideoFrameFromPacketQueue]];
-        }
+        [self.videoFrameQueue putFrame:[self getVideoFrameFromPacketQueue]];
     }
     self.decoding = NO;
+}
+
+- (void)displayThread
+{
+    while (1) {
+        if (self.endOfFile && self.audioPacketQueue.count == 0 && self.videoPacketQueue.count == 0 && self.videoFrameQueue.count == 0) {
+            break;
+        }
+        SGFFVideoFrame * videoFrame = [self.videoFrameQueue getFrame];
+        if (videoFrame) {
+            if ([self.output respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
+                [self.output decoder:self renderVideoFrame:videoFrame];
+            }
+            [NSThread sleepForTimeInterval:0.01];
+        }
+    }
 }
 
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler

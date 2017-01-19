@@ -13,13 +13,7 @@
 
 + (instancetype)packetQueue;
 
-+ (int)commonMaxSize NS_UNAVAILABLE;
-+ (int)videoMaxSize NS_UNAVAILABLE;
-+ (int)audioMaxSize NS_UNAVAILABLE;
-
-+ (int)commonMaxDuration;
-+ (int)videoMaxDuration;
-+ (int)audioMaxDuration;
++ (int)maxCommonSize;
 
 + (NSTimeInterval)sleepTimeInterval;
 
