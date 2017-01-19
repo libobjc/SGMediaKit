@@ -121,7 +121,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 @property (nonatomic, copy, readonly) NSString * contentURLString;
 @property (nonatomic, copy) NSDictionary * metadata;
 @property (nonatomic, assign) CGSize presentationSize;
-@property (nonatomic, assign) NSTimeInterval position;
+@property (nonatomic, assign) NSTimeInterval fps;
 
 @property (nonatomic, assign) BOOL endOfFile;
 @property (nonatomic, assign) BOOL reading;
@@ -510,7 +510,6 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             if (gotframe) {
                 audioFrame = [self getAudioFrameFromAVFrame];
                 if (audioFrame) {
-                    self.position = audioFrame.position;
                     break;
                 }
             }
@@ -661,7 +660,6 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     }
     
     NSBlockOperation * operation = [NSBlockOperation blockOperationWithBlock:^{
-        self.position = time;
         self.endOfFile = NO;
         if (self.videoStreamIndex != -1) {
             int64_t ts = (int64_t)(time / _video_timebase);

@@ -35,7 +35,6 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 // decode frames
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder;
-- (void)decoder:(SGFFDecoder *)decoder didDecodeFrames:(NSArray <SGFFFrame *> *)frames;
 
 // end of file
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder;
@@ -61,10 +60,13 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 @property (nonatomic, copy, readonly) NSDictionary * metadata;
 @property (nonatomic, assign, readonly) CGSize presentationSize;
-
 @property (nonatomic, assign, readonly) NSTimeInterval fps;
-@property (nonatomic, assign, readonly) NSTimeInterval position;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
+
+@property (nonatomic, assign, readonly) BOOL endOfFile;
+@property (nonatomic, assign, readonly) BOOL reading;
+@property (nonatomic, assign, readonly) BOOL decoding;
+@property (nonatomic, assign, readonly) BOOL prepareToDecode;
 
 @property (nonatomic, assign, readonly) BOOL videoEnable;
 @property (nonatomic, assign, readonly) BOOL audioEnable;
@@ -74,11 +76,6 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * audioStreamIndexs;
-
-@property (nonatomic, assign, readonly) BOOL endOfFile;
-@property (nonatomic, assign, readonly) BOOL reading;
-@property (nonatomic, assign, readonly) BOOL decoding;
-@property (nonatomic, assign, readonly) BOOL prepareToDecode;
 
 - (SGFFAudioFrame *)fetchAudioFrame;
 
