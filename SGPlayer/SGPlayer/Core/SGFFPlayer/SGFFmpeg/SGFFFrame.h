@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "avformat.h"
 
 typedef NS_ENUM(NSUInteger, SGFFFrameType) {
     SGFFFrameTypeVideo,
@@ -23,12 +24,21 @@ typedef NS_ENUM(NSUInteger, SGFFFrameType) {
 
 @interface SGFFVideoFrame : SGFFFrame
 
-@property (nonatomic, strong) NSData * luma;
-@property (nonatomic, strong) NSData * chromaB;
-@property (nonatomic, strong) NSData * chromaR;
+{
+@public
+    UInt8 * luma;
+    UInt8 * chromaB;
+    UInt8 * chromaR;
+    
+    int lumaLenght;
+    int chromaBLenght;
+    int chromaRLenght;
+}
 
-@property (nonatomic, assign) NSUInteger width;
-@property (nonatomic, assign) NSUInteger height;
+@property (nonatomic, assign, readonly) NSUInteger width;
+@property (nonatomic, assign, readonly) NSUInteger height;
+
+- (instancetype)initWithAVFrame:(AVFrame *)frame width:(int)width height:(int)height;
 
 @end
 

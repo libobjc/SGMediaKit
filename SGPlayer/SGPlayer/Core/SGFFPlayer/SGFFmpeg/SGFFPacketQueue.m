@@ -16,6 +16,8 @@
 @property (nonatomic, strong) NSCondition * condition;
 @property (nonatomic, strong) NSMutableArray <NSValue *> * packets;
 
+@property (nonatomic, assign) BOOL destoryToken;
+
 @end
 
 @implementation SGFFPacketQueue
@@ -48,16 +50,41 @@
 - (AVPacket)getPacket
 {
     [self.condition lock];
+    AVPacket packet;
     while (!self.packets.firstObject) {
+        if (self.destoryToken) {
+            [self.condition unlock];
+            return packet;
+        }
         [self.condition wait];
     }
-    AVPacket packet;
     [self.packets.firstObject getValue:&packet];
     [self.packets removeObjectAtIndex:0];
     self.size -= packet.size;
     self.duration -= packet.duration;
     [self.condition unlock];
     return packet;
+}
+
+- (void)flush
+{
+    [self.condition lock];
+    for (NSValue * value in self.packets) {
+        AVPacket packet;
+        [value getValue:&packet];
+        av_packet_unref(&packet);
+    }
+    [self.packets removeAllObjects];
+    [self.condition unlock];
+}
+
+- (void)destroy
+{
+    [self flush];
+    [self.condition lock];
+    self.destoryToken = YES;
+    [self.condition broadcast];
+    [self.condition unlock];
 }
 
 - (int)count

@@ -24,4 +24,7 @@
 - (void)putPacket:(AVPacket)packet;
 - (AVPacket)getPacket;
 
+- (void)flush;
+- (void)destroy;
+
 @end

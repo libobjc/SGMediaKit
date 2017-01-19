@@ -16,6 +16,8 @@
 @property (nonatomic, strong) NSCondition * condition;
 @property (nonatomic, strong) NSMutableArray <SGFFFrame *> * frames;
 
+@property (nonatomic, assign) BOOL destoryToken;
+
 @end
 
 @implementation SGFFFrameQueue
@@ -48,6 +50,10 @@
 {
     [self.condition lock];
     while (!self.frames.firstObject) {
+        if (self.destoryToken) {
+            [self.condition unlock];
+            return nil;
+        }
         [self.condition wait];
     }
     SGFFFrame * frame = self.frames.firstObject;
@@ -55,6 +61,22 @@
     self.duration -= frame.duration;
     [self.condition unlock];
     return frame;
+}
+
+- (void)flush
+{
+    [self.condition lock];
+    [self.frames removeAllObjects];
+    [self.condition unlock];
+}
+
+- (void)destroy
+{
+    [self flush];
+    [self.condition lock];
+    self.destoryToken = YES;
+    [self.condition broadcast];
+    [self.condition unlock];
 }
 
 - (int)count

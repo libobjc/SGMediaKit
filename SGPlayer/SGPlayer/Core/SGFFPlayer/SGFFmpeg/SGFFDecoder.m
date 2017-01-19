@@ -7,6 +7,7 @@
 //
 
 #import "SGFFDecoder.h"
+#import "SGFFTools.h"
 #import "SGAudioManager.h"
 #import "SGFFPacketQueue.h"
 #import "SGFFFrameQueue.h"
@@ -15,77 +16,6 @@
 #import "swresample.h"
 #import "swscale.h"
 #import <Accelerate/Accelerate.h>
-
-static NSTimeInterval decode_frames_min_duration = 0.0;
-
-static void SGFFLog(void * context, int level, const char * format, va_list args)
-{
-//    NSString * message = [[NSString alloc] initWithFormat:[NSString stringWithUTF8String:format] arguments:args];
-//    NSLog(@"SGFFLog : %@", message);
-}
-
-static NSError * checkErrorCode(int result, SGFFDecoderErrorCode errorCode)
-{
-    if (result < 0) {
-        char * error_string_buffer = malloc(256);
-        av_strerror(result, error_string_buffer, 256);
-        NSString * error_string = [[NSString alloc] initWithUTF8String:error_string_buffer];
-        NSError * error = [NSError errorWithDomain:error_string code:errorCode userInfo:nil];
-        return error;
-    }
-    return nil;
-}
-
-static NSError * checkError(int result)
-{
-    return checkErrorCode(result, -1);
-}
-
-static void fetchAVStreamFPSTimeBase(AVStream * stream, NSTimeInterval defaultTimebase, NSTimeInterval * pFPS, NSTimeInterval * pTimebase)
-{
-    NSTimeInterval fps, timebase;
-    
-    if (stream->time_base.den && stream->time_base.num) {
-        timebase = av_q2d(stream->time_base);
-    } else if (stream->codec->time_base.den && stream->codec->time_base.num) {
-        timebase = av_q2d(stream->codec->time_base);
-    } else {
-        timebase = defaultTimebase;
-    }
-
-    if (stream->codec->ticks_per_frame != 1) {
-        
-    }
-    
-    if (stream->avg_frame_rate.den && stream->avg_frame_rate.num) {
-        fps = av_q2d(stream->avg_frame_rate);
-    } else if (stream->r_frame_rate.den && stream->r_frame_rate.num) {
-        fps = av_q2d(stream->r_frame_rate);
-    } else {
-        fps = 1.0 / timebase;
-    }
-    
-    if (pFPS) {
-        * pFPS = fps;
-    }
-    
-    if (pTimebase) {
-        * pTimebase = timebase;
-    }
-}
-
-static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
-{
-    width = MIN(linesize, width);
-    NSMutableData *md = [NSMutableData dataWithLength: width * height];
-    Byte *dst = md.mutableBytes;
-    for (NSUInteger i = 0; i < height; ++i) {
-        memcpy(dst, src, width);
-        dst += width;
-        src += linesize;
-    }
-    return md;
-}
 
 @interface SGFFDecoder ()
 
@@ -123,16 +53,18 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 @property (nonatomic, assign) CGSize presentationSize;
 @property (nonatomic, assign) NSTimeInterval fps;
 
-@property (nonatomic, assign) BOOL endOfFile;
-@property (nonatomic, assign) BOOL reading;
-@property (nonatomic, assign) BOOL decoding;
-@property (nonatomic, assign) BOOL prepareToDecode;
+@property (atomic, assign) BOOL closed;
+@property (atomic, assign) BOOL endOfFile;
+@property (atomic, assign) BOOL seeking;
+@property (atomic, assign) BOOL reading;
+@property (atomic, assign) BOOL decoding;
+@property (atomic, assign) BOOL prepareToDecode;
 
-@property (nonatomic, assign) BOOL videoEnable;
-@property (nonatomic, assign) BOOL audioEnable;
+@property (atomic, assign) BOOL videoEnable;
+@property (atomic, assign) BOOL audioEnable;
 
-@property (nonatomic, assign) NSInteger videoStreamIndex;
-@property (nonatomic, assign) NSInteger audioStreamIndex;
+@property (atomic, assign) NSInteger videoStreamIndex;
+@property (atomic, assign) NSInteger audioStreamIndex;
 
 @property (nonatomic, copy) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy) NSArray <NSNumber *> * audioStreamIndexs;
@@ -152,7 +84,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
         
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
-            av_log_set_callback(SGFFLog);
+            av_log_set_callback(sg_ff_log);
             av_register_all();
             avformat_network_init();
         });
@@ -271,7 +203,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     NSError * error = nil;
     
     reslut = avformat_open_input(&_format_context, self.contentURLString.UTF8String, NULL, NULL);
-    error = checkErrorCode(reslut, SGFFDecoderErrorCodeFormatOpenInput);
+    error = sg_ff_check_error_code(reslut, SGFFDecoderErrorCodeFormatOpenInput);
     if (error || !_format_context) {
         if (_format_context) {
             avformat_free_context(_format_context);
@@ -280,7 +212,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     }
     
     reslut = avformat_find_stream_info(_format_context, NULL);
-    error = checkErrorCode(reslut, SGFFDecoderErrorCodeFormatFindStreamInfo);
+    error = sg_ff_check_error_code(reslut, SGFFDecoderErrorCodeFormatFindStreamInfo);
     if (error || !_format_context) {
         if (_format_context) {
             avformat_close_input(_format_context);
@@ -306,7 +238,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
                     self.videoStreamIndex = index;
                     _video_frame = av_frame_alloc();
                     self.videoEnable = YES;
-                    fetchAVStreamFPSTimeBase(_format_context->streams[self.videoStreamIndex], 0.04, &_fps, &_video_timebase);
+                    sg_ff_get_AVStream_fps_timebase(_format_context->streams[self.videoStreamIndex], 0.04, &_fps, &_video_timebase);
                     break;
                 }
             }
@@ -331,7 +263,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     }
     
     int result = avcodec_open2(stream->codec, codec, NULL);
-    error = checkErrorCode(result, SGFFDecoderErrorCodeCodecOpen2);
+    error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecOpen2);
     if (error) {
         return error;
     }
@@ -355,7 +287,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
                 self.audioStreamIndex = index;
                 _audio_frame = av_frame_alloc();
                 self.audioEnable = YES;
-                fetchAVStreamFPSTimeBase(_format_context->streams[self.audioStreamIndex], 0.025, 0, &_audio_timebase);
+                sg_ff_get_AVStream_fps_timebase(_format_context->streams[self.audioStreamIndex], 0.025, 0, &_audio_timebase);
                 break;
             }
         }
@@ -379,7 +311,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     }
     
     int result = avcodec_open2(stream->codec, codec, NULL);
-    error = checkErrorCode(result, SGFFDecoderErrorCodeCodecOpen2);
+    error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecOpen2);
     if (error) {
         return error;
     }
@@ -396,7 +328,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
         _audio_swr_context = swr_alloc_set_opts(NULL, av_get_default_channel_layout(audioManager.numOutputChannels), AV_SAMPLE_FMT_S16, audioManager.samplingRate, av_get_default_channel_layout(stream->codec->channels), stream->codec->sample_fmt, stream->codec->sample_rate, 0, NULL);
         
         result = swr_init(_audio_swr_context);
-        error = checkErrorCode(result, SGFFDecoderErrorCodeAuidoSwrInit);
+        error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeAuidoSwrInit);
         if (error || !_audio_swr_context) {
             if (_audio_swr_context) {
                 swr_free(&_audio_swr_context);
@@ -437,6 +369,10 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     BOOL finished = NO;
     AVPacket packet;
     while (!finished) {
+        if (self.closed) {
+            NSLog(@"读线程退出");
+            break;
+        }
         if (self.audioPacketQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
             NSTimeInterval interval = [SGFFPacketQueue sleepTimeInterval];
             [NSThread sleepForTimeInterval:interval];
@@ -469,6 +405,10 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
     BOOL finished = NO;
     AVPacket packet;
     while (!finished) {
+        if (self.closed) {
+            NSLog(@"解线程退出");
+            break;
+        }
         if (self.endOfFile && self.videoPacketQueue.count == 0) {
             break;
         }
@@ -477,7 +417,10 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
-        [self.videoFrameQueue putFrame:[self getVideoFrameFromPacketQueue]];
+        SGFFVideoFrame * videoFrame = [self getVideoFrameFromPacketQueue];
+        if (videoFrame) {
+            [self.videoFrameQueue putFrame:videoFrame];
+        }
     }
     self.decoding = NO;
 }
@@ -485,6 +428,10 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 - (void)displayThread
 {
     while (1) {
+        if (self.closed) {
+            NSLog(@"显线程退出");
+            break;
+        }
         if (self.endOfFile && self.audioPacketQueue.count == 0 && self.videoPacketQueue.count == 0 && self.videoFrameQueue.count == 0) {
             break;
         }
@@ -514,6 +461,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             break;
         }
         AVPacket packet = [self.videoPacketQueue getPacket];
+        if (packet.stream_index != self.videoStreamIndex) return nil;
         int packet_size = packet.size;
         while (packet_size > 0)
         {
@@ -542,23 +490,8 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 {
     if (!_video_frame->data[0]) return nil;
     
-    SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] init];
+    SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] initWithAVFrame:_video_frame width:_video_codec->width height:_video_codec->height];
     
-    videoFrame.luma = copyFrameData(_video_frame->data[0],
-                                  _video_frame->linesize[0],
-                                  _video_codec->width,
-                                  _video_codec->height);
-    videoFrame.chromaB = copyFrameData(_video_frame->data[1],
-                                     _video_frame->linesize[1],
-                                     _video_codec->width / 2,
-                                     _video_codec->height / 2);
-    videoFrame.chromaR = copyFrameData(_video_frame->data[2],
-                                     _video_frame->linesize[2],
-                                     _video_codec->width / 2,
-                                     _video_codec->height / 2);
-    
-    videoFrame.width = _video_codec->width;
-    videoFrame.height = _video_codec->height;
     videoFrame.position = av_frame_get_best_effort_timestamp(_video_frame) * _video_timebase;
     
     const int64_t frame_duration = av_frame_get_pkt_duration(_video_frame);
@@ -585,6 +518,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             break;
         }
         AVPacket packet = [self.audioPacketQueue getPacket];
+        if (packet.stream_index != self.audioStreamIndex) return nil;
         int packet_size = packet.size;
         while (packet_size > 0)
         {
@@ -628,7 +562,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
         
         Byte * outyput_buffer[2] = {_audio_swr_buffer, 0};
         numberOfFrames = swr_convert(_audio_swr_context, outyput_buffer, _audio_frame->nb_samples * ratio, (const uint8_t **)_audio_frame->data, _audio_frame->nb_samples);
-        NSError * error = checkError(numberOfFrames);
+        NSError * error = sg_ff_check_error(numberOfFrames);
         if (error) {
             NSLog(@"audio codec error : %@", error);
             return nil;
@@ -703,6 +637,10 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
 
 - (void)closeFileAsync:(BOOL)async
 {
+    self.closed = YES;
+    [self.videoPacketQueue destroy];
+    [self.audioPacketQueue destroy];
+    [self.videoFrameQueue destroy];
     if (async) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             [self.ffmpegOperationQueue cancelAllOperations];
@@ -710,6 +648,7 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
             [self closeAudioStream];
             [self closeVideoStream];
             [self closeInputStream];
+            [self closeOperation];
         });
     } else {
         [self.ffmpegOperationQueue cancelAllOperations];
@@ -717,7 +656,17 @@ static NSData * copyFrameData(UInt8 *src, int linesize, int width, int height)
         [self closeAudioStream];
         [self closeVideoStream];
         [self closeInputStream];
+        [self closeOperation];
     }
+}
+
+- (void)closeOperation
+{
+    self.readPacketOperation = nil;
+    self.openFileOperation = nil;
+    self.displayOperation = nil;
+    self.decodeFrameOperation = nil;
+    self.ffmpegOperationQueue = nil;
 }
 
 - (void)closeVideoStream

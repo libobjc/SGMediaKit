@@ -45,9 +45,9 @@
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
     const UInt8 * pixels[3] = {
-        self.videoFrame.luma.bytes,
-        self.videoFrame.chromaB.bytes,
-        self.videoFrame.chromaR.bytes
+        self.videoFrame->luma,
+        self.videoFrame->chromaB,
+        self.videoFrame->chromaR
     };
     const NSUInteger widths[3]  = {
         frameWidth,

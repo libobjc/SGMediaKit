@@ -7,12 +7,25 @@
 //
 
 #import "SGFFFrame.h"
+#import "SGFFTools.h"
 
 @implementation SGFFFrame
 
 @end
 
 @implementation SGFFVideoFrame
+
+- (instancetype)initWithAVFrame:(AVFrame *)frame width:(int)width height:(int)height
+{
+    if (self = [super init]) {
+        _width = width;
+        _height = height;
+        sg_ff_convert_AVFrame_to_YUV(frame->data[0], frame->linesize[0], width, height, &luma, &lumaLenght);
+        sg_ff_convert_AVFrame_to_YUV(frame->data[1], frame->linesize[1], width / 2, height / 2, &chromaB, &chromaBLenght);
+        sg_ff_convert_AVFrame_to_YUV(frame->data[2], frame->linesize[2], width / 2, height / 2, &chromaR, &chromaRLenght);
+    }
+    return self;
+}
 
 - (SGFFFrameType)type
 {
@@ -21,15 +34,13 @@
 
 - (void)dealloc
 {
-    if (self.luma.bytes) {
-        free(self.luma.bytes);
-    }
-    if (self.chromaB.bytes) {
-        free(self.chromaB.bytes);
-    }
-    if (self.chromaR.bytes) {
-        free(self.chromaR.bytes);
-    }
+    free(luma);
+    free(chromaB);
+    free(chromaR);
+    
+    luma = nil;
+    chromaB = nil;
+    chromaR = nil;
 }
 
 @end

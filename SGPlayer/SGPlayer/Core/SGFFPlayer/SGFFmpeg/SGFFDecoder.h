@@ -63,23 +63,28 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, assign, readonly) NSTimeInterval fps;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
 
-@property (nonatomic, assign, readonly) BOOL endOfFile;
-@property (nonatomic, assign, readonly) BOOL reading;
-@property (nonatomic, assign, readonly) BOOL decoding;
-@property (nonatomic, assign, readonly) BOOL prepareToDecode;
+@property (atomic, assign, readonly) BOOL closed;
+@property (atomic, assign, readonly) BOOL endOfFile;
+@property (atomic, assign, readonly) BOOL seeking;
+@property (atomic, assign, readonly) BOOL reading;
+@property (atomic, assign, readonly) BOOL decoding;
+@property (atomic, assign, readonly) BOOL prepareToDecode;
 
-@property (nonatomic, assign, readonly) BOOL videoEnable;
-@property (nonatomic, assign, readonly) BOOL audioEnable;
+@property (atomic, assign, readonly) BOOL videoEnable;
+@property (atomic, assign, readonly) BOOL audioEnable;
 
-@property (nonatomic, assign, readonly) NSInteger videoStreamIndex;
-@property (nonatomic, assign, readonly) NSInteger audioStreamIndex;
+@property (atomic, assign, readonly) NSInteger videoStreamIndex;
+@property (atomic, assign, readonly) NSInteger audioStreamIndex;
 
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * audioStreamIndexs;
 
 - (SGFFAudioFrame *)fetchAudioFrame;
 
+@property (nonatomic, assign) CGFloat volume;
+
 @property (nonatomic, assign, readonly) BOOL seekEnable;
+- (void)seekToTime:(NSTimeInterval)time;
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler;
 
 - (void)closeFile;      // when release of active calls, or when called in dealloc might block the thread

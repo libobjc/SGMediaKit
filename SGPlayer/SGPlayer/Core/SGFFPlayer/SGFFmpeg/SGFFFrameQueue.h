@@ -23,4 +23,7 @@
 - (void)putFrame:(SGFFFrame *)frame;
 - (SGFFFrame *)getFrame;
 
+- (void)flush;
+- (void)destroy;
+
 @end
