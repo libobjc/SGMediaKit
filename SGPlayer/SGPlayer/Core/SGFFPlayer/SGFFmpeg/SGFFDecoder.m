@@ -71,6 +71,9 @@
 @property (nonatomic, copy) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy) NSArray <NSNumber *> * audioStreamIndexs;
 
+@property (nonatomic, assign) NSTimeInterval seekToTime;
+@property (nonatomic, copy) void (^seekCompleteHandler)(BOOL finished);
+
 @end
 
 @implementation SGFFDecoder
@@ -128,26 +131,29 @@
         return;
     }
     
-    self.readPacketOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(readPacketThread) object:nil];
-    self.readPacketOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
-    self.readPacketOperation.qualityOfService = NSQualityOfServiceUserInteractive;
-    [self.readPacketOperation addDependency:self.openFileOperation];
-    
-    [self.ffmpegOperationQueue addOperation:self.readPacketOperation];
+    if (!self.readPacketOperation || self.readPacketOperation.isFinished) {
+        self.readPacketOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(readPacketThread) object:nil];
+        self.readPacketOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+        self.readPacketOperation.qualityOfService = NSQualityOfServiceUserInteractive;
+        [self.readPacketOperation addDependency:self.openFileOperation];
+        [self.ffmpegOperationQueue addOperation:self.readPacketOperation];
+    }
     
     if (self.videoEnable) {
-        self.decodeFrameOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(decodeFrameThread) object:nil];
-        self.decodeFrameOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
-        self.decodeFrameOperation.qualityOfService = NSQualityOfServiceUserInteractive;
-        [self.decodeFrameOperation addDependency:self.openFileOperation];
-        
-        self.displayOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(displayThread) object:nil];
-        self.displayOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
-        self.displayOperation.qualityOfService = NSQualityOfServiceUserInteractive;
-        [self.displayOperation addDependency:self.openFileOperation];
-        
-        [self.ffmpegOperationQueue addOperation:self.decodeFrameOperation];
-        [self.ffmpegOperationQueue addOperation:self.displayOperation];
+        if (!self.decodeFrameOperation || self.decodeFrameOperation.isFinished) {
+            self.decodeFrameOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(decodeFrameThread) object:nil];
+            self.decodeFrameOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+            self.decodeFrameOperation.qualityOfService = NSQualityOfServiceUserInteractive;
+            [self.decodeFrameOperation addDependency:self.openFileOperation];
+            [self.ffmpegOperationQueue addOperation:self.decodeFrameOperation];
+        }
+        if (!self.displayOperation || self.displayOperation.isFinished) {
+            self.displayOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(displayThread) object:nil];
+            self.displayOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+            self.displayOperation.qualityOfService = NSQualityOfServiceUserInteractive;
+            [self.displayOperation addDependency:self.openFileOperation];
+            [self.ffmpegOperationQueue addOperation:self.displayOperation];
+        }
     }
 }
 
@@ -371,9 +377,6 @@
 
 - (void)readPacketThread
 {
-    self.videoPacketQueue = [SGFFPacketQueue packetQueue];
-    self.audioPacketQueue = [SGFFPacketQueue packetQueue];
-    
     self.reading = YES;
     BOOL finished = NO;
     AVPacket packet;
@@ -382,7 +385,31 @@
             NSLog(@"读线程退出");
             break;
         }
+        if (self.seeking) {
+            self.endOfFile = NO;
+            [self.videoPacketQueue flush];
+            [self.audioPacketQueue flush];
+            [self.videoFrameQueue flush];
+            if (self.videoEnable) {
+                int64_t ts = (int64_t)(self.seekToTime / _video_timebase);
+                avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
+                avcodec_flush_buffers(_video_codec);
+            }
+            if (self.audioEnable) {
+                int64_t ts = (int64_t)(self.seekToTime / _audio_timebase);
+                avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
+                avcodec_flush_buffers(_audio_codec);
+            }
+            if (self.seekCompleteHandler) {
+                self.seekCompleteHandler(YES);
+            }
+            self.seekToTime = 0;
+            self.seekCompleteHandler = nil;
+            self.seeking = NO;
+            continue;
+        }
         if (self.audioPacketQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
+            NSLog(@"read sleep");
             NSTimeInterval interval = [SGFFPacketQueue sleepTimeInterval];
             [NSThread sleepForTimeInterval:interval];
             continue;
@@ -398,7 +425,9 @@
             break;
         }
         if (packet.stream_index == self.videoStreamIndex) {
+            NSLog(@"video : put packet");
             [self.videoPacketQueue putPacket:packet];
+            NSLog(@"audio : put packet");
         } else if (packet.stream_index == self.audioStreamIndex) {
             [self.audioPacketQueue putPacket:packet];
         }
@@ -408,8 +437,6 @@
 
 - (void)decodeFrameThread
 {
-    self.videoFrameQueue = [SGFFFrameQueue frameQueue];
-    
     self.decoding = YES;
     BOOL finished = NO;
     AVPacket packet;
@@ -417,6 +444,10 @@
         if (self.closed) {
             NSLog(@"解线程退出");
             break;
+        }
+        if (self.seeking) {
+            [NSThread sleepForTimeInterval:0.01];
+            continue;
         }
         if (self.endOfFile && self.videoPacketQueue.count == 0) {
             break;
@@ -441,6 +472,10 @@
             NSLog(@"显线程退出");
             break;
         }
+        if (self.seeking) {
+            [NSThread sleepForTimeInterval:0.01];
+            continue;
+        }
         if (self.endOfFile && self.audioPacketQueue.count == 0 && self.videoPacketQueue.count == 0 && self.videoFrameQueue.count == 0) {
             break;
         }
@@ -452,6 +487,28 @@
             [NSThread sleepForTimeInterval:0.03];
             continue;
         }
+    }
+}
+
+- (void)seekToTime:(NSTimeInterval)time
+{
+    [self seekToTime:time completeHandler:nil];
+}
+
+- (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler
+{
+    if (!self.seekEnable || self.error) {
+        if (completeHandler) {
+            completeHandler(NO);
+        }
+        return;
+    }
+    self.seekToTime = time;
+    self.seekCompleteHandler = completeHandler;
+    self.seeking = YES;
+    
+    if (self.endOfFile) {
+        [self setupReadPacketOperation];
     }
 }
 
@@ -605,38 +662,6 @@
     return audioFrame;
 }
 
-- (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler
-{
-    if (!self.seekEnable) {
-        if (completeHandler) {
-            completeHandler(NO);
-        }
-        return;
-    }
-    
-    NSBlockOperation * operation = [NSBlockOperation blockOperationWithBlock:^{
-        self.endOfFile = NO;
-        if (self.videoStreamIndex != -1) {
-            int64_t ts = (int64_t)(time / _video_timebase);
-            avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
-            avcodec_flush_buffers(_video_codec);
-        }
-        if (self.audioStreamIndex != -1) {
-            int64_t ts = (int64_t)(time / _audio_timebase);
-            avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
-            avcodec_flush_buffers(_audio_codec);
-        }
-        if (completeHandler) {
-            if (completeHandler) {
-                completeHandler(YES);
-            }
-        }
-    }];
-    operation.queuePriority = NSOperationQueuePriorityVeryHigh;
-    operation.qualityOfService = NSQualityOfServiceUserInteractive;
-    [self.ffmpegOperationQueue addOperation:operation];
-}
-
 #pragma mark - close stream
 
 - (void)closeFile
@@ -749,6 +774,30 @@
     } else {
         return [self.contentURL absoluteString];
     }
+}
+
+- (SGFFFrameQueue *)videoFrameQueue
+{
+    if (!_videoFrameQueue) {
+        _videoFrameQueue = [SGFFFrameQueue frameQueue];
+    }
+    return _videoFrameQueue;
+}
+
+- (SGFFPacketQueue *)videoPacketQueue
+{
+    if (!_videoPacketQueue) {
+        _videoPacketQueue = [SGFFPacketQueue packetQueue];
+    }
+    return _videoPacketQueue;
+}
+
+- (SGFFPacketQueue *)audioPacketQueue
+{
+    if (!_audioPacketQueue) {
+        _audioPacketQueue = [SGFFPacketQueue packetQueue];
+    }
+    return _audioPacketQueue;
 }
 
 #pragma mark - delegate callback

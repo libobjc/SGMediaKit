@@ -75,6 +75,8 @@
         av_packet_unref(&packet);
     }
     [self.packets removeAllObjects];
+    self.size = 0;
+    self.duration = 0;
     [self.condition unlock];
 }
 

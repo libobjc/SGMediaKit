@@ -67,6 +67,7 @@
 {
     [self.condition lock];
     [self.frames removeAllObjects];
+    self.duration = 0;
     [self.condition unlock];
 }
 
