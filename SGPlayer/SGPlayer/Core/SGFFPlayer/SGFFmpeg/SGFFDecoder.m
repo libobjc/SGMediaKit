@@ -446,7 +446,7 @@ static AVPacket flush_packet;
         }
         int result = av_read_frame(self->_format_context, &packet);
         if (result < 0) {
-            NSLog(@"读取完成");
+            NSLog(@"read finished");
             self.endOfFile = YES;
             finished = YES;
             if ([self.delegate respondsToSelector:@selector(decoderDidEndOfFile:)]) {
@@ -490,6 +490,7 @@ static AVPacket flush_packet;
             continue;
         }
         if (self.endOfFile && self.videoPacketQueue.count == 0) {
+            NSLog(@"decode finished");
             break;
         }
         if (self.videoFrameQueue.duration >= [SGFFFrameQueue maxVideoDuration]) {
@@ -524,6 +525,7 @@ static AVPacket flush_packet;
             continue;
         }
         if (self.endOfFile && self.audioPacketQueue.count == 0 && self.videoPacketQueue.count == 0 && self.videoFrameQueue.count == 0) {
+            NSLog(@"display finished");
             break;
         }
         SGFFVideoFrame * videoFrame = [self.videoFrameQueue getFrame];
