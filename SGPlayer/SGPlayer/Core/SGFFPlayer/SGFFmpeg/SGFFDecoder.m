@@ -405,7 +405,6 @@ static AVPacket flush_packet;
             break;
         }
         if (self.seeking) {
-            NSLog(@"seek befor");
             self.endOfFile = NO;
             if (self.videoEnable) {
                 int64_t ts = (int64_t)(self.seekToTime / _video_timebase);
@@ -415,20 +414,17 @@ static AVPacket flush_packet;
                 int64_t ts = (int64_t)(self.seekToTime / _audio_timebase);
                 avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
             }
-            NSLog(@"seek flush befor");
             [self.videoPacketQueue flush];
             [self.audioPacketQueue flush];
             [self.videoFrameQueue flush];
             [self.videoPacketQueue putPacket:flush_packet];
             [self.audioPacketQueue putPacket:flush_packet];
-            NSLog(@"seek flush after");
             if (self.seekCompleteHandler) {
                 self.seekCompleteHandler(YES);
             }
             self.seekToTime = 0;
             self.seekCompleteHandler = nil;
             self.seeking = NO;
-            NSLog(@"seek after");
             continue;
         }
         if (self.audioPacketQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
@@ -568,9 +564,7 @@ static AVPacket flush_packet;
         while (packet_size > 0)
         {
             int gotframe = 0;
-            NSLog(@"video decode befor");
             int lenght = avcodec_decode_video2(_video_codec, _video_frame, &gotframe, &packet);
-            NSLog(@"video decode after");
             if (lenght < 0) {
                 break;
             }
