@@ -246,10 +246,18 @@
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering
 {
     if (buffering) {
-        [self pause];
+//        [self pause];
+        [[KxAudioManager audioManager] pause];
     } else {
-        [self play];
+//        [self play];
+        [[KxAudioManager audioManager] play];
     }
+    NSLog(@"buffering value did change : %d", buffering);
+}
+
+- (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBufferedDuration:(NSTimeInterval)bufferedDuration
+{
+    NSLog(@"buffered duration value did change : %f", bufferedDuration);
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error

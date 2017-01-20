@@ -424,6 +424,7 @@ static AVPacket flush_packet;
                 int64_t ts = (int64_t)(self.seekToTime / self.audioTimebase);
                 avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
             }
+            self.buffering = YES;
             [self.videoPacketQueue flush];
             [self.audioPacketQueue flush];
             [self.videoFrameQueue flush];
@@ -444,7 +445,7 @@ static AVPacket flush_packet;
             } else {
                 interval = [SGFFPacketQueue sleepTimeIntervalForFull];
             }
-            NSLog(@"read thread sleep : %f", interval);
+//            NSLog(@"read thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
@@ -459,11 +460,11 @@ static AVPacket flush_packet;
             break;
         }
         if (packet.stream_index == self.videoStreamIndex) {
-            NSLog(@"video : put packet");
+//            NSLog(@"video : put packet");
             [self.videoPacketQueue putPacket:packet];
             [self delegateVideoBufferedDurationCallback];
-            NSLog(@"audio : put packet");
         } else if (packet.stream_index == self.audioStreamIndex) {
+//            NSLog(@"audio : put packet");
             [self.audioPacketQueue putPacket:packet];
             [self delegateAudioBufferedDurationCallback];
         }
@@ -503,7 +504,7 @@ static AVPacket flush_packet;
             } else {
                 interval = [SGFFFrameQueue sleepTimeIntervalForFull];
             }
-            NSLog(@"decode thread sleep : %f", interval);
+//            NSLog(@"decode thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
@@ -523,7 +524,7 @@ static AVPacket flush_packet;
             NSLog(@"显线程退出");
             break;
         }
-        if (self.seeking || self.paused) {
+        if (self.seeking || self.paused || self.buffering) {
             [NSThread sleepForTimeInterval:0.01];
             continue;
         }
@@ -589,7 +590,6 @@ static AVPacket flush_packet;
             break;
         }
         AVPacket packet = [self.videoPacketQueue getPacket];
-        [self delegateVideoBufferedDurationCallback];
         if (packet.data == flush_packet.data) {
             NSLog(@"video flush");
             if (self.videoEnable) {
@@ -654,7 +654,6 @@ static AVPacket flush_packet;
             break;
         }
         AVPacket packet = [self.audioPacketQueue getPacket];
-        [self delegateAudioBufferedDurationCallback];
         if (packet.data == flush_packet.data) {
             if (self.audioPacketQueue) {
                 avcodec_flush_buffers(_audio_codec);
@@ -879,7 +878,7 @@ static AVPacket flush_packet;
 - (NSTimeInterval)bufferedDuration
 {
     if (self.videoEnable) {
-        return self.videoPacketQueue.duration;
+        return self.videoPacketQueue.duration + self.videoFrameQueue.duration;
     } else if (self.audioEnable) {
         return self.audioPacketQueue.duration;
     } else {
@@ -905,15 +904,15 @@ static AVPacket flush_packet;
 
 - (void)checkBufferingStatus
 {
-//    if (self.buffering) {
-//        if (self.bufferedDuration >= self.minBufferedDruation || self.endOfFile) {
-//            self.buffering = NO;
-//        }
-//    } else {
-//        if (self.bufferedDuration <= 1 && !self.endOfFile) {
-//            self.buffering = YES;
-//        }
-//    }
+    if (self.buffering) {
+        if (self.bufferedDuration >= self.minBufferedDruation || self.endOfFile) {
+            self.buffering = NO;
+        }
+    } else {
+        if (self.bufferedDuration <= 0.2 && !self.endOfFile) {
+            self.buffering = YES;
+        }
+    }
 }
 
 - (void)delegateVideoDecodedDurationCallback
@@ -924,9 +923,9 @@ static AVPacket flush_packet;
 - (void)delegateVideoBufferedDurationCallback
 {
     if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfBufferedDuration:)]) {
-        [self.delegate decoder:self didChangeValueOfBufferedDuration:self.videoPacketQueue.duration];
+        [self.delegate decoder:self didChangeValueOfBufferedDuration:self.videoPacketQueue.duration + self.videoFrameQueue.duration];
     }
-    NSLog(@"video buffered duration : %f", self.videoPacketQueue.duration);
+//    NSLog(@"video buffered duration : %f", self.videoPacketQueue.duration);
 }
 
 - (void)delegateAudioBufferedDurationCallback
@@ -936,7 +935,7 @@ static AVPacket flush_packet;
             [self.delegate decoder:self didChangeValueOfBufferedDuration:self.audioPacketQueue.duration];
         }
     }
-    NSLog(@"audio buffered duration : %f", self.audioPacketQueue.duration);
+//    NSLog(@"audio buffered duration : %f", self.audioPacketQueue.duration);
 }
 
 - (void)delegateErrorCallback
