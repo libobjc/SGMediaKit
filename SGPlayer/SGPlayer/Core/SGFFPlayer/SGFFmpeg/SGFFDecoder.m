@@ -49,6 +49,8 @@ static AVPacket flush_packet;
 @property (nonatomic, strong) SGFFPacketQueue * videoPacketQueue;
 @property (nonatomic, strong) SGFFFrameQueue * videoFrameQueue;
 
+@property (atomic, strong) NSLock * commonLock;
+
 @property (nonatomic, strong) NSError * error;
 
 @property (nonatomic, copy) NSURL * contentURL;
@@ -113,6 +115,8 @@ static AVPacket flush_packet;
 
 - (void)setupOperationQueue
 {
+    self.commonLock = [[NSLock alloc] init];
+    
     self.ffmpegOperationQueue = [[NSOperationQueue alloc] init];
     self.ffmpegOperationQueue.maxConcurrentOperationCount = 3;
     self.ffmpegOperationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
@@ -452,9 +456,11 @@ static AVPacket flush_packet;
         if (packet.stream_index == self.videoStreamIndex) {
             NSLog(@"video : put packet");
             [self.videoPacketQueue putPacket:packet];
+            [self delegateVideoBufferedDurationCallback];
             NSLog(@"audio : put packet");
         } else if (packet.stream_index == self.audioStreamIndex) {
             [self.audioPacketQueue putPacket:packet];
+            [self delegateAudioBufferedDurationCallback];
         }
     }
     self.reading = NO;
@@ -497,6 +503,7 @@ static AVPacket flush_packet;
         SGFFVideoFrame * videoFrame = [self getVideoFrameFromPacketQueue];
         if (videoFrame) {
             [self.videoFrameQueue putFrame:videoFrame];
+            [self delegateVideoDecodedDurationCallback];
         }
     }
     self.decoding = NO;
@@ -815,11 +822,36 @@ static AVPacket flush_packet;
 
 #pragma mark - setter/getter
 
+/*
+- (void)setPaused:(BOOL)paused
+{
+    [self.commonLock lock];
+    if (_paused != paused) {
+        _paused = paused;
+        if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfPaused:)]) {
+            [self.delegate decoder:self didChangeValueOfPaused:_paused];
+        }
+    }
+    [self.commonLock unlock];
+}
+*/
+
 - (NSTimeInterval)duration
 {
     if (!_format_context) return 0;
     if (_format_context->duration == AV_NOPTS_VALUE) return MAXFLOAT;
     return (CGFloat)(_format_context->duration) / AV_TIME_BASE;
+}
+
+- (NSTimeInterval)bufferedDuration
+{
+    if (self.audioEnable) {
+        return self.audioPacketQueue.duration;
+    } else if (self.videoEnable) {
+        return self.videoPacketQueue.duration;
+    } else {
+        return 0;
+    }
 }
 
 - (BOOL)seekEnable
@@ -837,6 +869,27 @@ static AVPacket flush_packet;
 }
 
 #pragma mark - delegate callback
+
+- (void)delegateVideoDecodedDurationCallback
+{
+    
+}
+
+- (void)delegateVideoBufferedDurationCallback
+{
+    if (!self.audioEnable) {
+        if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfBufferedDuration:)]) {
+            [self.delegate decoder:self didChangeValueOfBufferedDuration:self.videoPacketQueue.duration];
+        }
+    }
+}
+
+- (void)delegateAudioBufferedDurationCallback
+{
+    if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfBufferedDuration:)]) {
+        [self.delegate decoder:self didChangeValueOfBufferedDuration:self.audioPacketQueue.duration];
+    }
+}
 
 - (void)delegateErrorCallback
 {

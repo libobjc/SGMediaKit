@@ -19,7 +19,7 @@
 + (NSTimeInterval)sleepTimeIntervalForFullAndPaused;
 
 @property (nonatomic, assign, readonly) int count;
-@property (nonatomic, assign, readonly) NSTimeInterval duration;
+@property (atomic, assign, readonly) NSTimeInterval duration;
 
 - (void)putFrame:(SGFFFrame *)frame;
 - (SGFFFrame *)getFrame;

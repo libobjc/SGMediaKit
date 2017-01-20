@@ -11,7 +11,7 @@
 @interface SGFFPacketQueue ()
 
 @property (nonatomic, assign) int size;
-@property (nonatomic, assign) int duration;
+@property (atomic, assign) NSTimeInterval duration;
 
 @property (nonatomic, strong) NSCondition * condition;
 @property (nonatomic, strong) NSMutableArray <NSValue *> * packets;
@@ -42,7 +42,7 @@
     NSValue * value = [NSValue value:&packet withObjCType:@encode(AVPacket)];
     [self.packets addObject:value];
     self.size += packet.size;
-    self.duration += packet.duration;
+//    self.duration += packet.duration;
     [self.condition signal];
     [self.condition unlock];
 }
@@ -61,7 +61,13 @@
     [self.packets.firstObject getValue:&packet];
     [self.packets removeObjectAtIndex:0];
     self.size -= packet.size;
-    self.duration -= packet.duration;
+    if (self.size < 0) {
+        self.size = 0;
+    }
+//    self.duration -= packet.duration;
+    if (self.duration < 0) {
+        self.duration = 0;
+    }
     [self.condition unlock];
     return packet;
 }

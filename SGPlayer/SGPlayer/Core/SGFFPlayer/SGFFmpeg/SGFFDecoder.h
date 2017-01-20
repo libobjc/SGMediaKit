@@ -33,14 +33,15 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 - (void)decoderDidOpenVideoStream:(SGFFDecoder *)decoder;
 - (void)decoderDidOpenAudioStream:(SGFFDecoder *)decoder;
 
-// decode frames
-- (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder;
+- (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder;     // prepare decode frames
+- (void)decoderDidEndOfFile:(SGFFDecoder *)decoder;     // end of file
+- (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error;       // error callback
 
-// end of file
-- (void)decoderDidEndOfFile:(SGFFDecoder *)decoder;
+- (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBufferedDuration:(NSTimeInterval)bufferedDuration;
 
-// error callback
-- (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error;
+/*
+- (void)decoder:(SGFFDecoder *)decoder didChangeValueOfPaused:(BOOL)paused;
+*/
 
 @end
 
@@ -64,6 +65,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, assign, readonly) CGSize presentationSize;
 @property (nonatomic, assign, readonly) NSTimeInterval fps;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
+@property (nonatomic, assign, readonly) NSTimeInterval bufferedDuration;
 
 @property (atomic, assign, readonly) BOOL closed;
 @property (atomic, assign, readonly) BOOL endOfFile;

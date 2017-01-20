@@ -11,7 +11,7 @@
 @interface SGFFFrameQueue ()
 
 @property (nonatomic, assign) int count;
-@property (nonatomic, assign) NSTimeInterval duration;
+@property (atomic, assign) NSTimeInterval duration;
 
 @property (nonatomic, strong) NSCondition * condition;
 @property (nonatomic, strong) NSMutableArray <SGFFFrame *> * frames;
@@ -59,6 +59,9 @@
     SGFFFrame * frame = self.frames.firstObject;
     [self.frames removeObjectAtIndex:0];
     self.duration -= frame.duration;
+    if (self.duration < 0) {
+        self.duration = 0;
+    }
     [self.condition unlock];
     return frame;
 }

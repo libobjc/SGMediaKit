@@ -20,7 +20,7 @@
 
 @property (nonatomic, assign, readonly) int count;
 @property (nonatomic, assign, readonly) int size;
-@property (nonatomic, assign, readonly) int duration;
+@property (atomic, assign, readonly) NSTimeInterval duration;
 
 - (void)putPacket:(AVPacket)packet;
 - (AVPacket)getPacket;
