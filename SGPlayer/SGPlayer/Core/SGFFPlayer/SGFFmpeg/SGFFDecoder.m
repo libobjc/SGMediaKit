@@ -1,4 +1,4 @@
-//
+    //
 //  SGFFDecoder.m
 //  SGMediaKit
 //
@@ -16,6 +16,8 @@
 #import "swresample.h"
 #import "swscale.h"
 #import <Accelerate/Accelerate.h>
+
+static AVPacket flush_packet;
 
 @interface SGFFDecoder ()
 
@@ -92,6 +94,8 @@
             av_log_set_callback(sg_ff_log);
             av_register_all();
             avformat_network_init();
+            av_init_packet(&flush_packet);
+            flush_packet.data = (uint8_t *)&flush_packet;
         });
         
         self.contentURL = contentURL;
@@ -401,28 +405,30 @@
             break;
         }
         if (self.seeking) {
+            NSLog(@"seek befor");
             self.endOfFile = NO;
-            NSLog(@"seek begin flush");
-            [self.videoPacketQueue flush];
-            [self.audioPacketQueue flush];
-            [self.videoFrameQueue flush];
-            NSLog(@"seek after flush");
             if (self.videoEnable) {
                 int64_t ts = (int64_t)(self.seekToTime / _video_timebase);
                 avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
-                avcodec_flush_buffers(_video_codec);
             }
             if (self.audioEnable) {
                 int64_t ts = (int64_t)(self.seekToTime / _audio_timebase);
                 avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
-                avcodec_flush_buffers(_audio_codec);
             }
+            NSLog(@"seek flush befor");
+            [self.videoPacketQueue flush];
+            [self.audioPacketQueue flush];
+            [self.videoFrameQueue flush];
+            [self.videoPacketQueue putPacket:flush_packet];
+            [self.audioPacketQueue putPacket:flush_packet];
+            NSLog(@"seek flush after");
             if (self.seekCompleteHandler) {
                 self.seekCompleteHandler(YES);
             }
             self.seekToTime = 0;
             self.seekCompleteHandler = nil;
             self.seeking = NO;
+            NSLog(@"seek after");
             continue;
         }
         if (self.audioPacketQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
@@ -550,12 +556,21 @@
             break;
         }
         AVPacket packet = [self.videoPacketQueue getPacket];
+        if (packet.data == flush_packet.data) {
+            NSLog(@"video flush");
+            if (self.videoEnable) {
+                avcodec_flush_buffers(_video_codec);
+            }
+            continue;
+        }
         if (packet.stream_index != self.videoStreamIndex) return nil;
         int packet_size = packet.size;
         while (packet_size > 0)
         {
             int gotframe = 0;
+            NSLog(@"video decode befor");
             int lenght = avcodec_decode_video2(_video_codec, _video_frame, &gotframe, &packet);
+            NSLog(@"video decode after");
             if (lenght < 0) {
                 break;
             }
@@ -607,6 +622,12 @@
             break;
         }
         AVPacket packet = [self.audioPacketQueue getPacket];
+        if (packet.data == flush_packet.data) {
+            if (self.audioPacketQueue) {
+                avcodec_flush_buffers(_audio_codec);
+            }
+            continue;
+        }
         if (packet.stream_index != self.audioStreamIndex) return nil;
         int packet_size = packet.size;
         while (packet_size > 0)
