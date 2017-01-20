@@ -15,7 +15,8 @@
 
 + (int)maxVideoDuration;
 
-+ (NSTimeInterval)sleepTimeInterval;
++ (NSTimeInterval)sleepTimeIntervalForFull;
++ (NSTimeInterval)sleepTimeIntervalForFullAndPaused;
 
 @property (nonatomic, assign, readonly) int count;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;

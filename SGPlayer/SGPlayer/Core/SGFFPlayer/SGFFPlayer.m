@@ -60,6 +60,7 @@
     self.playing = YES;
     [KxAudioManager audioManager].delegate = self;
     [[KxAudioManager audioManager] play];
+    [self.decoder resume];
     
     switch (self.state) {
         case SGPlayerStateNone:
@@ -82,6 +83,7 @@
 {
     self.playing = NO;
     [[KxAudioManager audioManager] pause];
+    [self.decoder pause];
     
     switch (self.state) {
         case SGPlayerStateNone:

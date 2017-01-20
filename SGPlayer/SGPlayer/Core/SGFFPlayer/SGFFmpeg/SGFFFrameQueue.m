@@ -90,9 +90,14 @@
     return 1;
 }
 
-+ (NSTimeInterval)sleepTimeInterval
++ (NSTimeInterval)sleepTimeIntervalForFull
 {
     return [self maxVideoDuration] / 2.0f;
+}
+
++ (NSTimeInterval)sleepTimeIntervalForFullAndPaused
+{
+    return [self maxVideoDuration] / 1.1f;
 }
 
 @end

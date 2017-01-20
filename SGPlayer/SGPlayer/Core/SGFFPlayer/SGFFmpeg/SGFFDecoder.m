@@ -59,6 +59,7 @@ static AVPacket flush_packet;
 
 @property (atomic, assign) BOOL closed;
 @property (atomic, assign) BOOL endOfFile;
+@property (atomic, assign) BOOL paused;
 @property (atomic, assign) BOOL seeking;
 @property (atomic, assign) BOOL reading;
 @property (atomic, assign) BOOL decoding;
@@ -428,8 +429,13 @@ static AVPacket flush_packet;
             continue;
         }
         if (self.audioPacketQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
-            NSLog(@"read sleep");
-            NSTimeInterval interval = [SGFFPacketQueue sleepTimeInterval];
+            NSTimeInterval interval = 0;
+            if (self.paused) {
+                interval = [SGFFPacketQueue sleepTimeIntervalForFullAndPaused];
+            } else {
+                interval = [SGFFPacketQueue sleepTimeIntervalForFull];
+            }
+            NSLog(@"read thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
@@ -478,7 +484,13 @@ static AVPacket flush_packet;
             break;
         }
         if (self.videoFrameQueue.duration >= [SGFFFrameQueue maxVideoDuration]) {
-            NSTimeInterval interval = [SGFFFrameQueue sleepTimeInterval];
+            NSTimeInterval interval = 0;
+            if (self.paused) {
+                interval = [SGFFFrameQueue sleepTimeIntervalForFullAndPaused];
+            } else {
+                interval = [SGFFFrameQueue sleepTimeIntervalForFull];
+            }
+            NSLog(@"decode thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
@@ -497,7 +509,7 @@ static AVPacket flush_packet;
             NSLog(@"显线程退出");
             break;
         }
-        if (self.seeking) {
+        if (self.seeking || self.paused) {
             [NSThread sleepForTimeInterval:0.01];
             continue;
         }
@@ -513,6 +525,16 @@ static AVPacket flush_packet;
             continue;
         }
     }
+}
+
+- (void)pause
+{
+    self.paused = YES;
+}
+
+- (void)resume
+{
+    self.paused = NO;
 }
 
 - (void)seekToTime:(NSTimeInterval)time

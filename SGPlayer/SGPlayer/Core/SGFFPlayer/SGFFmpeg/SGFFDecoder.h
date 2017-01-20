@@ -67,6 +67,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 @property (atomic, assign, readonly) BOOL closed;
 @property (atomic, assign, readonly) BOOL endOfFile;
+@property (atomic, assign, readonly) BOOL paused;
 @property (atomic, assign, readonly) BOOL seeking;
 @property (atomic, assign, readonly) BOOL reading;
 @property (atomic, assign, readonly) BOOL decoding;
@@ -81,6 +82,8 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * audioStreamIndexs;
 
+- (void)pause;
+- (void)resume;
 - (SGFFAudioFrame *)fetchAudioFrame;
 
 @property (nonatomic, assign) CGFloat volume;

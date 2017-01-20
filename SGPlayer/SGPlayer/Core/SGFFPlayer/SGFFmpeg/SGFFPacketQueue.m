@@ -99,9 +99,14 @@
     return 15 * 1024 * 1024;
 }
 
-+ (NSTimeInterval)sleepTimeInterval
++ (NSTimeInterval)sleepTimeIntervalForFull
 {
     return 0.01;
+}
+
++ (NSTimeInterval)sleepTimeIntervalForFullAndPaused
+{
+    return 0.5;
 }
 
 @end
