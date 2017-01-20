@@ -27,6 +27,7 @@
 
 - (void)replaceVideo;
 - (void)reloadVolume;
+- (void)reloadPlayableBufferInterval;
 
 - (void)play;
 - (void)pause;

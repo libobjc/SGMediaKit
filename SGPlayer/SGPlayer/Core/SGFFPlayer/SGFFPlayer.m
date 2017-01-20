@@ -200,6 +200,11 @@
     self.decoder.volume = self.abstractPlayer.volume;
 }
 
+- (void)reloadPlayableBufferInterval
+{
+    self.decoder.minBufferedDruation = self.abstractPlayer.playableBufferInterval;
+}
+
 #pragma mark - replace video
 
 - (void)replaceVideo
@@ -209,6 +214,7 @@
     
     self.decoder = [SGFFDecoder decoderWithContentURL:self.abstractPlayer.contentURL delegate:self output:self.abstractPlayer.displayView];
     [self reloadVolume];
+    [self reloadPlayableBufferInterval];
     
     switch (self.abstractPlayer.videoType) {
         case SGVideoTypeNormal:

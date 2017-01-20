@@ -898,15 +898,15 @@ static AVPacket flush_packet;
 
 - (void)checkBufferingStatus
 {
-    if (self.buffering) {
-        if (self.bufferedDuration >= self.minBufferedDruation || self.endOfFile) {
-            self.buffering = NO;
-        }
-    } else {
-        if (self.bufferedDuration <= 1 && !self.endOfFile) {
-            self.buffering = YES;
-        }
-    }
+//    if (self.buffering) {
+//        if (self.bufferedDuration >= self.minBufferedDruation || self.endOfFile) {
+//            self.buffering = NO;
+//        }
+//    } else {
+//        if (self.bufferedDuration <= 1 && !self.endOfFile) {
+//            self.buffering = YES;
+//        }
+//    }
 }
 
 - (void)delegateVideoDecodedDurationCallback

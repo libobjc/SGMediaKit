@@ -166,6 +166,14 @@
     }
 }
 
+- (void)setPlayableBufferInterval:(NSTimeInterval)playableBufferInterval
+{
+    _playableBufferInterval = playableBufferInterval;
+    if (_ffPlayer) {
+        [self.ffPlayer reloadPlayableBufferInterval];
+    }
+}
+
 - (void)setViewGravityMode:(SGGravityMode)viewGravityMode
 {
     _viewGravityMode = viewGravityMode;
