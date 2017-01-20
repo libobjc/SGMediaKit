@@ -37,6 +37,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder;     // end of file
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error;       // error callback
 
+- (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering;
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBufferedDuration:(NSTimeInterval)bufferedDuration;
 
 /*
@@ -67,9 +68,13 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
 @property (nonatomic, assign, readonly) NSTimeInterval bufferedDuration;
 
+@property (nonatomic, assign) NSTimeInterval minBufferedDruation;
+@property (nonatomic, assign) CGFloat volume;
+
 @property (atomic, assign, readonly) BOOL closed;
 @property (atomic, assign, readonly) BOOL endOfFile;
 @property (atomic, assign, readonly) BOOL paused;
+@property (atomic, assign, readonly) BOOL buffering;
 @property (atomic, assign, readonly) BOOL seeking;
 @property (atomic, assign, readonly) BOOL reading;
 @property (atomic, assign, readonly) BOOL decoding;
@@ -87,8 +92,6 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 - (void)pause;
 - (void)resume;
 - (SGFFAudioFrame *)fetchAudioFrame;
-
-@property (nonatomic, assign) CGFloat volume;
 
 @property (nonatomic, assign, readonly) BOOL seekEnable;
 - (void)seekToTime:(NSTimeInterval)time;

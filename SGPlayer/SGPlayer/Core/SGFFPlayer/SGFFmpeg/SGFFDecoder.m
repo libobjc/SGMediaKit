@@ -62,6 +62,7 @@ static AVPacket flush_packet;
 @property (atomic, assign) BOOL closed;
 @property (atomic, assign) BOOL endOfFile;
 @property (atomic, assign) BOOL paused;
+@property (atomic, assign) BOOL buffering;
 @property (atomic, assign) BOOL seeking;
 @property (atomic, assign) BOOL reading;
 @property (atomic, assign) BOOL decoding;
@@ -462,8 +463,10 @@ static AVPacket flush_packet;
             [self.audioPacketQueue putPacket:packet];
             [self delegateAudioBufferedDurationCallback];
         }
+        [self checkBufferingStatus];
     }
     self.reading = NO;
+    [self checkBufferingStatus];
 }
 
 - (void)decodeFrameThread
@@ -836,6 +839,18 @@ static AVPacket flush_packet;
 }
 */
 
+- (void)setBuffering:(BOOL)buffering
+{
+    [self.commonLock lock];
+    if (_buffering != buffering) {
+        _buffering = buffering;
+        if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfBuffering:)]) {
+            [self.delegate decoder:self didChangeValueOfBuffering:_buffering];
+        }
+    }
+    [self.commonLock unlock];
+}
+
 - (NSTimeInterval)duration
 {
     if (!_format_context) return 0;
@@ -869,6 +884,19 @@ static AVPacket flush_packet;
 }
 
 #pragma mark - delegate callback
+
+- (void)checkBufferingStatus
+{
+    if (self.buffering) {
+        if (self.bufferedDuration >= self.minBufferedDruation || self.endOfFile) {
+            self.buffering = NO;
+        }
+    } else {
+        if (self.bufferedDuration <= 1 && !self.endOfFile) {
+            self.buffering = YES;
+        }
+    }
+}
 
 - (void)delegateVideoDecodedDurationCallback
 {

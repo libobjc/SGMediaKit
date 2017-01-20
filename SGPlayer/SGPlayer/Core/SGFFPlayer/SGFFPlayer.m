@@ -237,6 +237,15 @@
 
 }
 
+- (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering
+{
+    if (buffering) {
+        [self pause];
+    } else {
+        [self play];
+    }
+}
+
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error
 {
     [self errorHandler:error];
