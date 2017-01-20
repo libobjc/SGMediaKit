@@ -41,6 +41,10 @@
 - (void)putPacket:(AVPacket)packet
 {
     [self.condition lock];
+    if (self.destoryToken) {
+        [self.condition unlock];
+        return;
+    }
     NSValue * value = [NSValue value:&packet withObjCType:@encode(AVPacket)];
     [self.packets addObject:value];
     self.size += packet.size;

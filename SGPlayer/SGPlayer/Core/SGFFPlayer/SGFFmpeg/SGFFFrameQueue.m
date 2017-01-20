@@ -40,6 +40,10 @@
 {
     if (!frame) return;
     [self.condition lock];
+    if (self.destoryToken) {
+        [self.condition unlock];
+        return;
+    }
     [self.frames addObject:frame];
     self.duration += frame.duration;
     [self.condition signal];

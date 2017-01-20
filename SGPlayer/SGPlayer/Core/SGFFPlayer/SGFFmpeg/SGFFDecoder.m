@@ -586,10 +586,15 @@ static AVPacket flush_packet;
 {
     SGFFVideoFrame * videoFrame;
     while (!videoFrame) {
-        if (self.endOfFile && self.videoPacketQueue.count == 0) {
-            break;
+        if (self.closed) {
+            return nil;
         }
+        if (self.endOfFile && self.videoPacketQueue.count == 0) {
+            return nil;
+        }
+//        NSLog(@"video get packet befor");
         AVPacket packet = [self.videoPacketQueue getPacket];
+//        NSLog(@"video get packet after");
         if (packet.data == flush_packet.data) {
             NSLog(@"video flush");
             if (self.videoEnable) {
@@ -602,7 +607,9 @@ static AVPacket flush_packet;
         while (packet_size > 0)
         {
             int gotframe = 0;
+//            NSLog(@"video decode befor");
             int lenght = avcodec_decode_video2(_video_codec, _video_frame, &gotframe, &packet);
+//            NSLog(@"video decode after");
             if (lenght < 0) {
                 break;
             }
@@ -650,8 +657,11 @@ static AVPacket flush_packet;
 {
     SGFFAudioFrame * audioFrame;
     while (!audioFrame) {
+        if (self.closed) {
+            return nil;
+        }
         if (self.endOfFile && self.audioPacketQueue.count == 0) {
-            break;
+            return nil;
         }
         AVPacket packet = [self.audioPacketQueue getPacket];
         if (packet.data == flush_packet.data) {
@@ -925,7 +935,6 @@ static AVPacket flush_packet;
     if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfBufferedDuration:)]) {
         [self.delegate decoder:self didChangeValueOfBufferedDuration:self.videoPacketQueue.duration + self.videoFrameQueue.duration];
     }
-//    NSLog(@"video buffered duration : %f", self.videoPacketQueue.duration);
 }
 
 - (void)delegateAudioBufferedDurationCallback
@@ -935,7 +944,6 @@ static AVPacket flush_packet;
             [self.delegate decoder:self didChangeValueOfBufferedDuration:self.audioPacketQueue.duration];
         }
     }
-//    NSLog(@"audio buffered duration : %f", self.audioPacketQueue.duration);
 }
 
 - (void)delegateErrorCallback
