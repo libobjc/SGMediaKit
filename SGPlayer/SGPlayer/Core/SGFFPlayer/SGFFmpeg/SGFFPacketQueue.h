@@ -11,16 +11,17 @@
 
 @interface SGFFPacketQueue : NSObject
 
-+ (instancetype)packetQueue;
++ (instancetype)packetQueueWithTimebase:(NSTimeInterval)timebase;
 
 + (int)maxCommonSize;
 
 + (NSTimeInterval)sleepTimeIntervalForFull;
 + (NSTimeInterval)sleepTimeIntervalForFullAndPaused;
 
-@property (nonatomic, assign, readonly) int count;
+@property (nonatomic, assign, readonly) NSUInteger count;
 @property (nonatomic, assign, readonly) int size;
 @property (atomic, assign, readonly) NSTimeInterval duration;
+@property (nonatomic, assign, readonly) NSTimeInterval timebase;
 
 - (void)putPacket:(AVPacket)packet;
 - (AVPacket)getPacket;

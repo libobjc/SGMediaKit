@@ -12,6 +12,7 @@
 
 @property (nonatomic, assign) int size;
 @property (atomic, assign) NSTimeInterval duration;
+@property (nonatomic, assign) NSTimeInterval timebase;
 
 @property (nonatomic, strong) NSCondition * condition;
 @property (nonatomic, strong) NSMutableArray <NSValue *> * packets;
@@ -22,14 +23,15 @@
 
 @implementation SGFFPacketQueue
 
-+ (instancetype)packetQueue
++ (instancetype)packetQueueWithTimebase:(NSTimeInterval)timebase
 {
-    return [[self alloc] init];
+    return [[self alloc] initWithTimebase:timebase];
 }
 
-- (instancetype)init
+- (instancetype)initWithTimebase:(NSTimeInterval)timebase
 {
     if (self = [super init]) {
+        self.timebase = timebase;
         self.packets = [NSMutableArray array];
         self.condition = [[NSCondition alloc] init];
     }
@@ -42,7 +44,7 @@
     NSValue * value = [NSValue value:&packet withObjCType:@encode(AVPacket)];
     [self.packets addObject:value];
     self.size += packet.size;
-//    self.duration += packet.duration;
+    self.duration += packet.duration * self.timebase;
     [self.condition signal];
     [self.condition unlock];
 }
@@ -64,7 +66,7 @@
     if (self.size < 0) {
         self.size = 0;
     }
-//    self.duration -= packet.duration;
+    self.duration -= packet.duration * self.timebase;
     if (self.duration < 0) {
         self.duration = 0;
     }
@@ -95,7 +97,7 @@
     [self.condition unlock];
 }
 
-- (int)count
+- (NSUInteger)count
 {
     return self.packets.count;
 }
@@ -107,7 +109,7 @@
 
 + (NSTimeInterval)sleepTimeIntervalForFull
 {
-    return 0.01;
+    return 0.1;
 }
 
 + (NSTimeInterval)sleepTimeIntervalForFullAndPaused
