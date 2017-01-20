@@ -10,11 +10,11 @@
 
 @interface SGFFFrameQueue ()
 
-@property (nonatomic, assign) int count;
+@property (nonatomic, assign) NSUInteger count;
 @property (atomic, assign) NSTimeInterval duration;
 
 @property (nonatomic, strong) NSCondition * condition;
-@property (nonatomic, strong) NSMutableArray <SGFFFrame *> * frames;
+@property (nonatomic, strong) NSMutableArray <__kindof SGFFFrame *> * frames;
 
 @property (nonatomic, assign) BOOL destoryToken;
 
@@ -36,7 +36,7 @@
     return self;
 }
 
-- (void)putFrame:(SGFFFrame *)frame
+- (void)putFrame:(__kindof SGFFFrame *)frame
 {
     if (!frame) return;
     [self.condition lock];
@@ -46,7 +46,7 @@
     [self.condition unlock];
 }
 
-- (SGFFFrame *)getFrame
+- (__kindof SGFFFrame *)getFrame
 {
     [self.condition lock];
     while (!self.frames.firstObject) {
@@ -83,7 +83,7 @@
     [self.condition unlock];
 }
 
-- (int)count
+- (NSUInteger)count
 {
     return self.frames.count;
 }

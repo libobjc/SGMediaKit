@@ -46,35 +46,28 @@ void sg_ff_convert_AVFrame_to_YUV(UInt8 * src, int linesize, int width, int heig
     }
 }
 
-void sg_ff_get_AVStream_fps_timebase(AVStream * stream, NSTimeInterval defaultTimebase, NSTimeInterval * pFPS, NSTimeInterval * pTimebase)
+double sg_ff_get_fps(AVStream * stream, double timebase)
 {
-    NSTimeInterval fps, timebase;
-    
-    if (stream->time_base.den && stream->time_base.num) {
-        timebase = av_q2d(stream->time_base);
-    } else if (stream->codec->time_base.den && stream->codec->time_base.num) {
-        timebase = av_q2d(stream->codec->time_base);
-    } else {
-        timebase = defaultTimebase;
-    }
-    
-    if (stream->codec->ticks_per_frame != 1) {
-        
-    }
-    
-    if (stream->avg_frame_rate.den && stream->avg_frame_rate.num) {
+    double fps;
+    if (stream->avg_frame_rate.den > 0 && stream->avg_frame_rate.num > 0) {
         fps = av_q2d(stream->avg_frame_rate);
-    } else if (stream->r_frame_rate.den && stream->r_frame_rate.num) {
+    } else if (stream->r_frame_rate.den > 0 && stream->r_frame_rate.num > 0) {
         fps = av_q2d(stream->r_frame_rate);
     } else {
         fps = 1.0 / timebase;
     }
-    
-    if (pFPS) {
-        * pFPS = fps;
+    return fps;
+}
+
+double sg_ff_get_timebase(AVStream * stream, double default_timebase)
+{
+    double timebase;
+    if (stream->time_base.den > 0 && stream->time_base.num > 0) {
+        timebase = av_q2d(stream->time_base);
+    } else if (stream->codec->time_base.den > 0 && stream->codec->time_base.num > 0) {
+        timebase = av_q2d(stream->codec->time_base);
+    } else {
+        timebase = default_timebase;
     }
-    
-    if (pTimebase) {
-        * pTimebase = timebase;
-    }
+    return timebase;
 }

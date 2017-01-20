@@ -71,10 +71,11 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, assign) NSTimeInterval minBufferedDruation;
 @property (nonatomic, assign) CGFloat volume;
 
+@property (nonatomic, assign, readonly) BOOL buffering;
+
 @property (atomic, assign, readonly) BOOL closed;
 @property (atomic, assign, readonly) BOOL endOfFile;
 @property (atomic, assign, readonly) BOOL paused;
-@property (atomic, assign, readonly) BOOL buffering;
 @property (atomic, assign, readonly) BOOL seeking;
 @property (atomic, assign, readonly) BOOL reading;
 @property (atomic, assign, readonly) BOOL decoding;
@@ -83,8 +84,8 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (atomic, assign, readonly) BOOL videoEnable;
 @property (atomic, assign, readonly) BOOL audioEnable;
 
-@property (atomic, assign, readonly) NSInteger videoStreamIndex;
-@property (atomic, assign, readonly) NSInteger audioStreamIndex;
+@property (atomic, assign, readonly) int videoStreamIndex;
+@property (atomic, assign, readonly) int audioStreamIndex;
 
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * audioStreamIndexs;

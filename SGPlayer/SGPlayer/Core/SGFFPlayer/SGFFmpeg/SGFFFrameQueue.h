@@ -18,11 +18,11 @@
 + (NSTimeInterval)sleepTimeIntervalForFull;
 + (NSTimeInterval)sleepTimeIntervalForFullAndPaused;
 
-@property (nonatomic, assign, readonly) int count;
+@property (nonatomic, assign, readonly) NSUInteger count;
 @property (atomic, assign, readonly) NSTimeInterval duration;
 
-- (void)putFrame:(SGFFFrame *)frame;
-- (SGFFFrame *)getFrame;
+- (void)putFrame:(__kindof SGFFFrame *)frame;
+- (__kindof SGFFFrame *)getFrame;
 
 - (void)flush;
 - (void)destroy;

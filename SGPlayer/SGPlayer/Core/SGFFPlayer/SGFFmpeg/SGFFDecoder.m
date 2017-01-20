@@ -27,8 +27,6 @@ static AVPacket flush_packet;
     AVCodecContext * _audio_codec;
     AVFrame * _video_frame;
     AVFrame * _audio_frame;
-    NSTimeInterval _video_timebase;
-    NSTimeInterval _audio_timebase;
     
     struct SwsContext * _video_sws_context;
     SwrContext * _audio_swr_context;
@@ -59,10 +57,11 @@ static AVPacket flush_packet;
 @property (nonatomic, assign) CGSize presentationSize;
 @property (nonatomic, assign) NSTimeInterval fps;
 
+@property (nonatomic, assign) BOOL buffering;
+
 @property (atomic, assign) BOOL closed;
 @property (atomic, assign) BOOL endOfFile;
 @property (atomic, assign) BOOL paused;
-@property (atomic, assign) BOOL buffering;
 @property (atomic, assign) BOOL seeking;
 @property (atomic, assign) BOOL reading;
 @property (atomic, assign) BOOL decoding;
@@ -71,8 +70,11 @@ static AVPacket flush_packet;
 @property (atomic, assign) BOOL videoEnable;
 @property (atomic, assign) BOOL audioEnable;
 
-@property (atomic, assign) NSInteger videoStreamIndex;
-@property (atomic, assign) NSInteger audioStreamIndex;
+@property (atomic, assign) int videoStreamIndex;
+@property (atomic, assign) int audioStreamIndex;
+
+@property (atomic, assign) NSTimeInterval videoTimebase;
+@property (atomic, assign) NSTimeInterval audioTimebase;
 
 @property (nonatomic, copy) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy) NSArray <NSNumber *> * audioStreamIndexs;
@@ -240,7 +242,7 @@ static AVPacket flush_packet;
     error = sg_ff_check_error_code(reslut, SGFFDecoderErrorCodeFormatFindStreamInfo);
     if (error || !_format_context) {
         if (_format_context) {
-            avformat_close_input(_format_context);
+            avformat_close_input(&_format_context);
         }
         return error;
     }
@@ -256,14 +258,15 @@ static AVPacket flush_packet;
     
     if (self.videoStreamIndexs.count > 0) {
         for (NSNumber * number in self.videoStreamIndexs) {
-            NSInteger index = number.integerValue;
+            int index = number.intValue;
             if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0) {
                 error = [self openVideoStream:index];
                 if (!error) {
                     self.videoStreamIndex = index;
                     _video_frame = av_frame_alloc();
                     self.videoEnable = YES;
-                    sg_ff_get_AVStream_fps_timebase(_format_context->streams[self.videoStreamIndex], 0.04, &_fps, &_video_timebase);
+                    self.videoTimebase = sg_ff_get_timebase(_format_context->streams[self.videoStreamIndex], 0.04);
+                    self.fps = sg_ff_get_fps(_format_context->streams[self.videoStreamIndex], self.videoTimebase);
                     break;
                 }
             }
@@ -306,13 +309,13 @@ static AVPacket flush_packet;
     
     if (self.audioStreamIndexs.count > 0) {
         for (NSNumber * number in self.audioStreamIndexs) {
-            NSInteger index = number.integerValue;
+            int index = number.intValue;
             error = [self openAudioStream:index];
             if (!error) {
                 self.audioStreamIndex = index;
                 _audio_frame = av_frame_alloc();
                 self.audioEnable = YES;
-                sg_ff_get_AVStream_fps_timebase(_format_context->streams[self.audioStreamIndex], 0.025, 0, &_audio_timebase);
+                self.audioTimebase = sg_ff_get_timebase(_format_context->streams[self.audioStreamIndex], 0.025);
                 break;
             }
         }
@@ -413,11 +416,11 @@ static AVPacket flush_packet;
         if (self.seeking) {
             self.endOfFile = NO;
             if (self.videoEnable) {
-                int64_t ts = (int64_t)(self.seekToTime / _video_timebase);
+                int64_t ts = (int64_t)(self.seekToTime / self.videoTimebase);
                 avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
             }
             if (self.audioEnable) {
-                int64_t ts = (int64_t)(self.seekToTime / _audio_timebase);
+                int64_t ts = (int64_t)(self.seekToTime / self.audioTimebase);
                 avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
             }
             [self.videoPacketQueue flush];
@@ -479,7 +482,6 @@ static AVPacket flush_packet;
     
     self.decoding = YES;
     BOOL finished = NO;
-    AVPacket packet;
     while (!finished) {
         if (self.closed) {
             NSLog(@"解线程退出");
@@ -624,12 +626,12 @@ static AVPacket flush_packet;
     
     SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] initWithAVFrame:_video_frame width:_video_codec->width height:_video_codec->height];
     
-    videoFrame.position = av_frame_get_best_effort_timestamp(_video_frame) * _video_timebase;
+    videoFrame.position = av_frame_get_best_effort_timestamp(_video_frame) * self.videoTimebase;
     
     const int64_t frame_duration = av_frame_get_pkt_duration(_video_frame);
     if (frame_duration) {
-        videoFrame.duration = frame_duration * _video_timebase;
-        videoFrame.duration += _video_frame->repeat_pict * _video_timebase * 0.5;
+        videoFrame.duration = frame_duration * self.videoTimebase;
+        videoFrame.duration += _video_frame->repeat_pict * self.videoTimebase * 0.5;
     } else {
         videoFrame.duration = 1.0 / self.fps;
     }
@@ -686,11 +688,11 @@ static AVPacket flush_packet;
     if (!_audio_frame->data[0]) return nil;
     
     SGAudioManager * audioManager = [SGAudioManager manager];
-    NSInteger numberOfFrames;
+    int numberOfFrames;
     void * audioDataBuffer;
     
     if (_audio_swr_context) {
-        const NSUInteger ratio = MAX(1, audioManager.samplingRate / _audio_codec->sample_rate) * MAX(1, audioManager.numOutputChannels / _audio_codec->channels) * 2;
+        const int ratio = MAX(1, audioManager.samplingRate / _audio_codec->sample_rate) * MAX(1, audioManager.numOutputChannels / _audio_codec->channels) * 2;
         const int buffer_size = av_samples_get_buffer_size(NULL, audioManager.numOutputChannels, _audio_frame->nb_samples * ratio, AV_SAMPLE_FMT_S16, 1);
         
         if (!_audio_swr_buffer || _audio_swr_buffer_size < buffer_size) {
@@ -723,8 +725,8 @@ static AVPacket flush_packet;
     vDSP_vsmul(data.mutableBytes, 1, &scale, data.mutableBytes, 1, numberOfElements);
     
     SGFFAudioFrame * audioFrame = [[SGFFAudioFrame alloc] init];
-    audioFrame.position = av_frame_get_best_effort_timestamp(_audio_frame) * _audio_timebase;
-    audioFrame.duration = av_frame_get_pkt_duration(_audio_frame) * _audio_timebase;
+    audioFrame.position = av_frame_get_best_effort_timestamp(_audio_frame) * self.audioTimebase;
+    audioFrame.duration = av_frame_get_pkt_duration(_audio_frame) * self.audioTimebase;
     audioFrame.samples = data;
     
     if (audioFrame.duration == 0) {
