@@ -749,6 +749,7 @@ static AVPacket flush_packet;
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             [self.ffmpegOperationQueue cancelAllOperations];
             [self.ffmpegOperationQueue waitUntilAllOperationsAreFinished];
+            [self closePropertyValue];
             [self closeAudioStream];
             [self closeVideoStream];
             [self closeInputStream];
@@ -757,6 +758,7 @@ static AVPacket flush_packet;
     } else {
         [self.ffmpegOperationQueue cancelAllOperations];
         [self.ffmpegOperationQueue waitUntilAllOperationsAreFinished];
+        [self closePropertyValue];
         [self closeAudioStream];
         [self closeVideoStream];
         [self closeInputStream];
@@ -771,6 +773,15 @@ static AVPacket flush_packet;
     self.displayOperation = nil;
     self.decodeFrameOperation = nil;
     self.ffmpegOperationQueue = nil;
+}
+
+- (void)closePropertyValue
+{
+    self.seeking = NO;
+    self.buffering = NO;
+    self.paused = NO;
+    self.prepareToDecode = NO;
+    self.endOfFile = NO;
 }
 
 - (void)closeVideoStream
