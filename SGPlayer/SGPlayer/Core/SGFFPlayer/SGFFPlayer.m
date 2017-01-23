@@ -59,13 +59,13 @@
     [self.decoder resume];
     
     switch (self.state) {
+        case SGPlayerStateFinished:
+            [self seekToTime:0];
+            break;
         case SGPlayerStateNone:
         case SGPlayerStateFailed:
-        case SGPlayerStateFinished:
         case SGPlayerStateBuffering:
-        {
             self.state = SGPlayerStateBuffering;
-        }
             break;
         case SGPlayerStateReadyToPlay:
         case SGPlayerStatePlaying:
