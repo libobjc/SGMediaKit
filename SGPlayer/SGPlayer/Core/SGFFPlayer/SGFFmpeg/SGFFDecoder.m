@@ -573,6 +573,9 @@ static AVPacket flush_packet;
 - (void)resume
 {
     self.paused = NO;
+    if (self.playbackFinished) {
+        [self seekToTime:0];
+    }
 }
 
 - (void)seekToTime:(NSTimeInterval)time
@@ -588,8 +591,8 @@ static AVPacket flush_packet;
         }
         return;
     }
-    self.progress = time;
-    self.seekToTime = time;
+    self.progress = self.duration - time > (self.minBufferedDruation + 1) ? time : self.duration - (self.minBufferedDruation + 1);
+    self.seekToTime = self.progress;
     self.seekCompleteHandler = completeHandler;
     self.seeking = YES;
     
@@ -989,7 +992,6 @@ static AVPacket flush_packet;
 {
     if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfBufferedDuration:)]) {
         self.bufferedDuration = self.videoPacketQueue.duration + self.videoFrameQueue.duration;
-        NSLog(@"buffer duration : %f, %f, %f", self.bufferedDuration, self.videoPacketQueue.duration, self.videoFrameQueue.duration);
     }
 }
 
