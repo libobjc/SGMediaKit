@@ -35,6 +35,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder;     // prepare decode frames
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder;     // end of file
+- (void)decoderDidPlaybackFinished:(SGFFDecoder *)decoder;
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error;       // error callback
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering;
@@ -75,6 +76,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 @property (nonatomic, assign, readonly) BOOL buffering;
 
+@property (atomic, assign, readonly) BOOL playbackFinished;
 @property (atomic, assign, readonly) BOOL closed;
 @property (atomic, assign, readonly) BOOL endOfFile;
 @property (atomic, assign, readonly) BOOL paused;

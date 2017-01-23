@@ -162,11 +162,6 @@
                     [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
                 }
             }
-        } else {
-            if (_bufferDuration <= 0.000001) {
-                self.progress = self.duration;
-                self.state = SGPlayerStateFinished;
-            }
         }
     }
 }
@@ -238,6 +233,11 @@
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder
 {
     [SGNotification postPlayer:self.abstractPlayer playablePercent:@(self.playableTime/self.duration) current:@(self.playableTime) total:@(self.duration)];
+}
+
+- (void)decoderDidPlaybackFinished:(SGFFDecoder *)decoder
+{
+    self.state = SGPlayerStateFinished;
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering
