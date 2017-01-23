@@ -39,6 +39,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering;
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBufferedDuration:(NSTimeInterval)bufferedDuration;
+- (void)decoder:(SGFFDecoder *)decoder didChangeValueOfProgress:(NSTimeInterval)progress;
 
 /*
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfPaused:(BOOL)paused;
@@ -65,6 +66,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, copy, readonly) NSDictionary * metadata;
 @property (nonatomic, assign, readonly) CGSize presentationSize;
 @property (nonatomic, assign, readonly) NSTimeInterval fps;
+@property (nonatomic, assign, readonly) NSTimeInterval progress;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
 @property (nonatomic, assign, readonly) NSTimeInterval bufferedDuration;
 

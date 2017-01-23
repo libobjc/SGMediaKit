@@ -128,7 +128,7 @@
     if (_progress != progress) {
         _progress = progress;
         NSTimeInterval duration = self.duration;
-        if (_progress == 0 || _progress == duration) {
+        if (_progress <= 0.000001 || _progress == duration) {
             [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
         } else {
             NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
@@ -164,6 +164,7 @@
             }
         } else {
             if (_bufferDuration <= 0.000001) {
+                self.progress = self.duration;
                 self.state = SGPlayerStateFinished;
             }
         }
@@ -258,7 +259,11 @@
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBufferedDuration:(NSTimeInterval)bufferedDuration
 {
     self.bufferDuration = bufferedDuration;
-    NSLog(@"缓冲时长 : %f", self.bufferDuration);
+}
+
+- (void)decoder:(SGFFDecoder *)decoder didChangeValueOfProgress:(NSTimeInterval)progress
+{
+    self.progress = progress;
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error

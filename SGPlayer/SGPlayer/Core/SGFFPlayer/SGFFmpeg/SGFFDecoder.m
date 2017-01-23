@@ -47,8 +47,6 @@ static AVPacket flush_packet;
 @property (nonatomic, strong) SGFFPacketQueue * videoPacketQueue;
 @property (nonatomic, strong) SGFFFrameQueue * videoFrameQueue;
 
-@property (atomic, strong) NSLock * commonLock;
-
 @property (nonatomic, strong) NSError * error;
 
 @property (nonatomic, copy) NSURL * contentURL;
@@ -56,6 +54,7 @@ static AVPacket flush_packet;
 @property (nonatomic, copy) NSDictionary * metadata;
 @property (nonatomic, assign) CGSize presentationSize;
 @property (nonatomic, assign) NSTimeInterval fps;
+@property (atomic, assign) NSTimeInterval progress;
 
 @property (nonatomic, assign) BOOL buffering;
 
@@ -83,6 +82,7 @@ static AVPacket flush_packet;
 @property (nonatomic, copy) void (^seekCompleteHandler)(BOOL finished);
 
 @property (nonatomic, strong) SGFFVideoFrame * currentVideoFrame;
+@property (nonatomic, strong) SGFFAudioFrame * currentAudioFrame;
 
 @end
 
@@ -121,8 +121,6 @@ static AVPacket flush_packet;
 
 - (void)setupOperationQueue
 {
-    self.commonLock = [[NSLock alloc] init];
-    
     self.ffmpegOperationQueue = [[NSOperationQueue alloc] init];
     self.ffmpegOperationQueue.maxConcurrentOperationCount = 3;
     self.ffmpegOperationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
@@ -439,6 +437,7 @@ static AVPacket flush_packet;
             self.seekCompleteHandler = nil;
             self.seeking = NO;
             self.currentVideoFrame = nil;
+            self.currentAudioFrame = nil;
             [self delegateAudioBufferedDurationCallback];
             [self delegateVideoBufferedDurationCallback];
             continue;
@@ -549,6 +548,7 @@ static AVPacket flush_packet;
             if ([self.output respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
                 [self.output decoder:self renderVideoFrame:self.currentVideoFrame];
             }
+            [self updateProgress];
             [NSThread sleepForTimeInterval:0.03];
             continue;
         }
@@ -578,6 +578,7 @@ static AVPacket flush_packet;
         }
         return;
     }
+    self.progress = time;
     self.seekToTime = time;
     self.seekCompleteHandler = completeHandler;
     self.seeking = YES;
@@ -665,7 +666,8 @@ static AVPacket flush_packet;
 
 - (SGFFAudioFrame *)fetchAudioFrame
 {
-    return [self getAudioFrameFromPacketQueue];
+    self.currentAudioFrame = [self getAudioFrameFromPacketQueue];
+    return self.currentAudioFrame;
 }
 
 - (SGFFAudioFrame *)getAudioFrameFromPacketQueue
@@ -700,6 +702,7 @@ static AVPacket flush_packet;
             if (gotframe) {
                 audioFrame = [self getAudioFrameFromAVFrame];
                 if (audioFrame) {
+                    [self updateProgress];
                     break;
                 }
             }
@@ -817,6 +820,7 @@ static AVPacket flush_packet;
     self.prepareToDecode = NO;
     self.endOfFile = NO;
     self.currentVideoFrame = nil;
+    self.currentAudioFrame = nil;
 }
 
 - (void)closeVideoStream
@@ -885,16 +889,24 @@ static AVPacket flush_packet;
 }
 */
 
+- (void)setProgress:(NSTimeInterval)progress
+{
+    if (_progress != progress) {
+        _progress = progress;
+        if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfProgress:)]) {
+            [self.delegate decoder:self didChangeValueOfProgress:_progress];
+        }
+    }
+}
+
 - (void)setBuffering:(BOOL)buffering
 {
-    [self.commonLock lock];
     if (_buffering != buffering) {
         _buffering = buffering;
         if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfBuffering:)]) {
             [self.delegate decoder:self didChangeValueOfBuffering:_buffering];
         }
     }
-    [self.commonLock unlock];
 }
 
 - (NSTimeInterval)duration
@@ -941,6 +953,17 @@ static AVPacket flush_packet;
         if (self.bufferedDuration <= 0.2 && !self.endOfFile) {
             self.buffering = YES;
         }
+    }
+}
+
+- (void)updateProgress;
+{
+    if (self.videoEnable) {
+        self.progress = self.currentVideoFrame.position;
+    } else if (self.audioEnable) {
+        self.progress = self.currentAudioFrame.position;
+    } else {
+        self.progress = 0;
     }
 }
 
