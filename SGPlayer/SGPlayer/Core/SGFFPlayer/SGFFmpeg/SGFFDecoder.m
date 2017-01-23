@@ -82,6 +82,8 @@ static AVPacket flush_packet;
 @property (nonatomic, assign) NSTimeInterval seekToTime;
 @property (nonatomic, copy) void (^seekCompleteHandler)(BOOL finished);
 
+@property (nonatomic, strong) SGFFVideoFrame * currentVideoFrame;
+
 @end
 
 @implementation SGFFDecoder
@@ -436,6 +438,9 @@ static AVPacket flush_packet;
             self.seekToTime = 0;
             self.seekCompleteHandler = nil;
             self.seeking = NO;
+            self.currentVideoFrame = nil;
+            [self delegateAudioBufferedDurationCallback];
+            [self delegateVideoBufferedDurationCallback];
             continue;
         }
         if (self.audioPacketQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
@@ -524,18 +529,25 @@ static AVPacket flush_packet;
             NSLog(@"显线程退出");
             break;
         }
-        if (self.seeking || self.paused || self.buffering) {
+        if (self.seeking || self.buffering) {
             [NSThread sleepForTimeInterval:0.01];
+            continue;
+        }
+        if (self.paused && self.currentVideoFrame) {
+            if ([self.output respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
+                [self.output decoder:self renderVideoFrame:self.currentVideoFrame];
+            }
+            [NSThread sleepForTimeInterval:0.03];
             continue;
         }
         if (self.endOfFile && self.audioPacketQueue.count == 0 && self.videoPacketQueue.count == 0 && self.videoFrameQueue.count == 0) {
             NSLog(@"display finished");
             break;
         }
-        SGFFVideoFrame * videoFrame = [self.videoFrameQueue getFrame];
-        if (videoFrame) {
+        self.currentVideoFrame = [self.videoFrameQueue getFrame];
+        if (self.currentVideoFrame) {
             if ([self.output respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
-                [self.output decoder:self renderVideoFrame:videoFrame];
+                [self.output decoder:self renderVideoFrame:self.currentVideoFrame];
             }
             [NSThread sleepForTimeInterval:0.03];
             continue;
@@ -594,6 +606,9 @@ static AVPacket flush_packet;
         }
 //        NSLog(@"video get packet befor");
         AVPacket packet = [self.videoPacketQueue getPacket];
+        if (self.endOfFile) {
+            [self delegateVideoBufferedDurationCallback];
+        }
 //        NSLog(@"video get packet after");
         if (packet.data == flush_packet.data) {
             NSLog(@"video flush");
@@ -664,6 +679,9 @@ static AVPacket flush_packet;
             return nil;
         }
         AVPacket packet = [self.audioPacketQueue getPacket];
+        if (self.endOfFile) {
+            [self delegateAudioBufferedDurationCallback];
+        }
         if (packet.data == flush_packet.data) {
             if (self.audioPacketQueue) {
                 avcodec_flush_buffers(_audio_codec);
@@ -798,6 +816,7 @@ static AVPacket flush_packet;
     self.paused = NO;
     self.prepareToDecode = NO;
     self.endOfFile = NO;
+    self.currentVideoFrame = nil;
 }
 
 - (void)closeVideoStream
@@ -933,7 +952,11 @@ static AVPacket flush_packet;
 - (void)delegateVideoBufferedDurationCallback
 {
     if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfBufferedDuration:)]) {
-        [self.delegate decoder:self didChangeValueOfBufferedDuration:self.videoPacketQueue.duration + self.videoFrameQueue.duration];
+        if (self.endOfFile) {
+            [self.delegate decoder:self didChangeValueOfBufferedDuration:self.videoPacketQueue.duration];
+        } else {
+            [self.delegate decoder:self didChangeValueOfBufferedDuration:self.videoPacketQueue.duration + self.videoFrameQueue.duration];
+        }
     }
 }
 

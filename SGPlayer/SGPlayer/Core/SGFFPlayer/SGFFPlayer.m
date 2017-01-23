@@ -14,7 +14,7 @@
 
 @interface SGFFPlayer () <SGFFDecoderDelegate, KxAudioManagerDelegate>
 
-@property (nonatomic, strong) NSLock * lock;
+@property (nonatomic, strong) NSLock * stateLock;
 
 @property (nonatomic, weak) SGPlayer * abstractPlayer;
 
@@ -45,7 +45,7 @@
 {
     if (self = [super init]) {
         self.abstractPlayer = abstractPlayer;
-        self.lock = [[NSLock alloc] init];
+        self.stateLock = [[NSLock alloc] init];
         [[KxAudioManager audioManager] activateAudioSession];
     }
     return self;
@@ -53,10 +53,6 @@
 
 - (void)play
 {
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self.decoder closeFile];
-//    });
-    
     self.playing = YES;
     [KxAudioManager audioManager].delegate = self;
     [[KxAudioManager audioManager] play];
@@ -64,7 +60,6 @@
     
     switch (self.state) {
         case SGPlayerStateNone:
-        case SGPlayerStateSuspend:
         case SGPlayerStateFailed:
         case SGPlayerStateFinished:
         case SGPlayerStateBuffering:
@@ -74,6 +69,7 @@
             break;
         case SGPlayerStateReadyToPlay:
         case SGPlayerStatePlaying:
+        case SGPlayerStateSuspend:
             self.state = SGPlayerStatePlaying;
             break;
     }
@@ -118,18 +114,17 @@
 
 - (void)setState:(SGPlayerState)state
 {
-    [self.lock lock];
+    [self.stateLock lock];
     if (_state != state) {
         SGPlayerState temp = _state;
         _state = state;
         [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
     }
-    [self.lock unlock];
+    [self.stateLock unlock];
 }
 
 - (void)setProgress:(NSTimeInterval)progress
 {
-    [self.lock lock];
     if (_progress != progress) {
         _progress = progress;
         NSTimeInterval duration = self.duration;
@@ -143,12 +138,10 @@
             }
         }
     }
-    [self.lock unlock];
 }
 
 - (void)setBufferDuration:(NSTimeInterval)bufferDuration
 {
-    [self.lock lock];
     if (_bufferDuration != bufferDuration) {
         if (bufferDuration < 0) {
             bufferDuration = 0;
@@ -169,9 +162,12 @@
                     [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
                 }
             }
+        } else {
+            if (_bufferDuration <= 0.000001) {
+                self.state = SGPlayerStateFinished;
+            }
         }
     }
-    [self.lock unlock];
 }
 
 - (NSTimeInterval)playableTime
@@ -240,24 +236,29 @@
 
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder
 {
-
+    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(self.playableTime/self.duration) current:@(self.playableTime) total:@(self.duration)];
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering
 {
     if (buffering) {
-//        [self pause];
         [[KxAudioManager audioManager] pause];
+        self.state = SGPlayerStateBuffering;
     } else {
-//        [self play];
-        [[KxAudioManager audioManager] play];
+        if (self.playing) {
+            self.state = SGPlayerStatePlaying;
+            [[KxAudioManager audioManager] play];
+        } else {
+            self.state = SGPlayerStateSuspend;
+        }
     }
-    NSLog(@"buffering value did change : %d", buffering);
+    NSLog(@"缓冲状态 : %d", buffering);
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBufferedDuration:(NSTimeInterval)bufferedDuration
 {
-    NSLog(@"buffered duration value did change : %f", bufferedDuration);
+    self.bufferDuration = bufferedDuration;
+    NSLog(@"缓冲时长 : %f", self.bufferDuration);
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didError:(NSError *)error
@@ -288,7 +289,7 @@
     self.lastPostProgressTime = 0;
     self.lastPostPlayableTime = 0;
     [self.abstractPlayer.displayView cleanEmptyBuffer];
-//    [[KxAudioManager audioManager] pause];
+    [[KxAudioManager audioManager] pause];
 }
 
 - (void)cleanFrames
