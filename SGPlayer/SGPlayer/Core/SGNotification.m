@@ -62,13 +62,9 @@
 
 + (void)postNotificationName:(NSString *)name object:(id)object userInfo:(NSDictionary *)userInfo
 {
-    if ([NSThread isMainThread]) {
+    dispatch_async(dispatch_get_main_queue(), ^{
         [[NSNotificationCenter defaultCenter] postNotificationName:name object:object userInfo:userInfo];
-    } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [[NSNotificationCenter defaultCenter] postNotificationName:name object:object userInfo:userInfo];
-        });
-    }
+    });
 }
 
 @end
