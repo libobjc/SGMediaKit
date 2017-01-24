@@ -88,6 +88,7 @@ static AVPacket flush_packet;
 
 @property (nonatomic, strong) NSLock * clockLock;
 @property (nonatomic, assign) NSTimeInterval audioTimeClock;
+@property (nonatomic, assign) BOOL needUpdateAudioTimeClock;
 
 @end
 
@@ -424,17 +425,17 @@ static AVPacket flush_packet;
         if (self.seeking) {
             self.endOfFile = NO;
             self.playbackFinished = NO;
-            if (self.videoEnable) {
-                int64_t ts = (int64_t)(self.seekToTime / self.videoTimebase);
-                avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, 0);
-            }
-            if (self.audioEnable) {
-                int64_t ts = (int64_t)(self.seekToTime / self.audioTimebase);
-                avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
-            }
+//            if (self.videoEnable) {
+//                int64_t ts = (int64_t)(self.seekToTime / self.videoTimebase);
+//                avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, 0);
+//            }
+//            if (self.audioEnable) {
+//                int64_t ts = (int64_t)(self.seekToTime / self.audioTimebase);
+//                avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
+//            }
             
-//            int64_t ts = av_rescale(self.seekToTime * 1000, AV_TIME_BASE, 1000);
-//            avformat_seek_file(_format_context, -1, ts, ts, ts, 0);
+            int64_t ts = av_rescale(self.seekToTime * 1000, AV_TIME_BASE, 1000);
+            avformat_seek_file(_format_context, -1, ts, ts, ts, 0);
             
             self.buffering = YES;
             [self.videoPacketQueue flush];
@@ -445,7 +446,7 @@ static AVPacket flush_packet;
             if (self.seekCompleteHandler) {
                 self.seekCompleteHandler(YES);
             }
-            self.audioTimeClock = self.seekToTime;
+            self.needUpdateAudioTimeClock = YES;
             self.seekToTime = 0;
             self.seekCompleteHandler = nil;
             self.seeking = NO;
@@ -575,14 +576,17 @@ static AVPacket flush_packet;
                 if (self.endOfFile) {
                     [self updateBufferedDurationByVideo];
                 }
-                [NSThread sleepForTimeInterval:delay];
+                if (self.needUpdateAudioTimeClock && self.audioEnable) {
+                    [NSThread sleepForTimeInterval:1 / self.fps];
+                } else {
+                    [NSThread sleepForTimeInterval:delay];
+                }
             } else {
                 [self updateProgressByVideo];
                 if (self.endOfFile) {
                     [self updateBufferedDurationByVideo];
                 }
             }
-            NSLog(@"delay : %f, video position : %f", delay, self.currentVideoFrame.position);
             continue;
         } else {
             NSLog(@"video nil");
@@ -646,12 +650,10 @@ static AVPacket flush_packet;
         if (self.endOfFile && self.videoPacketQueue.count == 0) {
             return nil;
         }
-//        NSLog(@"video get packet befor");
         AVPacket packet = [self.videoPacketQueue getPacket];
         if (self.endOfFile) {
             [self updateBufferedDurationByVideo];
         }
-//        NSLog(@"video get packet after");
         if (packet.data == flush_packet.data) {
             NSLog(@"video flush");
             if (self.videoEnable) {
@@ -664,9 +666,7 @@ static AVPacket flush_packet;
         while (packet_size > 0)
         {
             int gotframe = 0;
-//            NSLog(@"video decode befor");
             int lenght = avcodec_decode_video2(_video_codec, _video_frame, &gotframe, &packet);
-//            NSLog(@"video decode after");
             if (lenght < 0) {
                 break;
             }
@@ -986,6 +986,7 @@ static AVPacket flush_packet;
     [self.clockLock lock];
     if (_audioTimeClock != audioTimeClock) {
         _audioTimeClock = audioTimeClock;
+        self.needUpdateAudioTimeClock = NO;
         NSLog(@"audio time clock : %f", _audioTimeClock);
     }
     [self.clockLock unlock];
