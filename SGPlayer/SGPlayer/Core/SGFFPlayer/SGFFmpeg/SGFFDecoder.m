@@ -426,12 +426,16 @@ static AVPacket flush_packet;
             self.playbackFinished = NO;
             if (self.videoEnable) {
                 int64_t ts = (int64_t)(self.seekToTime / self.videoTimebase);
-                avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
+                avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, 0);
             }
             if (self.audioEnable) {
                 int64_t ts = (int64_t)(self.seekToTime / self.audioTimebase);
                 avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
             }
+            
+//            int64_t ts = av_rescale(self.seekToTime * 1000, AV_TIME_BASE, 1000);
+//            avformat_seek_file(_format_context, -1, ts, ts, ts, 0);
+            
             self.buffering = YES;
             [self.videoPacketQueue flush];
             [self.audioPacketQueue flush];
@@ -441,6 +445,7 @@ static AVPacket flush_packet;
             if (self.seekCompleteHandler) {
                 self.seekCompleteHandler(YES);
             }
+            self.audioTimeClock = self.seekToTime;
             self.seekToTime = 0;
             self.seekCompleteHandler = nil;
             self.seeking = NO;
@@ -553,13 +558,6 @@ static AVPacket flush_packet;
         }
         self.currentVideoFrame = [self.videoFrameQueue getFrame];
         if (self.currentVideoFrame) {
-            if ([self.output respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
-                [self.output decoder:self renderVideoFrame:self.currentVideoFrame];
-            }
-            [self updateProgressByVideo];
-            if (self.endOfFile) {
-                [self updateBufferedDurationByVideo];
-            }
             
             NSTimeInterval delay = 0;
             NSTimeInterval audioTimeClock = self.audioTimeClock;
@@ -568,10 +566,23 @@ static AVPacket flush_packet;
             } else {
                 delay = self.currentVideoFrame.duration - (audioTimeClock - self.currentVideoFrame.position);
             }
-            NSLog(@"delay : %f, video position : %f", delay, self.currentVideoFrame.position);
+            
             if (delay > 0.001) {
+                if ([self.output respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
+                    [self.output decoder:self renderVideoFrame:self.currentVideoFrame];
+                }
+                [self updateProgressByVideo];
+                if (self.endOfFile) {
+                    [self updateBufferedDurationByVideo];
+                }
                 [NSThread sleepForTimeInterval:delay];
+            } else {
+                [self updateProgressByVideo];
+                if (self.endOfFile) {
+                    [self updateBufferedDurationByVideo];
+                }
             }
+            NSLog(@"delay : %f, video position : %f", delay, self.currentVideoFrame.position);
             continue;
         } else {
             NSLog(@"video nil");
@@ -1032,14 +1043,14 @@ static AVPacket flush_packet;
 
 - (void)updateProgressByVideo;
 {
-    self.progress = self.currentVideoFrame.position;
+    if (!self.audioEnable && self.videoEnable) {
+        self.progress = self.currentVideoFrame.position;
+    }
 }
 
 - (void)updateProgressByAudio
 {
-    if (!self.videoEnable && self.audioEnable) {
-        self.progress = self.currentAudioFrame.position;
-    }
+    self.progress = self.currentAudioFrame.position;
 }
 
 - (void)updateVideoDecodedDuration
