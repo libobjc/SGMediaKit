@@ -712,6 +712,9 @@ static AVPacket flush_packet;
 - (SGFFAudioFrame *)fetchAudioFrame
 {
     self.currentAudioFrame = [self getAudioFrameFromPacketQueue];
+    if (self.currentVideoFrame) {
+        [self updateProgressByAudio];
+    }
     self.audioTimeClock = self.currentAudioFrame.position;
     return self.currentAudioFrame;
 }
@@ -748,7 +751,6 @@ static AVPacket flush_packet;
             if (gotframe) {
                 audioFrame = [self getAudioFrameFromAVFrame];
                 if (audioFrame) {
-                    [self updateProgressByAudio];
                     break;
                 }
             }
