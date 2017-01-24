@@ -577,8 +577,10 @@ static AVPacket flush_packet;
                     [self updateBufferedDurationByVideo];
                 }
                 if (self.needUpdateAudioTimeClock && self.audioEnable) {
+                    NSLog(@"------ delay : %f, video position : %f, duraion : %f", 1 / self.fps, self.currentVideoFrame.position, self.currentVideoFrame.duration);
                     [NSThread sleepForTimeInterval:1 / self.fps];
                 } else {
+                    NSLog(@"------ delay : %f, video position : %f, duraion : %f", delay, self.currentVideoFrame.position, self.currentVideoFrame.duration);
                     [NSThread sleepForTimeInterval:delay];
                 }
             } else {
