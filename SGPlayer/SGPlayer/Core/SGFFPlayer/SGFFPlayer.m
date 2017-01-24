@@ -134,6 +134,9 @@
             NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
             if (currentTime - self.lastPostProgressTime >= 1) {
                 self.lastPostProgressTime = currentTime;
+                if (!self.decoder.seekEnable) {
+                    duration = _progress;
+                }
                 [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
             }
         }
@@ -147,7 +150,7 @@
             bufferDuration = 0;
         }
         _bufferDuration = bufferDuration;
-        if (!self.decoder.endOfFile) {
+        if (!self.decoder.endOfFile && self.decoder.seekEnable) {
             NSTimeInterval playableTtime = self.playableTime;
             NSTimeInterval duration = self.duration;
             if (playableTtime > duration) {
