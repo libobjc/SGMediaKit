@@ -9,12 +9,18 @@
 #import <Foundation/Foundation.h>
 #import "SGFFDecoder.h"
 
-#define SGFFSynLog(...)          NSLog(__VA_ARGS__)
-#define SGFFThreadLog(...)       NSLog(__VA_ARGS__)
-#define SGFFPacketLog(...)       NSLog(__VA_ARGS__)
-#define SGFFSleepLog(...)        NSLog(__VA_ARGS__)
-#define SGFFDecodeLog(...)       NSLog(__VA_ARGS__)
-#define SGFFErrorLog(...)        NSLog(__VA_ARGS__)
+#define SGFFSynLog(...)
+//#define SGFFSynLog(...)          NSLog(__VA_ARGS__)
+#define SGFFThreadLog(...)
+//#define SGFFThreadLog(...)       NSLog(__VA_ARGS__)
+#define SGFFPacketLog(...)
+//#define SGFFPacketLog(...)       NSLog(__VA_ARGS__)
+#define SGFFSleepLog(...)
+//#define SGFFSleepLog(...)        NSLog(__VA_ARGS__)
+#define SGFFDecodeLog(...)
+//#define SGFFDecodeLog(...)       NSLog(__VA_ARGS__)
+#define SGFFErrorLog(...)
+//#define SGFFErrorLog(...)        NSLog(__VA_ARGS__)
 
 void sg_ff_log(void * context, int level, const char * format, va_list args);
 
