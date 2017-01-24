@@ -76,7 +76,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 @property (nonatomic, assign, readonly) BOOL buffering;
 
-@property (atomic, assign, readonly) BOOL playbackFinished;
+@property (nonatomic, assign, readonly) BOOL playbackFinished;
 @property (atomic, assign, readonly) BOOL closed;
 @property (atomic, assign, readonly) BOOL endOfFile;
 @property (atomic, assign, readonly) BOOL paused;

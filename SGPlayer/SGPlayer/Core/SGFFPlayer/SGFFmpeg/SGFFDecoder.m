@@ -59,7 +59,7 @@ static AVPacket flush_packet;
 
 @property (nonatomic, assign) BOOL buffering;
 
-@property (atomic, assign) BOOL playbackFinished;
+@property (nonatomic, assign) BOOL playbackFinished;
 @property (atomic, assign) BOOL closed;
 @property (atomic, assign) BOOL endOfFile;
 @property (atomic, assign) BOOL paused;
@@ -85,6 +85,9 @@ static AVPacket flush_packet;
 
 @property (nonatomic, strong) SGFFVideoFrame * currentVideoFrame;
 @property (nonatomic, strong) SGFFAudioFrame * currentAudioFrame;
+
+@property (nonatomic, strong) NSLock * clockLock;
+@property (nonatomic, assign) NSTimeInterval audioTimeClock;
 
 @end
 
@@ -123,6 +126,8 @@ static AVPacket flush_packet;
 
 - (void)setupOperationQueue
 {
+    self.clockLock = [[NSLock alloc] init];
+    
     self.ffmpegOperationQueue = [[NSOperationQueue alloc] init];
     self.ffmpegOperationQueue.maxConcurrentOperationCount = 3;
     self.ffmpegOperationQueue.qualityOfService = NSQualityOfServiceUserInteractive;
@@ -555,9 +560,21 @@ static AVPacket flush_packet;
             if (self.endOfFile) {
                 [self updateBufferedDurationByVideo];
             }
-            [NSThread sleepForTimeInterval:0.03];
+            
+            NSTimeInterval delay = 0;
+            NSTimeInterval audioTimeClock = self.audioTimeClock;
+            if (self.currentVideoFrame.position >= audioTimeClock) {
+                delay = self.currentVideoFrame.duration + self.currentVideoFrame.position - audioTimeClock;
+            } else {
+                delay = self.currentVideoFrame.duration - (audioTimeClock - self.currentVideoFrame.position);
+            }
+            NSLog(@"delay : %f, video position : %f", delay, self.currentVideoFrame.position);
+            if (delay > 0.001) {
+                [NSThread sleepForTimeInterval:delay];
+            }
             continue;
         } else {
+            NSLog(@"video nil");
             if (self.endOfFile) {
                 [self updateBufferedDurationByVideo];
             }
@@ -680,6 +697,7 @@ static AVPacket flush_packet;
 - (SGFFAudioFrame *)fetchAudioFrame
 {
     self.currentAudioFrame = [self getAudioFrameFromPacketQueue];
+    self.audioTimeClock = self.currentAudioFrame.position;
     return self.currentAudioFrame;
 }
 
@@ -950,6 +968,16 @@ static AVPacket flush_packet;
             self.playbackFinished = YES;
         }
     }
+}
+
+- (void)setAudioTimeClock:(NSTimeInterval)audioTimeClock
+{
+    [self.clockLock lock];
+    if (_audioTimeClock != audioTimeClock) {
+        _audioTimeClock = audioTimeClock;
+        NSLog(@"audio time clock : %f", _audioTimeClock);
+    }
+    [self.clockLock unlock];
 }
 
 - (NSTimeInterval)duration
