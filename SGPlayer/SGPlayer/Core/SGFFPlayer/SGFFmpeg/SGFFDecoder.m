@@ -419,20 +419,23 @@ static AVPacket flush_packet;
     AVPacket packet;
     while (!finished) {
         if (self.closed) {
-            NSLog(@"读线程退出");
+            SGFFThreadLog(@"read packet thread quit");
             break;
         }
         if (self.seeking) {
             self.endOfFile = NO;
             self.playbackFinished = NO;
-//            if (self.videoEnable) {
-//                int64_t ts = (int64_t)(self.seekToTime / self.videoTimebase);
-//                avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, 0);
-//            }
-//            if (self.audioEnable) {
-//                int64_t ts = (int64_t)(self.seekToTime / self.audioTimebase);
-//                avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
-//            }
+
+            /*
+            if (self.videoEnable) {
+                int64_t ts = (int64_t)(self.seekToTime / self.videoTimebase);
+                avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, 0);
+            }
+            if (self.audioEnable) {
+                int64_t ts = (int64_t)(self.seekToTime / self.audioTimebase);
+                avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
+            }
+             */
             
             int64_t ts = av_rescale(self.seekToTime * 1000, AV_TIME_BASE, 1000);
             avformat_seek_file(_format_context, -1, ts, ts, ts, 0);
@@ -463,13 +466,13 @@ static AVPacket flush_packet;
             } else {
                 interval = [SGFFPacketQueue sleepTimeIntervalForFull];
             }
-//            NSLog(@"read thread sleep : %f", interval);
+            SGFFSleepLog(@"read thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
         int result = av_read_frame(self->_format_context, &packet);
         if (result < 0) {
-            NSLog(@"read finished");
+            SGFFPacketLog(@"read packet finished");
             self.endOfFile = YES;
             finished = YES;
             if ([self.delegate respondsToSelector:@selector(decoderDidEndOfFile:)]) {
@@ -478,11 +481,11 @@ static AVPacket flush_packet;
             break;
         }
         if (packet.stream_index == self.videoStreamIndex) {
-//            NSLog(@"video : put packet");
+            SGFFPacketLog(@"video : put packet");
             [self.videoPacketQueue putPacket:packet];
             [self updateBufferedDurationByVideo];
         } else if (packet.stream_index == self.audioStreamIndex) {
-//            NSLog(@"audio : put packet");
+            SGFFPacketLog(@"audio : put packet");
             [self.audioPacketQueue putPacket:packet];
             [self updateBufferedDurationByAudio];
         }
@@ -504,7 +507,7 @@ static AVPacket flush_packet;
     BOOL finished = NO;
     while (!finished) {
         if (self.closed) {
-            NSLog(@"解线程退出");
+            SGFFThreadLog(@"解线程退出");
             break;
         }
         if (self.seeking) {
@@ -512,7 +515,7 @@ static AVPacket flush_packet;
             continue;
         }
         if (self.endOfFile && self.videoPacketQueue.count == 0) {
-            NSLog(@"decode finished");
+            SGFFDecodeLog(@"decode video frame finished");
             break;
         }
         if (self.videoFrameQueue.duration >= [SGFFFrameQueue maxVideoDuration]) {
@@ -522,7 +525,7 @@ static AVPacket flush_packet;
             } else {
                 interval = [SGFFFrameQueue sleepTimeIntervalForFull];
             }
-//            NSLog(@"decode thread sleep : %f", interval);
+            SGFFThreadLog(@"decode thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
@@ -539,7 +542,7 @@ static AVPacket flush_packet;
 {
     while (1) {
         if (self.closed) {
-            NSLog(@"显线程退出");
+            SGFFThreadLog(@"display thread quit");
             break;
         }
         if (self.seeking || self.buffering) {
@@ -554,7 +557,7 @@ static AVPacket flush_packet;
             continue;
         }
         if (self.endOfFile && self.videoPacketQueue.count == 0 && self.videoFrameQueue.count == 0) {
-            NSLog(@"display finished");
+            SGFFThreadLog(@"display finished");
             break;
         }
         self.currentVideoFrame = [self.videoFrameQueue getFrame];
@@ -577,10 +580,10 @@ static AVPacket flush_packet;
                     [self updateBufferedDurationByVideo];
                 }
                 if (self.needUpdateAudioTimeClock && self.audioEnable) {
-                    NSLog(@"------ delay : %f, video position : %f, duraion : %f", 1 / self.fps, self.currentVideoFrame.position, self.currentVideoFrame.duration);
+                    SGFFSynLog(@"------ delay : %f, video position : %f, duraion : %f", 1 / self.fps, self.currentVideoFrame.position, self.currentVideoFrame.duration);
                     [NSThread sleepForTimeInterval:1 / self.fps];
                 } else {
-                    NSLog(@"------ delay : %f, video position : %f, duraion : %f", delay, self.currentVideoFrame.position, self.currentVideoFrame.duration);
+                    SGFFSynLog(@"------ delay : %f, video position : %f, duraion : %f", delay, self.currentVideoFrame.position, self.currentVideoFrame.duration);
                     [NSThread sleepForTimeInterval:delay];
                 }
             } else {
@@ -591,7 +594,6 @@ static AVPacket flush_packet;
             }
             continue;
         } else {
-            NSLog(@"video nil");
             if (self.endOfFile) {
                 [self updateBufferedDurationByVideo];
             }
@@ -657,7 +659,7 @@ static AVPacket flush_packet;
             [self updateBufferedDurationByVideo];
         }
         if (packet.data == flush_packet.data) {
-            NSLog(@"video flush");
+            SGFFDecodeLog(@"video codec flush");
             if (self.videoEnable) {
                 avcodec_flush_buffers(_video_codec);
             }
@@ -781,13 +783,13 @@ static AVPacket flush_packet;
         numberOfFrames = swr_convert(_audio_swr_context, outyput_buffer, _audio_frame->nb_samples * ratio, (const uint8_t **)_audio_frame->data, _audio_frame->nb_samples);
         NSError * error = sg_ff_check_error(numberOfFrames);
         if (error) {
-            NSLog(@"audio codec error : %@", error);
+            SGFFErrorLog(@"audio codec error : %@", error);
             return nil;
         }
         audioDataBuffer = _audio_swr_buffer;
     } else {
         if (_audio_codec->sample_fmt != AV_SAMPLE_FMT_S16) {
-            NSLog(@"audio format error");
+            SGFFErrorLog(@"audio format error");
             return nil;
         }
         audioDataBuffer = _audio_frame->data[0];
@@ -989,7 +991,7 @@ static AVPacket flush_packet;
     if (_audioTimeClock != audioTimeClock) {
         _audioTimeClock = audioTimeClock;
         self.needUpdateAudioTimeClock = NO;
-        NSLog(@"audio time clock : %f", _audioTimeClock);
+        SGFFSynLog(@"audio time clock : %f", _audioTimeClock);
     }
     [self.clockLock unlock];
 }
