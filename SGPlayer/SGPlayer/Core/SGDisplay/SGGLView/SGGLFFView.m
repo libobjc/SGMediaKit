@@ -25,11 +25,7 @@
 - (void)renderFrame:(SGFFVideoFrame *)frame
 {
     self.videoFrame = frame;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-            [self display];
-        }
-    });
+    [self displayAsyncOnMainThread];
 }
 
 - (BOOL)updateTextureAspect:(CGFloat *)aspect
@@ -46,11 +42,6 @@
     
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
-    const UInt8 * pixels[3] = {
-        self.videoFrame->luma,
-        self.videoFrame->chromaB,
-        self.videoFrame->chromaR
-    };
     const NSUInteger widths[3]  = {
         frameWidth,
         frameWidth / 2,
@@ -62,18 +53,19 @@
         frameHeight / 2
     };
     
-    for (int i = 0; i < 3; i++) {
-        glActiveTexture(GL_TEXTURE0 + i);
-        glBindTexture(GL_TEXTURE_2D, _textures[i]);
+    for (SGYUVChannel channel = SGYUVChannelLuma; channel < SGYUVChannelCount; channel++)
+    {
+        glActiveTexture(GL_TEXTURE0 + channel);
+        glBindTexture(GL_TEXTURE_2D, _textures[channel]);
         glTexImage2D(GL_TEXTURE_2D,
                      0,
                      GL_LUMINANCE,
-                     widths[i],
-                     heights[i],
+                     widths[channel],
+                     heights[channel],
                      0,
                      GL_LUMINANCE,
                      GL_UNSIGNED_BYTE,
-                     pixels[i]);
+                     self.videoFrame->channel_pixels[channel]);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

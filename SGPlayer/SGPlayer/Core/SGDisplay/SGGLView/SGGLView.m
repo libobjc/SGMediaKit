@@ -85,10 +85,22 @@
     self.vrModel = [SGGLVRModel model];
 }
 
+- (void)displayAsyncOnMainThread
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self displayIfApplicationActive];
+    });
+}
+
+- (void)displayIfApplicationActive
+{
+    if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) return;
+    [self display];
+}
+
 - (void)cleanEmptyBuffer
 {
     [self cleanTexture];
-    [self display];
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect

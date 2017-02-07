@@ -44,9 +44,7 @@
 
 - (void)displayLinkAction
 {
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-        [self display];
-    }
+    [self displayIfApplicationActive];
 }
 
 - (void)setPaused:(BOOL)paused
