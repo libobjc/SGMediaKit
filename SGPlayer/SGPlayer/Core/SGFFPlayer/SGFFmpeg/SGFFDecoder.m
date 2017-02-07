@@ -35,7 +35,7 @@ static AVPacket flush_packet;
 }
 
 @property (nonatomic, weak) id <SGFFDecoderDelegate> delegate;
-@property (nonatomic, weak) id <SGFFDecoderOutput> output;
+@property (nonatomic, weak) id <SGFFDecoderVideoOutput> videoOutput;
 
 @property (nonatomic, strong) NSOperationQueue * ffmpegOperationQueue;
 @property (nonatomic, strong) NSInvocationOperation * openFileOperation;
@@ -94,12 +94,12 @@ static AVPacket flush_packet;
 
 @implementation SGFFDecoder
 
-+ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate output:(id<SGFFDecoderOutput>)output
++ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate videoOutput:(id<SGFFDecoderVideoOutput>)videoOutput
 {
-    return [[self alloc] initWithContentURL:contentURL delegate:delegate output:output];
+    return [[self alloc] initWithContentURL:contentURL delegate:delegate videoOutput:videoOutput];
 }
 
-- (instancetype)initWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate output:(id<SGFFDecoderOutput>)output
+- (instancetype)initWithContentURL:(NSURL *)contentURL delegate:(id<SGFFDecoderDelegate>)delegate videoOutput:(id<SGFFDecoderVideoOutput>)videoOutput
 {
     if (self = [super init]) {
         
@@ -115,7 +115,7 @@ static AVPacket flush_packet;
         
         self.contentURL = contentURL;
         self.delegate = delegate;
-        self.output = output;
+        self.videoOutput = videoOutput;
         
         self.videoStreamIndex = -1;
         self.audioStreamIndex = -1;
@@ -550,8 +550,8 @@ static AVPacket flush_packet;
             continue;
         }
         if (self.paused && self.currentVideoFrame) {
-            if ([self.output respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
-                [self.output decoder:self renderVideoFrame:self.currentVideoFrame];
+            if ([self.videoOutput respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
+                [self.videoOutput decoder:self renderVideoFrame:self.currentVideoFrame];
             }
             [NSThread sleepForTimeInterval:0.03];
             continue;
@@ -572,8 +572,8 @@ static AVPacket flush_packet;
             }
             
             if (delay > 0.001) {
-                if ([self.output respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
-                    [self.output decoder:self renderVideoFrame:self.currentVideoFrame];
+                if ([self.videoOutput respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
+                    [self.videoOutput decoder:self renderVideoFrame:self.currentVideoFrame];
                 }
                 [self updateProgressByVideo];
                 if (self.endOfFile) {

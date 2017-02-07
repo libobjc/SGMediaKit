@@ -207,7 +207,7 @@
     [self clean];
     if (!self.abstractPlayer.contentURL) return;
     
-    self.decoder = [SGFFDecoder decoderWithContentURL:self.abstractPlayer.contentURL delegate:self output:self.abstractPlayer.displayView];
+    self.decoder = [SGFFDecoder decoderWithContentURL:self.abstractPlayer.contentURL delegate:self videoOutput:self.abstractPlayer.displayView];
     [self reloadVolume];
     [self reloadPlayableBufferInterval];
     
