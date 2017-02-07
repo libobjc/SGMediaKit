@@ -443,13 +443,13 @@ static AVPacket flush_packet;
             [self.videoFrameQueue flush];
             [self.videoPacketQueue putPacket:flush_packet];
             [self.audioPacketQueue putPacket:flush_packet];
+            self.seeking = NO;
+            self.seekToTime = 0;
             if (self.seekCompleteHandler) {
                 self.seekCompleteHandler(YES);
+                self.seekCompleteHandler = nil;
             }
             self.needUpdateAudioTimeClock = YES;
-            self.seekToTime = 0;
-            self.seekCompleteHandler = nil;
-            self.seeking = NO;
             self.currentVideoFrame = nil;
             self.currentAudioFrame = nil;
             [self updateBufferedDurationByVideo];
