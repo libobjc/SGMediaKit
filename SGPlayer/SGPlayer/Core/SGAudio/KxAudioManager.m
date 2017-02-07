@@ -28,62 +28,41 @@ static void sessionPropertyListener(void *inClientData, AudioSessionPropertyID i
 static void sessionInterruptionListener(void *inClientData, UInt32 inInterruption);
 static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioActionFlags, const AudioTimeStamp * inTimeStamp, UInt32 inOutputBusNumber, UInt32 inNumberFrames, AudioBufferList* ioData);
 
+@interface KxAudioManager ()
 
-@interface KxAudioManagerImpl : KxAudioManager<KxAudioManager> {
-    
-    BOOL                        _initialized;
-    BOOL                        _activated;
-    float                       *_outData;
-    AudioUnit                   _audioUnit;
+{
+    BOOL _initialized;
+    BOOL _activated;
+    float * _outData;
+    AudioUnit _audioUnit;
     AudioStreamBasicDescription _outputFormat;
 }
 
-@property (readonly) UInt32             numOutputChannels;
-@property (readonly) Float64            samplingRate;
-@property (readonly) UInt32             numBytesPerSample;
-@property (readwrite) Float32           outputVolume;
-@property (readonly) BOOL               playing;
-@property (readonly, strong) NSString   *audioRoute;
+@property (nonatomic, assign) Float32 outputVolume;
+@property (nonatomic, assign) BOOL playAfterSessionEndInterruption;
 
-//@property (readwrite, copy) KxAudioManagerOutputBlock outputBlock;
-@property (nonatomic, weak) id <KxAudioManagerDelegate> delegate;
-@property (nonatomic, strong) dispatch_queue_t delegateQueue;
-@property (readwrite) BOOL playAfterSessionEndInterruption;
-
-- (BOOL) activateAudioSession;
-- (void) deactivateAudioSession;
-- (BOOL) play;
-- (void) pause;
-
-- (BOOL) checkAudioRoute;
-- (BOOL) setupAudio;
-- (BOOL) checkSessionProperties;
-- (BOOL) renderFrames: (UInt32) numFrames
-               ioData: (AudioBufferList *) ioData;
+- (BOOL)checkAudioRoute;
+- (BOOL)setupAudio;
+- (BOOL)checkSessionProperties;
+- (BOOL)renderFrames:(UInt32)numFrames ioData:(AudioBufferList *)ioData;
 
 @end
 
 @implementation KxAudioManager
 
-+ (id<KxAudioManager>) audioManager
++ (instancetype)audioManager
 {
-    static KxAudioManagerImpl *audioManager = nil;
+    static KxAudioManager * audioManager = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        audioManager = [[KxAudioManagerImpl alloc] init];
+        audioManager = [[self alloc] init];
     });
     return audioManager;
 }
 
-@end
-
-@implementation KxAudioManagerImpl
-
-- (id)init
-{    
-    self = [super init];
-	if (self) {
-        
+- (instancetype)init
+{
+	if (self = [super init]) {
         _outData = (float *)calloc(MAX_FRAME_SIZE*MAX_CHAN, sizeof(float));
         _outputVolume = 0.5;        
 	}	
@@ -93,42 +72,9 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
 - (void)dealloc
 {
     if (_outData) {
-        
         free(_outData);
         _outData = NULL;
     }
-}
-
-#pragma mark - private
-
-// Debug: dump the current frame data. Limited to 20 samples.
-
-#define dumpAudioSamples(prefix, dataBuffer, samplePrintFormat, sampleCount, channelCount) \
-{ \
-    NSMutableString *dump = [NSMutableString stringWithFormat:prefix]; \
-    for (int i = 0; i < MIN(MAX_SAMPLE_DUMPED, sampleCount); i++) \
-    { \
-        for (int j = 0; j < channelCount; j++) \
-        { \
-            [dump appendFormat:samplePrintFormat, dataBuffer[j + i * channelCount]]; \
-        } \
-        [dump appendFormat:@"\n"]; \
-    } \
-    LoggerAudio(3, @"%@", dump); \
-}
-
-#define dumpAudioSamplesNonInterleaved(prefix, dataBuffer, samplePrintFormat, sampleCount, channelCount) \
-{ \
-    NSMutableString *dump = [NSMutableString stringWithFormat:prefix]; \
-    for (int i = 0; i < MIN(MAX_SAMPLE_DUMPED, sampleCount); i++) \
-    { \
-        for (int j = 0; j < channelCount; j++) \
-        { \
-            [dump appendFormat:samplePrintFormat, dataBuffer[j][i]]; \
-        } \
-        [dump appendFormat:@"\n"]; \
-    } \
-    LoggerAudio(3, @"%@", dump); \
 }
 
 - (BOOL) checkAudioRoute
@@ -143,7 +89,6 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
         return NO;
     
     _audioRoute = CFBridgingRelease(route);
-//    LoggerAudio(1, @"AudioRoute: %@", _audioRoute);
     return YES;
 }
 
@@ -437,23 +382,17 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
 - (void) pause
 {	
 	if (_playing) {
-        
-        _playing = checkError(AudioOutputUnitStop(_audioUnit),
-                             "Couldn't stop the output unit");
+        _playing = checkError(AudioOutputUnitStop(_audioUnit), "Couldn't stop the output unit");
 	}
 }
 
-- (BOOL) play
+- (BOOL)play
 {    
     if (!_playing) {
-        
         if ([self activateAudioSession]) {
-            
-            _playing = !checkError(AudioOutputUnitStart(_audioUnit),
-                                   "Couldn't start the output unit");
+            _playing = !checkError(AudioOutputUnitStart(_audioUnit), "Couldn't start the output unit");
         }
 	}
-    
     return _playing;
 }
 
@@ -466,18 +405,14 @@ static void sessionPropertyListener(void *                  inClientData,
                                     UInt32                  inDataSize,
                                     const void *            inData)
 {
-    KxAudioManagerImpl *sm = (__bridge KxAudioManagerImpl *)inClientData;
+    KxAudioManager *sm = (__bridge KxAudioManager *)inClientData;
     
 	if (inID == kAudioSessionProperty_AudioRouteChange) {
-        
         if ([sm checkAudioRoute]) {
             [sm checkSessionProperties];
         }
-        
     } else if (inID == kAudioSessionProperty_CurrentHardwareOutputVolume) {
-        
         if (inData && inDataSize == 4) {
-
             sm.outputVolume = *(float *)inData;
         }
     }
@@ -485,17 +420,12 @@ static void sessionPropertyListener(void *                  inClientData,
 
 static void sessionInterruptionListener(void *inClientData, UInt32 inInterruption)
 {    
-    KxAudioManagerImpl *sm = (__bridge KxAudioManagerImpl *)inClientData;
+    KxAudioManager *sm = (__bridge KxAudioManager *)inClientData;
     
 	if (inInterruption == kAudioSessionBeginInterruption) {
-        
-//		LoggerAudio(2, @"Begin interuption");
         sm.playAfterSessionEndInterruption = sm.playing;
         [sm pause];
-                
 	} else if (inInterruption == kAudioSessionEndInterruption) {
-		
-//        LoggerAudio(2, @"End interuption");
         if (sm.playAfterSessionEndInterruption) {
             sm.playAfterSessionEndInterruption = NO;
             [sm play];
@@ -510,7 +440,7 @@ static OSStatus renderCallback (void						*inRefCon,
                                 UInt32						inNumberFrames,
                                 AudioBufferList				* ioData)
 {
-	KxAudioManagerImpl *sm = (__bridge KxAudioManagerImpl *)inRefCon;
+	KxAudioManager *sm = (__bridge KxAudioManager *)inRefCon;
     return [sm renderFrames:inNumberFrames ioData:ioData];
 }
 
@@ -528,10 +458,5 @@ static BOOL checkError(OSStatus error, const char *operation)
 	} else
 		// no, format it as an integer
 		sprintf(str, "%d", (int)error);
-    
-//	LoggerStream(0, @"Error: %s (%s)\n", operation, str);
-    
-	//exit(1);
-    
     return YES;
 }

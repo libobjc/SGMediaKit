@@ -15,7 +15,10 @@
 
 + (instancetype)manager;
 
-@property (readonly) UInt32             numOutputChannels;
-@property (readonly) Float64            samplingRate;
+@property (nonatomic, assign, readonly) Float64 samplingRate;
+@property (nonatomic, assign, readonly) UInt32 channelCount;
+
+- (void)play;
+- (void)pause;
 
 @end
