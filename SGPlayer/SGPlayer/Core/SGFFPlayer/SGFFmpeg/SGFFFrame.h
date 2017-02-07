@@ -33,8 +33,8 @@ typedef NS_ENUM(NSUInteger, SGYUVChannel) {
 
 {
 @public
-    UInt8 * channel_pixels[3];
-    UInt8 * channel_lenghts[3];
+    UInt8 * channel_pixels[SGYUVChannelCount];
+    UInt8 * channel_lenghts[SGYUVChannelCount];
 }
 
 @property (nonatomic, assign, readonly) NSUInteger width;
