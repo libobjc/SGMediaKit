@@ -125,6 +125,8 @@ static AVPacket flush_packet;
     return self;
 }
 
+#pragma mark - setup operations
+
 - (void)setupOperationQueue
 {
     self.clockLock = [[NSLock alloc] init];
@@ -395,23 +397,18 @@ static AVPacket flush_packet;
     return nil;
 }
 
-#pragma mark - Thread
+#pragma mark - operation thread
 
 - (void)readPacketThread
 {
-    if (self.videoEnable) {
-        if (self.videoPacketQueue) {
-            [self.videoPacketQueue flush];
-        } else {
-            self.videoPacketQueue = [SGFFPacketQueue packetQueueWithTimebase:self.videoTimebase];
-        }
+    [self.videoPacketQueue flush];
+    if (self.videoEnable && !self.videoPacketQueue) {
+        self.videoPacketQueue = [SGFFPacketQueue packetQueueWithTimebase:self.videoTimebase];
     }
-    if (self.audioEnable) {
-        if (self.audioPacketQueue) {
-            [self.audioPacketQueue flush];
-        } else {
-            self.audioPacketQueue = [SGFFPacketQueue packetQueueWithTimebase:self.audioTimebase];
-        }
+    
+    [self.audioPacketQueue flush];
+    if (self.audioEnable && !self.audioPacketQueue) {
+        self.audioPacketQueue = [SGFFPacketQueue packetQueueWithTimebase:self.audioTimebase];
     }
     
     self.reading = YES;
@@ -638,11 +635,6 @@ static AVPacket flush_packet;
 }
 
 #pragma mark - decode frames
-
-- (SGFFVideoFrame *)fetchVideoFrame
-{
-    return [self.videoFrameQueue getFrame];
-}
 
 - (SGFFVideoFrame *)getVideoFrameFromPacketQueue
 {
