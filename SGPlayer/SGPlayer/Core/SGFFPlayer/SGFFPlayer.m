@@ -12,7 +12,7 @@
 #import "SGNotification.h"
 #import "SGPlayer+DisplayView.h"
 
-@interface SGFFPlayer () <SGFFDecoderDelegate, KxAudioManagerDelegate>
+@interface SGFFPlayer () <SGFFDecoderDelegate, KxAudioManagerDelegate, SGFFDecoderAudioOutput>
 
 @property (nonatomic, strong) NSLock * stateLock;
 
@@ -207,7 +207,7 @@
     [self clean];
     if (!self.abstractPlayer.contentURL) return;
     
-    self.decoder = [SGFFDecoder decoderWithContentURL:self.abstractPlayer.contentURL delegate:self videoOutput:self.abstractPlayer.displayView];
+    self.decoder = [SGFFDecoder decoderWithContentURL:self.abstractPlayer.contentURL delegate:self videoOutput:self.abstractPlayer.displayView audioOutput:self];
     [self reloadVolume];
     [self reloadPlayableBufferInterval];
     
@@ -321,6 +321,16 @@
 }
 
 #pragma mark - audio
+
+- (Float64)samplingRate
+{
+    return [KxAudioManager audioManager].samplingRate;
+}
+
+- (UInt32)channelCount
+{
+    return [KxAudioManager audioManager].numOutputChannels;
+}
 
 - (void)audioManager:(KxAudioManager *)audioManager outputData:(float *)data numberOfFrames:(UInt32)numFrames numberOfChannels:(UInt32)numChannels
 {

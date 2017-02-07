@@ -50,9 +50,12 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @end
 
 @protocol SGFFDecoderVideoOutput <NSObject>
-
 - (void)decoder:(SGFFDecoder *)decoder renderVideoFrame:(SGFFVideoFrame *)videoFrame;
+@end
 
+@protocol SGFFDecoderAudioOutput <NSObject>
+- (Float64)samplingRate;
+- (UInt32)channelCount;
 @end
 
 @interface SGFFDecoder : NSObject
@@ -60,7 +63,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
 
-+ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id <SGFFDecoderDelegate>)delegate videoOutput:(id <SGFFDecoderVideoOutput>)videoOutput;
++ (instancetype)decoderWithContentURL:(NSURL *)contentURL delegate:(id <SGFFDecoderDelegate>)delegate videoOutput:(id <SGFFDecoderVideoOutput>)videoOutput audioOutput:(id <SGFFDecoderAudioOutput>)audioOutput;
 
 @property (nonatomic, strong, readonly) NSError * error;
 
