@@ -50,12 +50,19 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @end
 
 @protocol SGFFDecoderVideoOutput <NSObject>
+
 - (void)decoder:(SGFFDecoder *)decoder renderVideoFrame:(SGFFVideoFrame *)videoFrame;
+
 @end
 
 @protocol SGFFDecoderAudioOutput <NSObject>
+
 - (Float64)samplingRate;
 - (UInt32)channelCount;
+
+@optional
+- (void)decoder:(SGFFDecoder *)decoder audioOutputEnable:(BOOL)audioOutputEnable;
+
 @end
 
 @interface SGFFDecoder : NSObject
