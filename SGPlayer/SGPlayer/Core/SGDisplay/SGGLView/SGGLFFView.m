@@ -25,9 +25,11 @@
 - (void)renderFrame:(SGFFVideoFrame *)frame
 {
     self.videoFrame = frame;
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
-        [self display];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+            [self display];
+        }
+    });
 }
 
 - (BOOL)updateTextureAspect:(CGFloat *)aspect

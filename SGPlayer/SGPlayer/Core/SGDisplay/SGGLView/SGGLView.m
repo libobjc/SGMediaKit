@@ -16,6 +16,7 @@
 
 @interface SGGLView () <GLKViewDelegate>
 
+@property (nonatomic, assign) BOOL setupToken;
 @property (nonatomic, weak) SGDisplayView * displayView;
 
 @property (nonatomic, strong) SGGLNormalModel * normalModel;
@@ -36,7 +37,6 @@
 {
     if (self = [super initWithFrame:CGRectZero]) {
         self.displayView = displayView;
-        [self setup];
     }
     return self;
 }
@@ -44,6 +44,10 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    if (!self.setupToken) {
+        [self setup];
+        self.setupToken = YES;
+    }
     self.distorionRenderer.viewportSize = [self pixelSize];
 }
 
