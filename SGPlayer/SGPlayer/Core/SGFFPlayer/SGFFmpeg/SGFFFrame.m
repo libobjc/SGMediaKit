@@ -18,8 +18,8 @@
 - (instancetype)initWithAVFrame:(AVFrame *)frame width:(int)width height:(int)height
 {
     if (self = [super init]) {
-        _width = width;
-        _height = height;
+        self->_width = width;
+        self->_height = height;
         sg_ff_convert_AVFrame_to_YUV(frame->data[SGYUVChannelLuma],
                                      frame->linesize[SGYUVChannelLuma],
                                      width,
