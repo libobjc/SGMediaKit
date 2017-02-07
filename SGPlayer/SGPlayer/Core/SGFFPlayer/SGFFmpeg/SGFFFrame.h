@@ -16,6 +16,13 @@ typedef NS_ENUM(NSUInteger, SGFFFrameType) {
     SGFFFrameTypeArtwork,
 };
 
+typedef NS_ENUM(NSUInteger, SGYUVChannel) {
+    SGYUVChannelLuma = 0,
+    SGYUVChannelChromaB,
+    SGYUVChannelChromaR,
+    SGYUVChannelCount,
+};
+
 @interface SGFFFrame : NSObject
 @property (nonatomic, assign) SGFFFrameType type;
 @property (nonatomic, assign) NSTimeInterval position;
@@ -26,13 +33,8 @@ typedef NS_ENUM(NSUInteger, SGFFFrameType) {
 
 {
 @public
-    UInt8 * luma;
-    UInt8 * chromaB;
-    UInt8 * chromaR;
-    
-    int lumaLenght;
-    int chromaBLenght;
-    int chromaRLenght;
+    UInt8 * channel_pixels[3];
+    UInt8 * channel_lenghts[3];
 }
 
 @property (nonatomic, assign, readonly) NSUInteger width;

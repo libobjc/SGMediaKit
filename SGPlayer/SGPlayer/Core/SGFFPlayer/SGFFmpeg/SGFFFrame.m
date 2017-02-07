@@ -20,9 +20,24 @@
     if (self = [super init]) {
         _width = width;
         _height = height;
-        sg_ff_convert_AVFrame_to_YUV(frame->data[0], frame->linesize[0], width, height, &luma, &lumaLenght);
-        sg_ff_convert_AVFrame_to_YUV(frame->data[1], frame->linesize[1], width / 2, height / 2, &chromaB, &chromaBLenght);
-        sg_ff_convert_AVFrame_to_YUV(frame->data[2], frame->linesize[2], width / 2, height / 2, &chromaR, &chromaRLenght);
+        sg_ff_convert_AVFrame_to_YUV(frame->data[SGYUVChannelLuma],
+                                     frame->linesize[SGYUVChannelLuma],
+                                     width,
+                                     height,
+                                     &channel_pixels[SGYUVChannelLuma],
+                                     &channel_lenghts[SGYUVChannelLuma]);
+        sg_ff_convert_AVFrame_to_YUV(frame->data[SGYUVChannelChromaB],
+                                     frame->linesize[SGYUVChannelChromaB],
+                                     width / 2,
+                                     height / 2,
+                                     &channel_pixels[SGYUVChannelChromaB],
+                                     &channel_lenghts[SGYUVChannelChromaB]);
+        sg_ff_convert_AVFrame_to_YUV(frame->data[SGYUVChannelChromaR],
+                                     frame->linesize[SGYUVChannelChromaR],
+                                     width / 2,
+                                     height / 2,
+                                     &channel_pixels[SGYUVChannelChromaR],
+                                     &channel_lenghts[SGYUVChannelChromaR]);
     }
     return self;
 }
@@ -34,13 +49,13 @@
 
 - (void)dealloc
 {
-    free(luma);
-    free(chromaB);
-    free(chromaR);
+    free(channel_pixels[SGYUVChannelLuma]);
+    free(channel_pixels[SGYUVChannelChromaB]);
+    free(channel_pixels[SGYUVChannelChromaR]);
     
-    luma = nil;
-    chromaB = nil;
-    chromaR = nil;
+    channel_pixels[SGYUVChannelLuma] = nil;
+    channel_pixels[SGYUVChannelChromaB] = nil;
+    channel_pixels[SGYUVChannelChromaR] = nil;
 }
 
 @end
