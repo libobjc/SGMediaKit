@@ -21,8 +21,6 @@
 #define MAX_FRAME_SIZE 4096
 #define MAX_CHAN       2
 
-#define MAX_SAMPLE_DUMPED 5
-
 static BOOL checkError(OSStatus error, const char *operation);
 static void sessionPropertyListener(void *inClientData, AudioSessionPropertyID inID, UInt32 inDataSize, const void *inData);
 static void sessionInterruptionListener(void *inClientData, UInt32 inInterruption);
@@ -69,15 +67,7 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
 	return self;
 }
 
-- (void)dealloc
-{
-    if (_outData) {
-        free(_outData);
-        _outData = NULL;
-    }
-}
-
-- (BOOL) checkAudioRoute
+- (BOOL)checkAudioRoute
 {
     // Check what the audio route is.
     UInt32 propertySize = sizeof(CFStringRef);
@@ -92,7 +82,7 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
     return YES;
 }
 
-- (BOOL) setupAudio
+- (BOOL)setupAudio
 {
     // --- Audio Session Setup ---
         
@@ -185,9 +175,6 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
     _numBytesPerSample = _outputFormat.mBitsPerChannel / 8;
     _numOutputChannels = _outputFormat.mChannelsPerFrame;
     
-//    LoggerAudio(2, @"Current output bytes per sample: %ld", _numBytesPerSample);
-//    LoggerAudio(2, @"Current output num channels: %ld", _numOutputChannels);
-    
     // Slap a render callback on the unit
     AURenderCallbackStruct callbackStruct;
     callbackStruct.inputProc = renderCallback;
@@ -209,7 +196,7 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
     return YES;
 }
 
-- (BOOL) checkSessionProperties
+- (BOOL)checkSessionProperties
 {
     [self checkAudioRoute];
     
@@ -221,9 +208,7 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
                                            &newNumChannels),
                    "Checking number of output channels"))
         return NO;
-    
-//    LoggerAudio(2, @"We've got %lu output channels", newNumChannels);
-    
+
     // Get the hardware sampling rate. This is settable, but here we're only reading.
     size = sizeof(_samplingRate);
     if (checkError(AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareSampleRate,
@@ -232,46 +217,32 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
                    "Checking hardware sampling rate"))
         
         return NO;
-    
-//    LoggerAudio(2, @"Current sampling rate: %f", _samplingRate);
-    
+
     size = sizeof(_outputVolume);
     if (checkError(AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareOutputVolume,
                                            &size,
                                            &_outputVolume),
                    "Checking current hardware output volume"))
         return NO;
-    
-//    LoggerAudio(1, @"Current output volume: %f", _outputVolume);
-    
+
     return YES;	
 }
 
-- (BOOL) renderFrames: (UInt32) numFrames
-               ioData: (AudioBufferList *) ioData
+- (BOOL)renderFrames:(UInt32)numFrames ioData:(AudioBufferList *)ioData
 {
     for (int iBuffer=0; iBuffer < ioData->mNumberBuffers; ++iBuffer) {
         memset(ioData->mBuffers[iBuffer].mData, 0, ioData->mBuffers[iBuffer].mDataByteSize);
     }
     
     if (_playing && self.delegate) {
+        [self.delegate audioManager:self outputData:_outData numberOfFrames:numFrames numberOfChannels:_numOutputChannels];
     
-        // Collect data to render from the callbacks
-//        _outputBlock(_outData, numFrames, _numOutputChannels);
-//        dispatch_sync(self.delegateQueue, ^{
-            [self.delegate audioManager:self outputData:_outData numberOfFrames:numFrames numberOfChannels:_numOutputChannels];
-//        });
-    
-        
         // Put the rendered data into the output buffer
         if (_numBytesPerSample == 4) // then we've already got floats
         {
             float zero = 0.0;
-            
             for (int iBuffer=0; iBuffer < ioData->mNumberBuffers; ++iBuffer) {
-                
                 int thisNumChannels = ioData->mBuffers[iBuffer].mNumberChannels;
-                
                 for (int iChannel = 0; iChannel < thisNumChannels; ++iChannel) {
                     vDSP_vsadd(_outData+iChannel, _numOutputChannels, &zero, (float *)ioData->mBuffers[iBuffer].mData, thisNumChannels, numFrames);
                 }
@@ -279,31 +250,15 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
         }
         else if (_numBytesPerSample == 2) // then we need to convert SInt16 -> Float (and also scale)
         {
-//            dumpAudioSamples(@"Audio frames decoded by FFmpeg:\n",
-//                             _outData, @"% 12.4f ", numFrames, _numOutputChannels);
-
             float scale = (float)INT16_MAX;
             vDSP_vsmul(_outData, 1, &scale, _outData, 1, numFrames*_numOutputChannels);
-            
-#ifdef DUMP_AUDIO_DATA
-            LoggerAudio(2, @"Buffer %u - Output Channels %u - Samples %u",
-                          (uint)ioData->mNumberBuffers, (uint)ioData->mBuffers[0].mNumberChannels, (uint)numFrames);
-#endif
 
             for (int iBuffer=0; iBuffer < ioData->mNumberBuffers; ++iBuffer) {
-                
                 int thisNumChannels = ioData->mBuffers[iBuffer].mNumberChannels;
-                
                 for (int iChannel = 0; iChannel < thisNumChannels; ++iChannel) {
                     vDSP_vfix16(_outData+iChannel, _numOutputChannels, (SInt16 *)ioData->mBuffers[iBuffer].mData+iChannel, thisNumChannels, numFrames);
                 }
-#ifdef DUMP_AUDIO_DATA
-                dumpAudioSamples(@"Audio frames decoded by FFmpeg and reformatted:\n",
-                                 ((SInt16 *)ioData->mBuffers[iBuffer].mData),
-                                 @"% 8d ", numFrames, thisNumChannels);
-#endif
             }
-            
         }        
     }
 
@@ -394,6 +349,14 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
         }
 	}
     return _playing;
+}
+
+- (void)dealloc
+{
+    if (_outData) {
+        free(_outData);
+        _outData = NULL;
+    }
 }
 
 @end
