@@ -27,6 +27,7 @@ typedef NS_ENUM(int, SGYUVChannel) {
 @property (nonatomic, assign) SGFFFrameType type;
 @property (nonatomic, assign) NSTimeInterval position;
 @property (nonatomic, assign) NSTimeInterval duration;
+@property (nonatomic, assign, readonly) int size;
 @end
 
 @interface SGFFVideoFrame : SGFFFrame

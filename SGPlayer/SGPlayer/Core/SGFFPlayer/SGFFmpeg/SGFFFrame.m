@@ -47,6 +47,11 @@
     return SGFFFrameTypeVideo;
 }
 
+- (int)size
+{
+    return channel_lenghts[SGYUVChannelLuma] + channel_lenghts[SGYUVChannelChromaB] + channel_lenghts[SGYUVChannelChromaR];
+}
+
 - (void)dealloc
 {
     free(channel_pixels[SGYUVChannelLuma]);
@@ -65,6 +70,11 @@
 - (SGFFFrameType)type
 {
     return SGFFFrameTypeAudio;
+}
+
+- (int)size
+{
+    return (int)self.samples.length;
 }
 
 @end
