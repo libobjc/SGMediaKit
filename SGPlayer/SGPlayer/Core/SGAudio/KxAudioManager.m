@@ -130,8 +130,10 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
     }
     
     if (_playing && self.delegate) {
+//        NSTimeInterval time = [NSDate date].timeIntervalSince1970;
+//        NSLog(@"audio callback");
         [self.delegate audioManager:self outputData:_outData numberOfFrames:numFrames numberOfChannels:_numOutputChannels];
-    
+//        NSLog(@"audio done time : %f", [NSDate date].timeIntervalSince1970 - time);
         // Put the rendered data into the output buffer
         if (_numBytesPerSample == 4) // then we've already got floats
         {
