@@ -13,9 +13,9 @@
 #import "SGNotification.h"
 #import "SGPlayer+DisplayView.h"
 
-#define UsesSGAudioSession 0
+#define UsesSGAudioSession 1
 
-@interface SGFFPlayer () <SGFFDecoderDelegate, SGFFDecoderAudioOutput>
+@interface SGFFPlayer () <SGFFDecoderDelegate, SGFFDecoderAudioOutput, SGAudioManagerDelegate>
 
 @property (nonatomic, strong) NSLock * stateLock;
 
