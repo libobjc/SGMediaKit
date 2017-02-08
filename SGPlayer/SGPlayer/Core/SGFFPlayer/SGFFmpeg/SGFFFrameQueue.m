@@ -10,6 +10,7 @@
 
 @interface SGFFFrameQueue ()
 
+@property (nonatomic, assign) int size;
 @property (nonatomic, assign) NSUInteger count;
 @property (atomic, assign) NSTimeInterval duration;
 
@@ -46,6 +47,7 @@
     }
     [self.frames addObject:frame];
     self.duration += frame.duration;
+    self.size += frame.size;
     [self.condition signal];
     [self.condition unlock];
 }
@@ -65,6 +67,10 @@
     self.duration -= frame.duration;
     if (self.duration < 0) {
         self.duration = 0;
+    }
+    self.size -= frame.size;
+    if (self.size <= 0) {
+        self.size = 0;
     }
     [self.condition unlock];
     return frame;
