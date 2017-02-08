@@ -705,7 +705,8 @@ static AVPacket flush_packet;
 
 - (SGFFAudioFrame *)fetchAudioFrame
 {
-    if (self.closed || self.seeking || self.buffering || self.audioFrameQueue.count == 0) return nil;
+    BOOL check = self.closed || self.seeking || self.buffering || self.paused || self.playbackFinished || !self.audioEnable;
+    if (check || self.audioFrameQueue.count == 0) return nil;
     self.currentAudioFrame = [self.audioFrameQueue getFrame];
     if (!self.currentAudioFrame) return nil;
     
