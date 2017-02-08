@@ -16,11 +16,11 @@ typedef NS_ENUM(NSUInteger, SGFFFrameType) {
     SGFFFrameTypeArtwork,
 };
 
-typedef NS_ENUM(NSUInteger, SGYUVChannel) {
+typedef NS_ENUM(int, SGYUVChannel) {
     SGYUVChannelLuma = 0,
-    SGYUVChannelChromaB,
-    SGYUVChannelChromaR,
-    SGYUVChannelCount,
+    SGYUVChannelChromaB = 1,
+    SGYUVChannelChromaR = 2,
+    SGYUVChannelCount = 3,
 };
 
 @interface SGFFFrame : NSObject
@@ -34,11 +34,11 @@ typedef NS_ENUM(NSUInteger, SGYUVChannel) {
 {
 @public
     UInt8 * channel_pixels[SGYUVChannelCount];
-    UInt8 * channel_lenghts[SGYUVChannelCount];
+    int channel_lenghts[SGYUVChannelCount];
 }
 
-@property (nonatomic, assign, readonly) NSUInteger width;
-@property (nonatomic, assign, readonly) NSUInteger height;
+@property (nonatomic, assign, readonly) int width;
+@property (nonatomic, assign, readonly) int height;
 
 - (instancetype)initWithAVFrame:(AVFrame *)frame width:(int)width height:(int)height;
 

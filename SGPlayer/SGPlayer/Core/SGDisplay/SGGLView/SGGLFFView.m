@@ -36,18 +36,18 @@
 //    assert(self.videoFrame.chromaB.length == (self.videoFrame.width * self.videoFrame.height) / 4);
 //    assert(self.videoFrame.chromaR.length == (self.videoFrame.width * self.videoFrame.height) / 4);
     
-    const NSUInteger frameWidth = self.videoFrame.width;
-    const NSUInteger frameHeight = self.videoFrame.height;
+    const int frameWidth = self.videoFrame.width;
+    const int frameHeight = self.videoFrame.height;
     * aspect = (frameWidth * 1.0) / (frameHeight * 1.0);
     
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     
-    const NSUInteger widths[3]  = {
+    const int widths[3]  = {
         frameWidth,
         frameWidth / 2,
         frameWidth / 2
     };
-    const NSUInteger heights[3] = {
+    const int heights[3] = {
         frameHeight,
         frameHeight / 2,
         frameHeight / 2
