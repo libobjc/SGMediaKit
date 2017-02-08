@@ -21,4 +21,7 @@
 - (void)play;
 - (void)pause;
 
+- (void)registerAudioSession;
+- (void)unregisterAudioSession;
+
 @end
