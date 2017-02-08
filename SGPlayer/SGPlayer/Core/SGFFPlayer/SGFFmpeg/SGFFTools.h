@@ -9,18 +9,48 @@
 #import <Foundation/Foundation.h>
 #import "SGFFDecoder.h"
 
+#define SGFFSynLogEnable        1
+#define SGFFThreadLogEnable     1
+#define SGFFPacketLogEnable     1
+#define SGFFSleepLogEnable      1
+#define SGFFDecodeLogEnable     1
+#define SGFFErrorLogEnable      1
+
+#if SGFFSynLogEnable
+#define SGFFSynLog(...)          NSLog(__VA_ARGS__)
+#else
 #define SGFFSynLog(...)
-//#define SGFFSynLog(...)          NSLog(__VA_ARGS__)
+#endif
+
+#if SGFFThreadLogEnable
+#define SGFFThreadLog(...)       NSLog(__VA_ARGS__)
+#else
 #define SGFFThreadLog(...)
-//#define SGFFThreadLog(...)       NSLog(__VA_ARGS__)
+#endif
+
+#if SGFFPacketLogEnable
+#define SGFFPacketLog(...)       NSLog(__VA_ARGS__)
+#else
 #define SGFFPacketLog(...)
-//#define SGFFPacketLog(...)       NSLog(__VA_ARGS__)
+#endif
+
+#if SGFFSleepLogEnable
+#define SGFFSleepLog(...)        NSLog(__VA_ARGS__)
+#else
 #define SGFFSleepLog(...)
-//#define SGFFSleepLog(...)        NSLog(__VA_ARGS__)
+#endif
+
+#if SGFFDecodeLogEnable
+#define SGFFDecodeLog(...)       NSLog(__VA_ARGS__)
+#else
 #define SGFFDecodeLog(...)
-//#define SGFFDecodeLog(...)       NSLog(__VA_ARGS__)
+#endif
+
+#if SGFFErrorLogEnable
+#define SGFFErrorLog(...)        NSLog(__VA_ARGS__)
+#else
 #define SGFFErrorLog(...)
-//#define SGFFErrorLog(...)        NSLog(__VA_ARGS__)
+#endif
 
 void sg_ff_log(void * context, int level, const char * format, va_list args);
 
