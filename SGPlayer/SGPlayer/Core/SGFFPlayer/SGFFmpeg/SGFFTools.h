@@ -9,12 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "SGFFDecoder.h"
 
-#define SGFFSynLogEnable        1
-#define SGFFThreadLogEnable     1
-#define SGFFPacketLogEnable     1
-#define SGFFSleepLogEnable      1
-#define SGFFDecodeLogEnable     1
-#define SGFFErrorLogEnable      1
+#define SGFFSynLogEnable        0
+#define SGFFThreadLogEnable     0
+#define SGFFPacketLogEnable     0
+#define SGFFSleepLogEnable      0
+#define SGFFDecodeLogEnable     0
+#define SGFFErrorLogEnable      0
 
 #if SGFFSynLogEnable
 #define SGFFSynLog(...)          NSLog(__VA_ARGS__)
