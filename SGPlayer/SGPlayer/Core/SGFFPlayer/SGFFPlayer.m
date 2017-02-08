@@ -257,6 +257,11 @@
 - (void)decoderDidPlaybackFinished:(SGFFDecoder *)decoder
 {
     self.state = SGPlayerStateFinished;
+#if UsesSGAudioSession
+    [[SGAudioManager manager] pause];
+#else
+    [[KxAudioManager audioManager] pause];
+#endif
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering
@@ -396,11 +401,6 @@
                 
                 if (!frame) {
                     memset(outData, 0, numFrames * numChannels * sizeof(float));
-#if UsesSGAudioSession
-                    [[SGAudioManager manager] pause];
-#else
-                    [[KxAudioManager audioManager] pause];
-#endif
                     return;
                 }
                 
