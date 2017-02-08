@@ -43,9 +43,9 @@ static AVPacket flush_packet;
 @property (nonatomic, strong) NSInvocationOperation * decodeFrameOperation;
 @property (nonatomic, strong) NSInvocationOperation * displayOperation;
 
-@property (nonatomic, strong) SGFFPacketQueue * audioPacketQueue;
 @property (nonatomic, strong) SGFFPacketQueue * videoPacketQueue;
 @property (nonatomic, strong) SGFFFrameQueue * videoFrameQueue;
+@property (nonatomic, strong) SGFFFrameQueue * audioFrameQueue;
 
 @property (nonatomic, strong) NSError * error;
 
@@ -406,9 +406,9 @@ static AVPacket flush_packet;
         self.videoPacketQueue = [SGFFPacketQueue packetQueueWithTimebase:self.videoTimebase];
     }
     
-    [self.audioPacketQueue flush];
-    if (self.audioEnable && !self.audioPacketQueue) {
-        self.audioPacketQueue = [SGFFPacketQueue packetQueueWithTimebase:self.audioTimebase];
+    [self.audioFrameQueue flush];
+    if (self.audioEnable && !self.audioFrameQueue) {
+        self.audioFrameQueue = [SGFFFrameQueue frameQueue];
     }
     
     self.reading = YES;
@@ -439,10 +439,12 @@ static AVPacket flush_packet;
             
             self.buffering = YES;
             [self.videoPacketQueue flush];
-            [self.audioPacketQueue flush];
             [self.videoFrameQueue flush];
+            [self.audioFrameQueue flush];
             [self.videoPacketQueue putPacket:flush_packet];
-            [self.audioPacketQueue putPacket:flush_packet];
+            if (self.audioEnable) {
+                avcodec_flush_buffers(_audio_codec);
+            }
             self.seeking = NO;
             self.seekToTime = 0;
             if (self.seekCompleteHandler) {
@@ -456,7 +458,7 @@ static AVPacket flush_packet;
             [self updateBufferedDurationByAudio];
             continue;
         }
-        if (self.audioPacketQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
+        if (self.audioFrameQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
             NSTimeInterval interval = 0;
             if (self.paused) {
                 interval = [SGFFPacketQueue sleepTimeIntervalForFullAndPaused];
@@ -483,7 +485,7 @@ static AVPacket flush_packet;
             [self updateBufferedDurationByVideo];
         } else if (packet.stream_index == self.audioStreamIndex) {
             SGFFPacketLog(@"audio : put packet");
-            [self.audioPacketQueue putPacket:packet];
+            [self putAudioPacket:packet];
             [self updateBufferedDurationByAudio];
         }
         [self checkBufferingStatus];
@@ -703,57 +705,41 @@ static AVPacket flush_packet;
 
 - (SGFFAudioFrame *)fetchAudioFrame
 {
-    self.currentAudioFrame = [self getAudioFrameFromPacketQueue];
-    if (self.currentVideoFrame) {
-        [self updateProgressByAudio];
+    if (self.closed || self.seeking || self.buffering || self.audioFrameQueue.count == 0) return nil;
+    self.currentAudioFrame = [self.audioFrameQueue getFrame];
+    if (!self.currentAudioFrame) return nil;
+    
+    if (self.endOfFile) {
+        [self updateBufferedDurationByAudio];
     }
+    [self updateProgressByAudio];
     self.audioTimeClock = self.currentAudioFrame.position;
     return self.currentAudioFrame;
 }
 
-- (SGFFAudioFrame *)getAudioFrameFromPacketQueue
+- (void)putAudioPacket:(AVPacket)packet
 {
-    SGFFAudioFrame * audioFrame;
-    while (!audioFrame) {
-        if (self.closed) {
-            return nil;
+    int packet_size = packet.size;
+    while (packet_size > 0)
+    {
+        int gotframe = 0;
+        int lenght = avcodec_decode_audio4(_audio_codec, _audio_frame, &gotframe, &packet);
+        if (lenght < 0) {
+            break;
         }
-        if (self.endOfFile && self.audioPacketQueue.count == 0) {
-            return nil;
-        }
-        AVPacket packet = [self.audioPacketQueue getPacket];
-        if (self.endOfFile) {
-            [self updateBufferedDurationByAudio];
-        }
-        if (packet.data == flush_packet.data) {
-            if (self.audioPacketQueue) {
-                avcodec_flush_buffers(_audio_codec);
-            }
-            continue;
-        }
-        if (packet.stream_index != self.audioStreamIndex) return nil;
-        int packet_size = packet.size;
-        while (packet_size > 0)
-        {
-            int gotframe = 0;
-            int lenght = avcodec_decode_audio4(_audio_codec, _audio_frame, &gotframe, &packet);
-            if (lenght < 0) {
+        if (gotframe) {
+            SGFFAudioFrame * audioFrame = [self getAudioFrameFromAVFrame];
+            if (audioFrame) {
+                [self.audioFrameQueue putFrame:audioFrame];
                 break;
             }
-            if (gotframe) {
-                audioFrame = [self getAudioFrameFromAVFrame];
-                if (audioFrame) {
-                    break;
-                }
-            }
-            if (lenght == 0) {
-                break;
-            }
-            packet_size -= lenght;
         }
-        av_packet_unref(&packet);
+        if (lenght == 0) {
+            break;
+        }
+        packet_size -= lenght;
     }
-    return audioFrame;
+    av_packet_unref(&packet);
 }
 
 - (SGFFAudioFrame *)getAudioFrameFromAVFrame
@@ -819,8 +805,8 @@ static AVPacket flush_packet;
 {
     self.closed = YES;
     [self.videoPacketQueue destroy];
-    [self.audioPacketQueue destroy];
     [self.videoFrameQueue destroy];
+    [self.audioFrameQueue destroy];
     if (async) {
         dispatch_async(dispatch_get_global_queue(0, 0), ^{
             [self.ffmpegOperationQueue cancelAllOperations];
@@ -1035,7 +1021,7 @@ static AVPacket flush_packet;
 - (void)updateBufferedDurationByAudio
 {
     if (!self.videoEnable) {
-        self.bufferedDuration = self.audioPacketQueue.duration;
+        self.bufferedDuration = self.audioFrameQueue.duration;
     }
 }
 
