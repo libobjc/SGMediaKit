@@ -108,7 +108,7 @@
 
 + (int)maxCommonSize
 {
-    return 15 * 1024 * 1024;
+    return 20 * 1024 * 1024;
 }
 
 + (NSTimeInterval)sleepTimeIntervalForFull
