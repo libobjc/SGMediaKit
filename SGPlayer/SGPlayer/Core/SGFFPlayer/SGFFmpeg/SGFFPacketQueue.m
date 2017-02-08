@@ -57,6 +57,7 @@
 {
     [self.condition lock];
     AVPacket packet;
+    packet.stream_index = -2;
     while (!self.packets.firstObject) {
         if (self.destoryToken) {
             [self.condition unlock];
