@@ -14,16 +14,14 @@
 
 
 #import "KxAudioManager.h"
-#import "TargetConditionals.h"
 #import <AudioToolbox/AudioToolbox.h>
 #import <Accelerate/Accelerate.h>
+#import <AVFoundation/AVFoundation.h>
 
 #define MAX_FRAME_SIZE 4096
 #define MAX_CHAN       2
 
 static BOOL checkError(OSStatus error, const char *operation);
-static void sessionPropertyListener(void *inClientData, AudioSessionPropertyID inID, UInt32 inDataSize, const void *inData);
-static void sessionInterruptionListener(void *inClientData, UInt32 inInterruption);
 static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioActionFlags, const AudioTimeStamp * inTimeStamp, UInt32 inOutputBusNumber, UInt32 inNumberFrames, AudioBufferList* ioData);
 
 @interface KxAudioManager ()
@@ -35,14 +33,6 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
     AudioUnit _audioUnit;
     AudioStreamBasicDescription _outputFormat;
 }
-
-@property (nonatomic, assign) Float32 outputVolume;
-@property (nonatomic, assign) BOOL playAfterSessionEndInterruption;
-
-- (BOOL)checkAudioRoute;
-- (BOOL)setupAudio;
-- (BOOL)checkSessionProperties;
-- (BOOL)renderFrames:(UInt32)numFrames ioData:(AudioBufferList *)ioData;
 
 @end
 
@@ -62,75 +52,12 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
 {
 	if (self = [super init]) {
         _outData = (float *)calloc(MAX_FRAME_SIZE*MAX_CHAN, sizeof(float));
-        _outputVolume = 0.5;        
 	}	
 	return self;
 }
 
-- (BOOL)checkAudioRoute
-{
-    // Check what the audio route is.
-    UInt32 propertySize = sizeof(CFStringRef);
-    CFStringRef route;
-    if (checkError(AudioSessionGetProperty(kAudioSessionProperty_AudioRoute,
-                                           &propertySize,
-                                           &route),
-                   "Couldn't check the audio route"))
-        return NO;
-    
-    _audioRoute = CFBridgingRelease(route);
-    return YES;
-}
-
 - (BOOL)setupAudio
 {
-    // --- Audio Session Setup ---
-        
-    UInt32 sessionCategory = kAudioSessionCategory_MediaPlayback;
-    //UInt32 sessionCategory = kAudioSessionCategory_PlayAndRecord;
-    if (checkError(AudioSessionSetProperty(kAudioSessionProperty_AudioCategory,
-                                           sizeof(sessionCategory),
-                                           &sessionCategory),
-                   "Couldn't set audio category"))
-        return NO;
-    
-    
-    if (checkError(AudioSessionAddPropertyListener(kAudioSessionProperty_AudioRouteChange,
-                                                   sessionPropertyListener,
-                                                   (__bridge void *)(self)),
-                   "Couldn't add audio session property listener"))
-    {
-        // just warning
-    }
-    
-    if (checkError(AudioSessionAddPropertyListener(kAudioSessionProperty_CurrentHardwareOutputVolume,
-                                                   sessionPropertyListener,
-                                                   (__bridge void *)(self)),
-                   "Couldn't add audio session property listener"))
-    {
-        // just warning
-    }
-    
-    // Set the buffer size, this will affect the number of samples that get rendered every time the audio callback is fired
-    // A small number will get you lower latency audio, but will make your processor work harder
-    
-#if !TARGET_IPHONE_SIMULATOR
-    Float32 preferredBufferSize = 0.0232;
-    if (checkError(AudioSessionSetProperty(kAudioSessionProperty_PreferredHardwareIOBufferDuration,
-                                            sizeof(preferredBufferSize),
-                                            &preferredBufferSize),
-                    "Couldn't set the preferred buffer duration")) {
-        
-        // just warning
-    }
-#endif
-        
-    if (checkError(AudioSessionSetActive(YES),
-                   "Couldn't activate the audio session"))
-        return NO;
-    
-    [self checkSessionProperties];
-    
     // ----- Audio Unit Setup -----
     
     // Describe the output unit.
@@ -160,7 +87,7 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
         return NO;
     
     
-    _outputFormat.mSampleRate = _samplingRate;
+    _outputFormat.mSampleRate = self.samplingRate;
     if (checkError(AudioUnitSetProperty(_audioUnit,
                                         kAudioUnitProperty_StreamFormat,
                                         kAudioUnitScope_Input,
@@ -194,38 +121,6 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
         return NO;
     
     return YES;
-}
-
-- (BOOL)checkSessionProperties
-{
-    [self checkAudioRoute];
-    
-    // Check the number of output channels.
-    UInt32 newNumChannels;
-    UInt32 size = sizeof(newNumChannels);
-    if (checkError(AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareOutputNumberChannels,
-                                           &size,
-                                           &newNumChannels),
-                   "Checking number of output channels"))
-        return NO;
-
-    // Get the hardware sampling rate. This is settable, but here we're only reading.
-    size = sizeof(_samplingRate);
-    if (checkError(AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareSampleRate,
-                                           &size,
-                                           &_samplingRate),
-                   "Checking hardware sampling rate"))
-        
-        return NO;
-
-    size = sizeof(_outputVolume);
-    if (checkError(AudioSessionGetProperty(kAudioSessionProperty_CurrentHardwareOutputVolume,
-                                           &size,
-                                           &_outputVolume),
-                   "Checking current hardware output volume"))
-        return NO;
-
-    return YES;	
 }
 
 - (BOOL)renderFrames:(UInt32)numFrames ioData:(AudioBufferList *)ioData
@@ -265,40 +160,20 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
     return noErr;
 }
 
-#pragma mark - public
-
-- (BOOL) activateAudioSession
+- (BOOL)activateAudioSession
 {
     if (!_activated) {
-        
-        if (!_initialized) {
-            
-            if (checkError(AudioSessionInitialize(NULL,
-                                                  kCFRunLoopDefaultMode,
-                                                  sessionInterruptionListener,
-                                                  (__bridge void *)(self)),
-                           "Couldn't initialize audio session"))
-                return NO;
-            
-            _initialized = YES;
-        }
-        
-        if ([self checkAudioRoute] &&
-            [self setupAudio]) {
-            
+        if ([self setupAudio]) {
             _activated = YES;
         }
     }
-    
     return _activated;
 }
 
-- (void) deactivateAudioSession
+- (void)deactivateAudioSession
 {
     if (_activated) {
-     
         [self pause];
-                
         checkError(AudioUnitUninitialize(_audioUnit),
                    "Couldn't uninitialize the audio unit");
         
@@ -316,20 +191,6 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
                 
         checkError(AudioComponentInstanceDispose(_audioUnit),
                    "Couldn't dispose the output audio unit");
-                
-        checkError(AudioSessionSetActive(NO),
-                   "Couldn't deactivate the audio session");        
-        
-        checkError(AudioSessionRemovePropertyListenerWithUserData(kAudioSessionProperty_AudioRouteChange,
-                                                                  sessionPropertyListener,
-                                                                  (__bridge void *)(self)),
-                   "Couldn't remove audio session property listener");
-        
-        checkError(AudioSessionRemovePropertyListenerWithUserData(kAudioSessionProperty_CurrentHardwareOutputVolume,
-                                                                  sessionPropertyListener,
-                                                                  (__bridge void *)(self)),
-                   "Couldn't remove audio session property listener");
-        
         _activated = NO;
     }
 }
@@ -351,6 +212,16 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
     return _playing;
 }
 
+- (Float32)outputVolume
+{
+    return [AVAudioSession sharedInstance].outputVolume;
+}
+
+- (Float64)samplingRate
+{
+    return [AVAudioSession sharedInstance].sampleRate;
+}
+
 - (void)dealloc
 {
     if (_outData) {
@@ -362,39 +233,6 @@ static OSStatus renderCallback (void *inRefCon, AudioUnitRenderActionFlags	*ioAc
 @end
 
 #pragma mark - callbacks
-
-static void sessionPropertyListener(void *                  inClientData,
-                                    AudioSessionPropertyID  inID,
-                                    UInt32                  inDataSize,
-                                    const void *            inData)
-{
-    KxAudioManager *sm = (__bridge KxAudioManager *)inClientData;
-    
-	if (inID == kAudioSessionProperty_AudioRouteChange) {
-        if ([sm checkAudioRoute]) {
-            [sm checkSessionProperties];
-        }
-    } else if (inID == kAudioSessionProperty_CurrentHardwareOutputVolume) {
-        if (inData && inDataSize == 4) {
-            sm.outputVolume = *(float *)inData;
-        }
-    }
-}
-
-static void sessionInterruptionListener(void *inClientData, UInt32 inInterruption)
-{    
-    KxAudioManager *sm = (__bridge KxAudioManager *)inClientData;
-    
-	if (inInterruption == kAudioSessionBeginInterruption) {
-        sm.playAfterSessionEndInterruption = sm.playing;
-        [sm pause];
-	} else if (inInterruption == kAudioSessionEndInterruption) {
-        if (sm.playAfterSessionEndInterruption) {
-            sm.playAfterSessionEndInterruption = NO;
-            [sm play];
-        }
-	}
-}
 
 static OSStatus renderCallback (void						*inRefCon,
                                 AudioUnitRenderActionFlags	* ioActionFlags,

@@ -10,7 +10,7 @@
 //  KxMovie is licenced under the LGPL v3, see lgpl-3.0.txt
 
 
-#import <CoreFoundation/CoreFoundation.h>
+#import <Foundation/Foundation.h>
 
 @class KxAudioManager;
 
@@ -27,7 +27,6 @@
 @property (nonatomic, assign, readonly) UInt32 numBytesPerSample;
 @property (nonatomic, assign, readonly) Float32 outputVolume;
 @property (nonatomic, assign, readonly) BOOL playing;
-@property (nonatomic, copy, readonly) NSString * audioRoute;
 
 @property (nonatomic, weak) id <KxAudioManagerDelegate> delegate;
 
