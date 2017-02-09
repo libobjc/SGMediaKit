@@ -52,7 +52,7 @@ static OSStatus renderCallback (void * inRefCon,
 - (instancetype)init
 {
     if (self = [super init]) {
-        _outData = (float *)calloc(max_frame_size * max_chan, sizeof(float));
+        self->_outData = (float *)calloc(max_frame_size * max_chan, sizeof(float));
     }
     return self;
 }
@@ -155,7 +155,7 @@ static OSStatus renderCallback (void * inRefCon,
     return YES;
 }
 
-- (OSStatus)renderFrames:(UInt32)numFrames ioData:(AudioBufferList *)ioData
+- (OSStatus)renderFrames:(UInt32)numberOfFrames ioData:(AudioBufferList *)ioData
 {
     for (int iBuffer = 0; iBuffer < ioData->mNumberBuffers; iBuffer++) {
         memset(ioData->mBuffers[iBuffer].mData, 0, ioData->mBuffers[iBuffer].mDataByteSize);
@@ -163,7 +163,7 @@ static OSStatus renderCallback (void * inRefCon,
     
     if (self.playing && self.delegate)
     {
-        [self.delegate audioManager:self outputData:_outData numberOfFrames:numFrames numberOfChannels:self.channelCount];
+        [self.delegate audioManager:self outputData:self->_outData numberOfFrames:numberOfFrames numberOfChannels:self.numberOfChannels];
         
         UInt32 numBytesPerSample = self->_audioOutputFormat.mBitsPerChannel / 8;
         if (numBytesPerSample == 4) {
@@ -171,19 +171,28 @@ static OSStatus renderCallback (void * inRefCon,
             for (int iBuffer = 0; iBuffer < ioData->mNumberBuffers; iBuffer++) {
                 int thisNumChannels = ioData->mBuffers[iBuffer].mNumberChannels;
                 for (int iChannel = 0; iChannel < thisNumChannels; iChannel++) {
-                    vDSP_vsadd(_outData+iChannel, self.channelCount, &zero, (float *)ioData->mBuffers[iBuffer].mData, thisNumChannels, numFrames);
+                    vDSP_vsadd(self->_outData + iChannel,
+                               self.numberOfChannels,
+                               &zero,
+                               (float *)ioData->mBuffers[iBuffer].mData,
+                               thisNumChannels,
+                               numberOfFrames);
                 }
             }
         }
         else if (numBytesPerSample == 2)
         {
             float scale = (float)INT16_MAX;
-            vDSP_vsmul(_outData, 1, &scale, _outData, 1, numFrames*self.channelCount);
+            vDSP_vsmul(self->_outData, 1, &scale, self->_outData, 1, numberOfFrames * self.numberOfChannels);
             
             for (int iBuffer = 0; iBuffer < ioData->mNumberBuffers; iBuffer++) {
                 int thisNumChannels = ioData->mBuffers[iBuffer].mNumberChannels;
                 for (int iChannel = 0; iChannel < thisNumChannels; iChannel++) {
-                    vDSP_vfix16(_outData+iChannel, self.channelCount, (SInt16 *)ioData->mBuffers[iBuffer].mData+iChannel, thisNumChannels, numFrames);
+                    vDSP_vfix16(self->_outData + iChannel,
+                                self.numberOfChannels,
+                                (SInt16 *)ioData->mBuffers[iBuffer].mData + iChannel,
+                                thisNumChannels,
+                                numberOfFrames);
                 }
             }
         }
@@ -225,7 +234,7 @@ static OSStatus renderCallback (void * inRefCon,
     return (Float64)self.audioSession.sampleRate;
 }
 
-- (UInt32)channelCount
+- (UInt32)numberOfChannels
 {
     UInt32 number = self->_audioOutputFormat.mChannelsPerFrame;
     if (number > 0) {
@@ -251,9 +260,9 @@ static OSStatus renderCallback (void * inRefCon,
 - (void)dealloc
 {
     [self unregisterAudioSession];
-    if (_outData) {
-        free(_outData);
-        _outData = NULL;
+    if (self->_outData) {
+        free(self->_outData);
+        self->_outData = NULL;
     }
 }
 

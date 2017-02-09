@@ -11,7 +11,7 @@
 @class SGAudioManager;
 
 @protocol SGAudioManagerDelegate <NSObject>
-- (void)audioManager:(SGAudioManager *)audioManager outputData:(float *)outputData numberOfFrames:(UInt32)numFrames numberOfChannels:(UInt32)numChannels;
+- (void)audioManager:(SGAudioManager *)audioManager outputData:(float *)outputData numberOfFrames:(UInt32)numberOfFrames numberOfChannels:(UInt32)numberOfChannels;
 @end
 
 @interface SGAudioManager : NSObject
@@ -25,7 +25,7 @@
 @property (nonatomic, assign, readonly) BOOL playing;
 
 @property (nonatomic, assign, readonly) Float64 samplingRate;
-@property (nonatomic, assign, readonly) UInt32 channelCount;
+@property (nonatomic, assign, readonly) UInt32 numberOfChannels;
 
 - (void)play;
 - (void)pause;
