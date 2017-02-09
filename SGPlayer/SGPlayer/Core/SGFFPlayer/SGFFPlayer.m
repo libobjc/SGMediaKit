@@ -331,19 +331,17 @@
 
 - (UInt32)channelCount
 {
-    return [SGAudioManager manager].channelCount;
+    return [SGAudioManager manager].numberOfChannels;
 }
 
-- (void)audioManager:(SGAudioManager *)audioManager outputData:(float *)data numberOfFrames:(UInt32)numFrames numberOfChannels:(UInt32)numChannels
+- (void)audioManager:(SGAudioManager *)audioManager outputData:(float *)outputData numberOfFrames:(UInt32)numberOfFrames numberOfChannels:(UInt32)numberOfChannels
 {
-    if (!self.playing) return;
+    if (!self.playing) {
+        memset(outputData, 0, numberOfFrames * numberOfChannels * sizeof(float));
+        return;
+    }
     
-    [self audioCallbackFillData:data numFrames:numFrames numChannels:numChannels];
-}
-
-- (void)audioCallbackFillData:(float *)outData numFrames:(UInt32) numFrames numChannels:(UInt32)numChannels
-{
-    while (numFrames > 0)
+    while (numberOfFrames > 0)
     {
         @autoreleasepool
         {
@@ -351,7 +349,7 @@
                 SGFFAudioFrame * frame = [self.decoder fetchAudioFrame];
                 
                 if (!frame) {
-                    memset(outData, 0, numFrames * numChannels * sizeof(float));
+                    memset(outputData, 0, numberOfFrames * numberOfChannels * sizeof(float));
                     return;
                 }
                 
@@ -361,13 +359,13 @@
             if (self.currentAudioFrameSamples) {
                 const void *bytes = (Byte *)self.currentAudioFrameSamples.bytes + self.currentAudioFramePosition;
                 const NSUInteger bytesLeft = (self.currentAudioFrameSamples.length - self.currentAudioFramePosition);
-                const NSUInteger frameSizeOf = numChannels * sizeof(float);
-                const NSUInteger bytesToCopy = MIN(numFrames * frameSizeOf, bytesLeft);
+                const NSUInteger frameSizeOf = numberOfChannels * sizeof(float);
+                const NSUInteger bytesToCopy = MIN(numberOfFrames * frameSizeOf, bytesLeft);
                 const NSUInteger framesToCopy = bytesToCopy / frameSizeOf;
                 
-                memcpy(outData, bytes, bytesToCopy);
-                numFrames -= framesToCopy;
-                outData += framesToCopy * numChannels;
+                memcpy(outputData, bytes, bytesToCopy);
+                numberOfFrames -= framesToCopy;
+                outputData += framesToCopy * numberOfChannels;
                 
                 if (bytesToCopy < bytesLeft) {
                     self.currentAudioFramePosition += bytesToCopy;
@@ -375,7 +373,7 @@
                     self.currentAudioFrameSamples = nil;
                 }
             } else {
-                memset(outData, 0, numFrames * numChannels * sizeof(float));
+                memset(outputData, 0, numberOfFrames * numberOfChannels * sizeof(float));
                 break;
             }
         }
