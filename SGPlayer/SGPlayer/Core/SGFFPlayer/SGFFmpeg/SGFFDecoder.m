@@ -628,11 +628,11 @@ static AVPacket flush_packet;
         }
         return;
     }
-    NSTimeInterval temp = 1;
+    NSTimeInterval tempDuration = 2;
     if (!self.audioEnable) {
-        temp = 10;
+        tempDuration = 10;
     }
-    self.progress = self.duration - time > (self.minBufferedDruation + 1) ? time : self.duration - (self.minBufferedDruation + temp);
+    self.progress = self.duration - time > (self.minBufferedDruation + 1) ? time : self.duration - (self.minBufferedDruation + tempDuration);
     self.seekToTime = self.progress;
     self.seekCompleteHandler = completeHandler;
     self.seeking = YES;
