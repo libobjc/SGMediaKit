@@ -117,6 +117,7 @@
     if (_state != state) {
         SGPlayerState temp = _state;
         _state = state;
+        [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
         switch (_state) {
             case SGPlayerStatePlaying:
                 [self.audioManager playWithDelegate:self];
@@ -125,7 +126,6 @@
                 [self.audioManager pause];
                 break;
         }
-        [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
     }
     [self.stateLock unlock];
 }
@@ -281,7 +281,9 @@
 - (void)errorHandler:(NSError *)error
 {
     self.state = SGPlayerStateFailed;
-    [SGNotification postPlayer:self.abstractPlayer error:error];
+    SGError * obj = [[SGError alloc] init];
+    obj.error = error;
+    [SGNotification postPlayer:self.abstractPlayer error:obj];
 }
 
 #pragma mark - clean

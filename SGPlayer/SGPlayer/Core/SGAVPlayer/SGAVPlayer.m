@@ -324,6 +324,34 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                         SGPlayerLog(@"SGAVPlayer item status failed");
                         self.readyToPlayTime = 0;
                         self.state = SGPlayerStateFailed;
+                        SGError * error = [[SGError alloc] init];
+                        if (self.avPlayerItem.error) {
+                            error.error = self.avPlayerItem.error;
+                            if (self.avPlayerItem.errorLog.extendedLogData.length > 0) {
+                                error.extendedLogData = self.avPlayerItem.errorLog.extendedLogData;
+                                error.extendedLogDataStringEncoding = self.avPlayerItem.errorLog.extendedLogDataStringEncoding;
+                            }
+                            if (self.avPlayerItem.errorLog.events.count > 0) {
+                                NSMutableArray <SGErrorEvent *> * array = [NSMutableArray arrayWithCapacity:self.avPlayerItem.errorLog.events.count];
+                                for (AVPlayerItemErrorLogEvent * obj in self.avPlayerItem.errorLog.events) {
+                                    SGErrorEvent * event = [[SGErrorEvent alloc] init];
+                                    event.date = obj.date;
+                                    event.URI = obj.URI;
+                                    event.serverAddress = obj.serverAddress;
+                                    event.playbackSessionID = obj.playbackSessionID;
+                                    event.errorStatusCode = obj.errorStatusCode;
+                                    event.errorDomain = obj.errorDomain;
+                                    event.errorComment = obj.errorComment;
+                                    [array addObject:event];
+                                }
+                                error.errorEvents = array;
+                            }
+                        } else if (self.avPlayer.error) {
+                            error.error = self.avPlayer.error;
+                        } else {
+                            error.error = [NSError errorWithDomain:@"AVPlayer playback error" code:-1 userInfo:nil];
+                        }
+                        [SGNotification postPlayer:self.abstractPlayer error:error];
                     }
                         break;
                 }

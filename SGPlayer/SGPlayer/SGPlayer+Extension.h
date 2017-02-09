@@ -51,8 +51,21 @@
 + (SGPlayable *)playableFromUserInfo:(NSDictionary *)userInfo;
 @end
 
+@interface SGErrorEvent : SGModel
+@property (nonatomic, copy) NSDate * date;
+@property (nonatomic, copy) NSString * URI;
+@property (nonatomic, copy) NSString * serverAddress;
+@property (nonatomic, copy) NSString * playbackSessionID;
+@property (nonatomic, assign) NSInteger errorStatusCode;
+@property (nonatomic, copy) NSString * errorDomain;
+@property (nonatomic, copy) NSString * errorComment;
+@end
+
 @interface SGError : SGModel
 @property (nonatomic, copy) NSError * error;
+@property (nonatomic, copy) NSData * extendedLogData;
+@property (nonatomic, assign) NSStringEncoding extendedLogDataStringEncoding;
+@property (nonatomic, copy) NSArray <SGErrorEvent *> * errorEvents;
 + (SGError *)errorFromUserInfo:(NSDictionary *)userInfo;
 @end
 

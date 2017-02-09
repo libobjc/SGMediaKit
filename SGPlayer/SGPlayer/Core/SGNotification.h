@@ -11,7 +11,7 @@
 
 @interface SGNotification : NSObject
 
-+ (void)postPlayer:(SGPlayer *)player error:(NSError *)error;
++ (void)postPlayer:(SGPlayer *)player error:(SGError *)error;
 + (void)postPlayer:(SGPlayer *)player statePrevious:(SGPlayerState)previous current:(SGPlayerState)current;
 + (void)postPlayer:(SGPlayer *)player progressPercent:(NSNumber *)percent current:(NSNumber *)current total:(NSNumber *)total;
 + (void)postPlayer:(SGPlayer *)player playablePercent:(NSNumber *)percent current:(NSNumber *)current total:(NSNumber *)total;

@@ -97,13 +97,26 @@
 
 @end
 
+@implementation SGErrorEvent
+
+@end
+
 @implementation SGError
 
 + (SGError *)errorFromUserInfo:(NSDictionary *)userInfo
 {
-    SGError * error = [[SGError alloc] init];
-    error.error = [userInfo objectForKey:SGPlayerErrorKey];
-    return error;
+    SGError * error = [userInfo objectForKey:SGPlayerErrorKey];
+    if ([error isKindOfClass:[SGError class]]) {
+        return error;
+    } else if ([error isKindOfClass:[NSError class]]) {
+        SGError * obj = [[SGError alloc] init];
+        obj.error = (NSError *)error;
+        return obj;
+    } else {
+        SGError * obj = [[SGError alloc] init];
+        obj.error = [NSError errorWithDomain:@"SGPlayer error" code:-1 userInfo:nil];
+        return obj;
+    }
 }
 
 @end

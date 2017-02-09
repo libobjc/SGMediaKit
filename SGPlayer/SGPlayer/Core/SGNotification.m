@@ -10,7 +10,7 @@
 
 @implementation SGNotification
 
-+ (void)postPlayer:(SGPlayer *)player error:(NSError *)error
++ (void)postPlayer:(SGPlayer *)player error:(SGError *)error
 {
     if (!player) return;
     NSDictionary * userInfo;
