@@ -8,31 +8,72 @@
 
 #import "SGPlayer+Extension.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @implementation SGPlayer (Extension)
 
-+ (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction
++ (void)registerPlayerNotificationTarget:(id)target
+                             stateAction:(nullable SEL)stateAction
+                          progressAction:(nullable SEL)progressAction
+                          playableAction:(nullable SEL)playableAction
 {
-    [self registerPlayerNotification:nil target:target stateAction:stateAction progressAction:progressAction playableAction:playableAction errorAction:nil];
+    [self registerPlayerNotification:nil
+                              target:target
+                         stateAction:stateAction
+                      progressAction:progressAction
+                      playableAction:playableAction
+                         errorAction:nil];
 }
 
-- (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction
+- (void)registerPlayerNotificationTarget:(id)target
+                             stateAction:(nullable SEL)stateAction
+                          progressAction:(nullable SEL)progressAction
+                          playableAction:(nullable SEL)playableAction
 {
-    [self.class registerPlayerNotification:self target:target stateAction:stateAction progressAction:progressAction playableAction:playableAction errorAction:nil];
+    [self.class registerPlayerNotification:self
+                                    target:target
+                               stateAction:stateAction
+                            progressAction:progressAction
+                            playableAction:playableAction
+                               errorAction:nil];
 }
 
-+ (void)registerPlayerNotification:(SGPlayer *)player target:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction errorAction:(SEL)errorAction
++ (void)registerPlayerNotification:(nullable SGPlayer *)player
+                            target:(id)target
+                       stateAction:(nullable SEL)stateAction
+                    progressAction:(nullable SEL)progressAction
+                    playableAction:(nullable SEL)playableAction
+                       errorAction:(nullable SEL)errorAction
 {
     if (!target) return;
     [self removePlayerNotification:player target:target];
-    if (stateAction) [[NSNotificationCenter defaultCenter] addObserver:target selector:stateAction name:SGPlayerStateChangeName object:player];
-    if (progressAction) [[NSNotificationCenter defaultCenter] addObserver:target selector:progressAction name:SGPlayerProgressChangeName object:player];
-    if (playableAction) [[NSNotificationCenter defaultCenter] addObserver:target selector:playableAction name:SGPlayerPlayableChangeName object:player];
-    if (errorAction) [[NSNotificationCenter defaultCenter] addObserver:target selector:errorAction name:SGPlayerErrorName object:player];
+    
+    if (stateAction) {
+        [[NSNotificationCenter defaultCenter] addObserver:target selector:stateAction name:SGPlayerStateChangeName object:player];
+    }
+    if (progressAction) {
+        [[NSNotificationCenter defaultCenter] addObserver:target selector:progressAction name:SGPlayerProgressChangeName object:player];
+    }
+    if (playableAction) {
+        [[NSNotificationCenter defaultCenter] addObserver:target selector:playableAction name:SGPlayerPlayableChangeName object:player];
+    }
+    if (errorAction) {
+        [[NSNotificationCenter defaultCenter] addObserver:target selector:errorAction name:SGPlayerErrorName object:player];
+    }
 }
 
-- (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction errorAction:(SEL)errorAction
+- (void)registerPlayerNotificationTarget:(id)target
+                             stateAction:(nullable SEL)stateAction
+                          progressAction:(nullable SEL)progressAction
+                          playableAction:(nullable SEL)playableAction
+                             errorAction:(nullable SEL)errorAction
 {
-    [self.class registerPlayerNotification:self target:target stateAction:stateAction progressAction:progressAction playableAction:playableAction errorAction:errorAction];
+    [self.class registerPlayerNotification:self
+                                    target:target
+                               stateAction:stateAction
+                            progressAction:progressAction
+                            playableAction:playableAction
+                               errorAction:errorAction];
 }
 
 - (void)removePlayerNotificationTarget:(id)target
@@ -45,7 +86,7 @@
     [self removePlayerNotification:nil target:target];
 }
 
-+ (void)removePlayerNotification:(SGPlayer *)player target:(id)target
++ (void)removePlayerNotification:(nullable SGPlayer *)player target:(id)target
 {
     [[NSNotificationCenter defaultCenter] removeObserver:target name:SGPlayerStateChangeName object:player];
     [[NSNotificationCenter defaultCenter] removeObserver:target name:SGPlayerProgressChangeName object:player];
@@ -120,3 +161,5 @@
 }
 
 @end
+
+NS_ASSUME_NONNULL_END

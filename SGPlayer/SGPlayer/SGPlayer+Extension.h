@@ -13,14 +13,31 @@
 @class SGPlayable;
 @class SGError;
 
+NS_ASSUME_NONNULL_BEGIN
+
 #pragma mark - SGPlayer Extsion Category
 
 @interface SGPlayer (Extension)
 
-+ (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction;      // object's class is NSNotification
-+ (void)registerPlayerNotification:(SGPlayer *)player target:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction errorAction:(SEL)errorAction;
-- (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction;      // object's class is NSNotification
-- (void)registerPlayerNotificationTarget:(id)target stateAction:(SEL)stateAction progressAction:(SEL)progressAction playableAction:(SEL)playableAction errorAction:(SEL)errorAction;
++ (void)registerPlayerNotificationTarget:(id)target
+                             stateAction:(nullable SEL)stateAction
+                          progressAction:(nullable SEL)progressAction
+                          playableAction:(nullable SEL)playableAction;      // object's class is NSNotification
++ (void)registerPlayerNotification:(nullable SGPlayer *)player
+                            target:(id)target
+                       stateAction:(nullable SEL)stateAction
+                    progressAction:(nullable SEL)progressAction
+                    playableAction:(nullable SEL)playableAction
+                       errorAction:(nullable SEL)errorAction;
+- (void)registerPlayerNotificationTarget:(id)target
+                             stateAction:(nullable SEL)stateAction
+                          progressAction:(nullable SEL)progressAction
+                          playableAction:(nullable SEL)playableAction;      // object's class is NSNotification
+- (void)registerPlayerNotificationTarget:(id)target
+                             stateAction:(nullable SEL)stateAction
+                          progressAction:(nullable SEL)progressAction
+                          playableAction:(nullable SEL)playableAction
+                             errorAction:(nullable SEL)errorAction;
 + (void)removePlayerNotificationTarget:(id)target;
 - (void)removePlayerNotificationTarget:(id)target;
 
@@ -52,20 +69,21 @@
 @end
 
 @interface SGErrorEvent : SGModel
-@property (nonatomic, copy) NSDate * date;
-@property (nonatomic, copy) NSString * URI;
-@property (nonatomic, copy) NSString * serverAddress;
-@property (nonatomic, copy) NSString * playbackSessionID;
+@property (nonatomic, copy, nullable) NSDate * date;
+@property (nonatomic, copy, nullable) NSString * URI;
+@property (nonatomic, copy, nullable) NSString * serverAddress;
+@property (nonatomic, copy, nullable) NSString * playbackSessionID;
 @property (nonatomic, assign) NSInteger errorStatusCode;
 @property (nonatomic, copy) NSString * errorDomain;
-@property (nonatomic, copy) NSString * errorComment;
+@property (nonatomic, copy, nullable) NSString * errorComment;
 @end
 
 @interface SGError : SGModel
 @property (nonatomic, copy) NSError * error;
-@property (nonatomic, copy) NSData * extendedLogData;
+@property (nonatomic, copy, nullable) NSData * extendedLogData;
 @property (nonatomic, assign) NSStringEncoding extendedLogDataStringEncoding;
-@property (nonatomic, copy) NSArray <SGErrorEvent *> * errorEvents;
+@property (nonatomic, copy, nullable) NSArray <SGErrorEvent *> * errorEvents;
 + (SGError *)errorFromUserInfo:(NSDictionary *)userInfo;
 @end
 
+NS_ASSUME_NONNULL_END
