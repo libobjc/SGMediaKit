@@ -562,12 +562,14 @@ static AVPacket flush_packet;
         self.currentVideoFrame = [self.videoFrameQueue getFrame];
         if (self.currentVideoFrame) {
             
-            NSTimeInterval delay = 0;
-            NSTimeInterval audioTimeClock = self.audioTimeClock;
-            if (self.currentVideoFrame.position >= audioTimeClock) {
-                delay = self.currentVideoFrame.duration + self.currentVideoFrame.position - audioTimeClock;
-            } else {
-                delay = self.currentVideoFrame.duration - (audioTimeClock - self.currentVideoFrame.position);
+            NSTimeInterval delay = self.currentVideoFrame.duration;
+            if (self.audioEnable) {
+                NSTimeInterval audioTimeClock = self.audioTimeClock;
+                if (self.currentVideoFrame.position >= audioTimeClock) {
+                    delay = self.currentVideoFrame.duration + self.currentVideoFrame.position - audioTimeClock;
+                } else {
+                    delay = self.currentVideoFrame.duration - (audioTimeClock - self.currentVideoFrame.position);
+                }
             }
             
             if (delay > 0.001) {
