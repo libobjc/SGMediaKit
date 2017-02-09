@@ -72,7 +72,7 @@
         self.size = 0;
     }
     self.duration -= packet.duration * self.timebase;
-    if (self.duration < 0) {
+    if (self.duration < 0 || self.count <= 0) {
         self.duration = 0;
     }
     [self.condition unlock];

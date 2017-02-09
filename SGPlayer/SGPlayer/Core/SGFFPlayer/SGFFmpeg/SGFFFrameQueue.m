@@ -65,11 +65,11 @@
     SGFFFrame * frame = self.frames.firstObject;
     [self.frames removeObjectAtIndex:0];
     self.duration -= frame.duration;
-    if (self.duration < 0) {
+    if (self.duration < 0 || self.count <= 0) {
         self.duration = 0;
     }
     self.size -= frame.size;
-    if (self.size <= 0) {
+    if (self.size <= 0 || self.count <= 0) {
         self.size = 0;
     }
     [self.condition unlock];

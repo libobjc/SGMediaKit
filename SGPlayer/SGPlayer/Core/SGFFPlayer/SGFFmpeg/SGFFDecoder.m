@@ -488,7 +488,6 @@ static AVPacket flush_packet;
             [self putAudioPacket:packet];
             [self updateBufferedDurationByAudio];
         }
-        [self checkBufferingStatus];
     }
     self.reading = NO;
     [self checkBufferingStatus];
@@ -535,6 +534,7 @@ static AVPacket flush_packet;
         }
     }
     self.decoding = NO;
+    [self checkBufferingStatus];
 }
 
 - (void)displayThread
@@ -558,6 +558,9 @@ static AVPacket flush_packet;
         if (self.endOfFile && self.videoPacketQueue.count == 0 && self.videoFrameQueue.count == 0) {
             SGFFThreadLog(@"display finished");
             break;
+        }
+        if (self.videoFrameQueue.count <= 0) {
+            [self updateBufferedDurationByVideo];
         }
         self.currentVideoFrame = [self.videoFrameQueue getFrame];
         if (self.currentVideoFrame) {
@@ -600,6 +603,7 @@ static AVPacket flush_packet;
             }
         }
     }
+    [self checkBufferingStatus];
 }
 
 - (void)pause
@@ -712,7 +716,11 @@ static AVPacket flush_packet;
 - (SGFFAudioFrame *)fetchAudioFrame
 {
     BOOL check = self.closed || self.seeking || self.buffering || self.paused || self.playbackFinished || !self.audioEnable;
-    if (check || self.audioFrameQueue.count == 0) return nil;
+    if (check) return nil;
+    if (self.audioFrameQueue.count <= 0) {
+        [self updateBufferedDurationByAudio];
+        return nil;
+    }
     self.currentAudioFrame = [self.audioFrameQueue getFrame];
     if (!self.currentAudioFrame) return nil;
     
@@ -968,6 +976,7 @@ static AVPacket flush_packet;
         if (_bufferedDuration <= 0 && self.endOfFile) {
             self.playbackFinished = YES;
         }
+        [self checkBufferingStatus];
     }
 }
 
@@ -1020,9 +1029,7 @@ static AVPacket flush_packet;
 
 - (void)updateBufferedDurationByVideo
 {
-    if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfBufferedDuration:)]) {
-        self.bufferedDuration = self.videoPacketQueue.duration + self.videoFrameQueue.duration;
-    }
+    self.bufferedDuration = self.videoPacketQueue.duration + self.videoFrameQueue.duration;
 }
 
 - (void)updateBufferedDurationByAudio
