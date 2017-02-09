@@ -85,36 +85,38 @@
     }
 }
 
+- (BOOL)isReady
+{
+    if (self.manager.isDeviceMotionAvailable) {
+        return self.manager.deviceMotion && self.manager.isDeviceMotionActive;
+    } else {
+        return YES;
+    }
+}
+
 - (void)start
 {
-    if (!self.manager.isDeviceMotionActive && self.manager.isDeviceMotionAvailable) {
+    if (!self.isReady && !self.manager.isDeviceMotionActive) {
         self.manager.deviceMotionUpdateInterval = 0.01;
         [self.manager startDeviceMotionUpdatesUsingReferenceFrame:CMAttitudeReferenceFrameXArbitraryZVertical];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            _ready = YES;
-        });
-    } else {
-        _ready = YES;
     }
 }
 
 - (void)stop
 {
     [self.manager stopDeviceMotionUpdates];
-    _ready = NO;
     self.manager = nil;
 }
 
 - (GLKMatrix4)modelView
 {
-    if (!self.manager.isDeviceMotionAvailable) {
-        _ready = YES;
+    if (!self.manager.isDeviceMotionAvailable || !self.manager.isDeviceMotionActive) {
         return GLKMatrix4Identity;
-    };
+    }
     
     CMDeviceMotion * motion = self.manager.deviceMotion;
     if (!motion) return GLKMatrix4Identity;
-    _ready = YES;
+    
     [self updateDeviceOrientation:[UIApplication sharedApplication].statusBarOrientation];
     CMRotationMatrix rotationMatrix = motion.attitude.rotationMatrix;
     GLKMatrix4 inertialReferenceFrameToDevice = GLKMatrix4Transpose([self glMatrixFromRotationMatrix:rotationMatrix]);

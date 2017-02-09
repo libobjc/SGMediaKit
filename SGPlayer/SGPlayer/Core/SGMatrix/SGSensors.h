@@ -10,10 +10,11 @@
 
 @interface SGSensors : NSObject
 
-@property (nonatomic, assign, readonly) GLKMatrix4 modelView;
 @property (nonatomic, assign, readonly, getter=isReady) BOOL ready;
 
 - (void)start;
 - (void)stop;
+
+- (GLKMatrix4)modelView;
 
 @end
