@@ -11,6 +11,7 @@
 #import "SGFFFrame.h"
 
 typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
+    SGFFDecoderErrorCodeFormatCreate,
     SGFFDecoderErrorCodeFormatOpenInput,
     SGFFDecoderErrorCodeFormatFindStreamInfo,
     SGFFDecoderErrorCodeStreamNotFound,

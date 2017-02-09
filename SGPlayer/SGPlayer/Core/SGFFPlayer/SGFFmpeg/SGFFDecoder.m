@@ -18,6 +18,12 @@
 
 static AVPacket flush_packet;
 
+static int ffmpeg_interrupt_callback(void *ctx)
+{
+    SGFFDecoder * obj = (__bridge SGFFDecoder *)ctx;
+    return obj.closed;
+}
+
 @interface SGFFDecoder ()
 
 {
@@ -237,9 +243,18 @@ static AVPacket flush_packet;
 
 - (NSError *)openStream
 {
-    _format_context = NULL;
     int reslut = 0;
     NSError * error = nil;
+    
+    _format_context = avformat_alloc_context();
+    if (!_format_context) {
+        reslut = -1;
+        error = [NSError errorWithDomain:@"SGFFDecoderErrorCodeFormatCreate error" code:SGFFDecoderErrorCodeFormatCreate userInfo:nil];
+        return error;
+    }
+
+    _format_context->interrupt_callback.callback = ffmpeg_interrupt_callback;
+    _format_context->interrupt_callback.opaque = (__bridge void *)self;
     
     reslut = avformat_open_input(&_format_context, self.contentURLString.UTF8String, NULL, NULL);
     error = sg_ff_check_error_code(reslut, SGFFDecoderErrorCodeFormatOpenInput);
