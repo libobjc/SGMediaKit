@@ -21,13 +21,13 @@
 
 + (instancetype)manager;
 
-@property (nonatomic, weak) id <SGAudioManagerDelegate> delegate;
+@property (nonatomic, weak, readonly) id <SGAudioManagerDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL playing;
 
 @property (nonatomic, assign, readonly) Float64 samplingRate;
 @property (nonatomic, assign, readonly) UInt32 numberOfChannels;
 
-- (void)play;
+- (void)playWithDelegate:(id <SGAudioManagerDelegate>)delegate;
 - (void)pause;
 
 - (BOOL)registerAudioSession;

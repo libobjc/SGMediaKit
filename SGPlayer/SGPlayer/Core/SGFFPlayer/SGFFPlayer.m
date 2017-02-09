@@ -19,6 +19,7 @@
 @property (nonatomic, weak) SGPlayer * abstractPlayer;
 
 @property (nonatomic, strong) SGFFDecoder * decoder;
+@property (nonatomic, strong) SGAudioManager * audioManager;
 
 @property (nonatomic, strong) NSData * currentAudioFrameSamples;
 @property (nonatomic, assign) NSUInteger currentAudioFramePosition;
@@ -46,7 +47,8 @@
     if (self = [super init]) {
         self.abstractPlayer = abstractPlayer;
         self.stateLock = [[NSLock alloc] init];
-        [[SGAudioManager manager] registerAudioSession];
+        self.audioManager = [SGAudioManager manager];
+        [self.audioManager registerAudioSession];
     }
     return self;
 }
@@ -54,8 +56,6 @@
 - (void)play
 {
     self.playing = YES;
-    [SGAudioManager manager].delegate = self;
-    [[SGAudioManager manager] play];
     [self.decoder resume];
     
     switch (self.state) {
@@ -78,7 +78,6 @@
 - (void)pause
 {
     self.playing = NO;
-    [[SGAudioManager manager] pause];
     [self.decoder pause];
     
     switch (self.state) {
@@ -118,6 +117,14 @@
     if (_state != state) {
         SGPlayerState temp = _state;
         _state = state;
+        switch (_state) {
+            case SGPlayerStatePlaying:
+                [self.audioManager playWithDelegate:self];
+                break;
+            default:
+                [self.audioManager pause];
+                break;
+        }
         [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
     }
     [self.stateLock unlock];
@@ -241,23 +248,19 @@
 - (void)decoderDidPlaybackFinished:(SGFFDecoder *)decoder
 {
     self.state = SGPlayerStateFinished;
-    [[SGAudioManager manager] pause];
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering
 {
     if (buffering) {
-        [[SGAudioManager manager] pause];
         self.state = SGPlayerStateBuffering;
     } else {
         if (self.playing) {
             self.state = SGPlayerStatePlaying;
-            [[SGAudioManager manager] play];
         } else {
             self.state = SGPlayerStateSuspend;
         }
     }
-    NSLog(@"缓冲状态 : %d", buffering);
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBufferedDuration:(NSTimeInterval)bufferedDuration
@@ -298,7 +301,6 @@
     self.lastPostProgressTime = 0;
     self.lastPostPlayableTime = 0;
     [self.abstractPlayer.displayView cleanEmptyBuffer];
-    [[SGAudioManager manager] pause];
 }
 
 - (void)cleanFrames
@@ -318,7 +320,7 @@
 - (void)dealloc
 {
     [self clean];
-    [[SGAudioManager manager] unregisterAudioSession];
+    [self.audioManager unregisterAudioSession];
     NSLog(@"SGFFPlayer release");
 }
 
@@ -326,12 +328,12 @@
 
 - (Float64)samplingRate
 {
-    return [SGAudioManager manager].samplingRate;
+    return self.audioManager.samplingRate;
 }
 
-- (UInt32)channelCount
+- (UInt32)numberOfChannels
 {
-    return [SGAudioManager manager].numberOfChannels;
+    return self.audioManager.numberOfChannels;
 }
 
 - (void)audioManager:(SGAudioManager *)audioManager outputData:(float *)outputData numberOfFrames:(UInt32)numberOfFrames numberOfChannels:(UInt32)numberOfChannels

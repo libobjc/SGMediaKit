@@ -358,13 +358,13 @@ static AVPacket flush_packet;
     
     BOOL needSwr = YES;
     if (stream->codec->sample_fmt == AV_SAMPLE_FMT_S16) {
-        if (self.audioOutput.samplingRate == stream->codec->sample_rate && self.audioOutput.channelCount == stream->codec->channels) {
+        if (self.audioOutput.samplingRate == stream->codec->sample_rate && self.audioOutput.numberOfChannels == stream->codec->channels) {
             needSwr = NO;
         }
     }
     
     if (needSwr) {
-        _audio_swr_context = swr_alloc_set_opts(NULL, av_get_default_channel_layout(self.audioOutput.channelCount), AV_SAMPLE_FMT_S16, self.audioOutput.samplingRate, av_get_default_channel_layout(stream->codec->channels), stream->codec->sample_fmt, stream->codec->sample_rate, 0, NULL);
+        _audio_swr_context = swr_alloc_set_opts(NULL, av_get_default_channel_layout(self.audioOutput.numberOfChannels), AV_SAMPLE_FMT_S16, self.audioOutput.samplingRate, av_get_default_channel_layout(stream->codec->channels), stream->codec->sample_fmt, stream->codec->sample_rate, 0, NULL);
         
         result = swr_init(_audio_swr_context);
         error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeAuidoSwrInit);
@@ -751,8 +751,8 @@ static AVPacket flush_packet;
     void * audioDataBuffer;
     
     if (_audio_swr_context) {
-        const int ratio = MAX(1, self.audioOutput.samplingRate / _audio_codec->sample_rate) * MAX(1, self.audioOutput.channelCount / _audio_codec->channels) * 2;
-        const int buffer_size = av_samples_get_buffer_size(NULL, self.audioOutput.channelCount, _audio_frame->nb_samples * ratio, AV_SAMPLE_FMT_S16, 1);
+        const int ratio = MAX(1, self.audioOutput.samplingRate / _audio_codec->sample_rate) * MAX(1, self.audioOutput.numberOfChannels / _audio_codec->channels) * 2;
+        const int buffer_size = av_samples_get_buffer_size(NULL, self.audioOutput.numberOfChannels, _audio_frame->nb_samples * ratio, AV_SAMPLE_FMT_S16, 1);
         
         if (!_audio_swr_buffer || _audio_swr_buffer_size < buffer_size) {
             _audio_swr_buffer_size = buffer_size;
@@ -776,7 +776,7 @@ static AVPacket flush_packet;
         numberOfFrames = _audio_frame->nb_samples;
     }
     
-    const NSUInteger numberOfElements = numberOfFrames * self.audioOutput.channelCount;
+    const NSUInteger numberOfElements = numberOfFrames * self.audioOutput.numberOfChannels;
     NSMutableData *data = [NSMutableData dataWithLength:numberOfElements * sizeof(float)];
     
     float scale = 1.0 / (float)INT16_MAX ;
@@ -789,7 +789,7 @@ static AVPacket flush_packet;
     audioFrame.samples = data;
     
     if (audioFrame.duration == 0) {
-        audioFrame.duration = audioFrame.samples.length / (sizeof(float) * self.audioOutput.channelCount * self.audioOutput.samplingRate);
+        audioFrame.duration = audioFrame.samples.length / (sizeof(float) * self.audioOutput.numberOfChannels * self.audioOutput.samplingRate);
     }
     
     return audioFrame;

@@ -201,6 +201,12 @@ static OSStatus renderCallback (void * inRefCon,
     return noErr;
 }
 
+- (void)playWithDelegate:(id<SGAudioManagerDelegate>)delegate
+{
+    self->_delegate = delegate;
+    [self play];
+}
+
 - (void)play
 {
     if (!self->_playing) {
