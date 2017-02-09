@@ -10,4 +10,6 @@
 
 @implementation SGPlayer (DisplayView)
 
+@dynamic displayView;
+
 @end

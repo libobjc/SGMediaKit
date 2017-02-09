@@ -11,6 +11,6 @@
 
 @interface SGPlayer (DisplayView)
 
-@property (nonatomic, strong) SGDisplayView * displayView;
+@property (nonatomic, strong, readonly) SGDisplayView * displayView;
 
 @end
