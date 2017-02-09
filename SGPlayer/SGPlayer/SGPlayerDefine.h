@@ -33,6 +33,7 @@ typedef NS_ENUM(NSUInteger, SGVideoFormat) {
     SGVideoFormatFLV,
     SGVideoFormatM3U8,
     SGVideoFormatRTMP,
+    SGVideoFormatRTSP,
 };
 
 // video type

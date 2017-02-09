@@ -23,6 +23,7 @@
         self.flvFormat = SGDecoderTypeFFmpeg;
         self.m3u8Format = SGDecoderTypeAVPlayer;
         self.rtmpFormat = SGDecoderTypeFFmpeg;
+        self.rtspFormat = SGDecoderTypeFFmpeg;
     }
     return self;
 }
@@ -30,6 +31,23 @@
 - (SGVideoFormat)formatForContentURL:(NSURL *)contentURL
 {
     if (!contentURL) return SGVideoFormatError;
+    NSString * path;
+    if (contentURL.isFileURL) {
+        path = contentURL.path;
+    } else {
+        path = contentURL.absoluteString;
+    }
+    if ([path hasPrefix:@"rtmp:"]) {
+        return SGVideoFormatRTMP;
+    } else if ([path hasPrefix:@"rtsp:"]) {
+        return SGVideoFormatRTSP;
+    } else if ([path containsString:@".flv"]) {
+        return SGVideoFormatFLV;
+    } else if ([path containsString:@".mp4"]) {
+        return SGVideoFormatMPEG4;
+    } else if ([path containsString:@".m3u8"]) {
+        return SGVideoFormatM3U8;
+    }
     return SGVideoFormatUnknown;
 }
 
@@ -49,6 +67,8 @@
             return self.m3u8Format;
         case SGVideoFormatRTMP:
             return self.rtmpFormat;
+        case SGVideoFormatRTSP:
+            return self.rtspFormat;
     }
 }
 

@@ -20,5 +20,6 @@
 @property (nonatomic, assign) SGDecoderType flvFormat;       // default is SGDecodeTypeFFmpeg
 @property (nonatomic, assign) SGDecoderType m3u8Format;      // default is SGDecodeTypeAVPlayer
 @property (nonatomic, assign) SGDecoderType rtmpFormat;      // default is SGDecodeTypeFFmpeg
+@property (nonatomic, assign) SGDecoderType rtspFormat;      // default is SGDecodeTypeFFmpeg
 
 @end
