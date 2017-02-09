@@ -376,10 +376,6 @@
 		9CEC9A891E233A6D00657B35 /* SGAudioManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CEC9A861E233A6D00657B35 /* SGAudioManager.h */; };
 		9CEC9A8A1E233A6D00657B35 /* SGAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CEC9A871E233A6D00657B35 /* SGAudioManager.m */; };
 		9CEC9A8B1E233A6D00657B35 /* SGAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CEC9A871E233A6D00657B35 /* SGAudioManager.m */; };
-		9CEC9A8E1E2340F400657B35 /* KxAudioManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CEC9A8C1E2340F400657B35 /* KxAudioManager.h */; };
-		9CEC9A8F1E2340F400657B35 /* KxAudioManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CEC9A8C1E2340F400657B35 /* KxAudioManager.h */; };
-		9CEC9A901E2340F400657B35 /* KxAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CEC9A8D1E2340F400657B35 /* KxAudioManager.m */; };
-		9CEC9A911E2340F400657B35 /* KxAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CEC9A8D1E2340F400657B35 /* KxAudioManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -585,8 +581,6 @@
 		9CE4184B1E2DB390009BCFB6 /* SGGLVRModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGGLVRModel.m; sourceTree = "<group>"; };
 		9CEC9A861E233A6D00657B35 /* SGAudioManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAudioManager.h; sourceTree = "<group>"; };
 		9CEC9A871E233A6D00657B35 /* SGAudioManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAudioManager.m; sourceTree = "<group>"; };
-		9CEC9A8C1E2340F400657B35 /* KxAudioManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KxAudioManager.h; sourceTree = "<group>"; };
-		9CEC9A8D1E2340F400657B35 /* KxAudioManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KxAudioManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1076,8 +1070,6 @@
 			children = (
 				9CEC9A861E233A6D00657B35 /* SGAudioManager.h */,
 				9CEC9A871E233A6D00657B35 /* SGAudioManager.m */,
-				9CEC9A8C1E2340F400657B35 /* KxAudioManager.h */,
-				9CEC9A8D1E2340F400657B35 /* KxAudioManager.m */,
 			);
 			path = SGAudio;
 			sourceTree = "<group>";
@@ -1218,7 +1210,6 @@
 				9CB2D77B1E1CA9A700C5F3F0 /* display.h in Headers */,
 				9CB2D7411E1CA9A700C5F3F0 /* avfiltergraph.h in Headers */,
 				9CB2D73D1E1CA9A700C5F3F0 /* version.h in Headers */,
-				9CEC9A8F1E2340F400657B35 /* KxAudioManager.h in Headers */,
 				9CA377FA1E13AAD9001C923C /* SGDistortionRenderer.h in Headers */,
 				9C2161B01E2CD929005FAF08 /* SGGLFFView.h in Headers */,
 				9CB2D7731E1CA9A700C5F3F0 /* cpu.h in Headers */,
@@ -1322,7 +1313,6 @@
 				9CB2D77A1E1CA9A700C5F3F0 /* display.h in Headers */,
 				9CA2D90B1DEBC59500AEC8A9 /* SGVideoCapturePreview.h in Headers */,
 				9CB2D7881E1CA9A700C5F3F0 /* frame.h in Headers */,
-				9CEC9A8E1E2340F400657B35 /* KxAudioManager.h in Headers */,
 				9CB2D7BC1E1CA9A700C5F3F0 /* pixfmt.h in Headers */,
 				9CA2D90F1DEBE34800AEC8A9 /* SGVideoConfiguration.h in Headers */,
 				9CB2D7801E1CA9A700C5F3F0 /* eval.h in Headers */,
@@ -1502,7 +1492,6 @@
 				9C3335681E1B633800E4DDCC /* SGPlayerDecoder.m in Sources */,
 				9C6E6D801E2CC8D7003D62D5 /* SGMatrix.m in Sources */,
 				9C7C71331DF904180098E2E7 /* SGAVPlayer.m in Sources */,
-				9CEC9A911E2340F400657B35 /* KxAudioManager.m in Sources */,
 				9C7C71411DF904180098E2E7 /* SGPlayer+Extension.m in Sources */,
 				9C2161D71E2CDCBC005FAF08 /* SGGLAVProgram.m in Sources */,
 				9CDEFAA11E1D050B005510C9 /* NSDictionary+SGFFmpeg.m in Sources */,
@@ -1539,7 +1528,6 @@
 				9C3335551E1B51CD00E4DDCC /* SGFFPlayer.m in Sources */,
 				9C2161CA1E2CD99C005FAF08 /* SGGLAVTexture.m in Sources */,
 				9CA2D9141DEBE35700AEC8A9 /* SGAudioConfiguration.m in Sources */,
-				9CEC9A901E2340F400657B35 /* KxAudioManager.m in Sources */,
 				9CDEFAA01E1D050B005510C9 /* NSDictionary+SGFFmpeg.m in Sources */,
 				9C7C71401DF904180098E2E7 /* SGPlayer+Extension.m in Sources */,
 				9C7C71441DF904180098E2E7 /* SGPlayer.m in Sources */,

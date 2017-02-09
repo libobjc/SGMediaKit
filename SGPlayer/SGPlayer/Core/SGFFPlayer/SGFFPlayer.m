@@ -9,11 +9,8 @@
 #import "SGFFPlayer.h"
 #import "SGFFDecoder.h"
 #import "SGAudioManager.h"
-#import "KxAudioManager.h"
 #import "SGNotification.h"
 #import "SGPlayer+DisplayView.h"
-
-#define UsesSGAudioSession 1
 
 @interface SGFFPlayer () <SGFFDecoderDelegate, SGFFDecoderAudioOutput, SGAudioManagerDelegate>
 
@@ -49,11 +46,7 @@
     if (self = [super init]) {
         self.abstractPlayer = abstractPlayer;
         self.stateLock = [[NSLock alloc] init];
-#if UsesSGAudioSession
         [[SGAudioManager manager] registerAudioSession];
-#else
-        [[KxAudioManager audioManager] activateAudioSession];
-#endif
     }
     return self;
 }
@@ -61,13 +54,8 @@
 - (void)play
 {
     self.playing = YES;
-#if UsesSGAudioSession
     [SGAudioManager manager].delegate = self;
     [[SGAudioManager manager] play];
-#else
-    [KxAudioManager audioManager].delegate = self;
-    [[KxAudioManager audioManager] play];
-#endif
     [self.decoder resume];
     
     switch (self.state) {
@@ -90,11 +78,7 @@
 - (void)pause
 {
     self.playing = NO;
-#if UsesSGAudioSession
     [[SGAudioManager manager] pause];
-#else
-    [[KxAudioManager audioManager] pause];
-#endif
     [self.decoder pause];
     
     switch (self.state) {
@@ -257,31 +241,18 @@
 - (void)decoderDidPlaybackFinished:(SGFFDecoder *)decoder
 {
     self.state = SGPlayerStateFinished;
-#if UsesSGAudioSession
     [[SGAudioManager manager] pause];
-#else
-    [[KxAudioManager audioManager] pause];
-#endif
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBuffering:(BOOL)buffering
 {
     if (buffering) {
-#if UsesSGAudioSession
         [[SGAudioManager manager] pause];
-#else
-        [[KxAudioManager audioManager] pause];
-#endif
         self.state = SGPlayerStateBuffering;
     } else {
         if (self.playing) {
             self.state = SGPlayerStatePlaying;
-#if UsesSGAudioSession
             [[SGAudioManager manager] play];
-#else
-            [[KxAudioManager audioManager] play];
-#endif
-            
         } else {
             self.state = SGPlayerStateSuspend;
         }
@@ -327,11 +298,7 @@
     self.lastPostProgressTime = 0;
     self.lastPostPlayableTime = 0;
     [self.abstractPlayer.displayView cleanEmptyBuffer];
-#if UsesSGAudioSession
     [[SGAudioManager manager] pause];
-#else
-    [[KxAudioManager audioManager] pause];
-#endif
 }
 
 - (void)cleanFrames
@@ -351,11 +318,7 @@
 - (void)dealloc
 {
     [self clean];
-#if UsesSGAudioSession
     [[SGAudioManager manager] unregisterAudioSession];
-#else
-    [[KxAudioManager audioManager] deactivateAudioSession];
-#endif
     NSLog(@"SGFFPlayer release");
 }
 
@@ -363,27 +326,15 @@
 
 - (Float64)samplingRate
 {
-#if UsesSGAudioSession
     return [SGAudioManager manager].samplingRate;
-#else
-    return [KxAudioManager audioManager].samplingRate;
-#endif
 }
 
 - (UInt32)channelCount
 {
-#if UsesSGAudioSession
     return [SGAudioManager manager].channelCount;
-#else
-    return [KxAudioManager audioManager].numOutputChannels;
-#endif
 }
 
-#if UsesSGAudioSession
 - (void)audioManager:(SGAudioManager *)audioManager outputData:(float *)data numberOfFrames:(UInt32)numFrames numberOfChannels:(UInt32)numChannels
-#else
-- (void)audioManager:(KxAudioManager *)audioManager outputData:(float *)data numberOfFrames:(UInt32)numFrames numberOfChannels:(UInt32)numChannels
-#endif
 {
     if (!self.playing) return;
     
