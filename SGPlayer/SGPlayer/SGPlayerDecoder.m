@@ -12,40 +12,69 @@
 
 + (instancetype)defaultDecoder
 {
-    return [[self alloc] init];
+    SGPlayerDecoder * decoder = [[self alloc] init];
+    decoder.unkonwnFormat   = SGDecoderTypeFFmpeg;
+    decoder.mpeg4Format     = SGDecoderTypeAVPlayer;
+    decoder.flvFormat       = SGDecoderTypeFFmpeg;
+    decoder.m3u8Format      = SGDecoderTypeAVPlayer;
+    decoder.rtmpFormat      = SGDecoderTypeFFmpeg;
+    decoder.rtspFormat      = SGDecoderTypeFFmpeg;
+    return decoder;
 }
 
-- (instancetype)init
++ (instancetype)AVPlayerDecoder
 {
-    if (self = [super init]) {
-        self.unkonwnFormat = SGDecoderTypeFFmpeg;
-        self.mpeg4Format = SGDecoderTypeAVPlayer;
-        self.flvFormat = SGDecoderTypeFFmpeg;
-        self.m3u8Format = SGDecoderTypeAVPlayer;
-        self.rtmpFormat = SGDecoderTypeFFmpeg;
-        self.rtspFormat = SGDecoderTypeFFmpeg;
-    }
-    return self;
+    SGPlayerDecoder * decoder = [[self alloc] init];
+    decoder.unkonwnFormat   = SGDecoderTypeAVPlayer;
+    decoder.mpeg4Format     = SGDecoderTypeAVPlayer;
+    decoder.flvFormat       = SGDecoderTypeAVPlayer;
+    decoder.m3u8Format      = SGDecoderTypeAVPlayer;
+    decoder.rtmpFormat      = SGDecoderTypeAVPlayer;
+    decoder.rtspFormat      = SGDecoderTypeAVPlayer;
+    return decoder;
+}
+
++ (instancetype)FFmpegDecoder
+{
+    SGPlayerDecoder * decoder = [[self alloc] init];
+    decoder.unkonwnFormat   = SGDecoderTypeFFmpeg;
+    decoder.mpeg4Format     = SGDecoderTypeFFmpeg;
+    decoder.flvFormat       = SGDecoderTypeFFmpeg;
+    decoder.m3u8Format      = SGDecoderTypeFFmpeg;
+    decoder.rtmpFormat      = SGDecoderTypeFFmpeg;
+    decoder.rtspFormat      = SGDecoderTypeFFmpeg;
+    return decoder;
 }
 
 - (SGVideoFormat)formatForContentURL:(NSURL *)contentURL
 {
     if (!contentURL) return SGVideoFormatError;
+    
     NSString * path;
     if (contentURL.isFileURL) {
         path = contentURL.path;
     } else {
         path = contentURL.absoluteString;
     }
-    if ([path hasPrefix:@"rtmp:"]) {
+    
+    if ([path hasPrefix:@"rtmp:"])
+    {
         return SGVideoFormatRTMP;
-    } else if ([path hasPrefix:@"rtsp:"]) {
+    }
+    else if ([path hasPrefix:@"rtsp:"])
+    {
         return SGVideoFormatRTSP;
-    } else if ([path containsString:@".flv"]) {
+    }
+    else if ([path containsString:@".flv"])
+    {
         return SGVideoFormatFLV;
-    } else if ([path containsString:@".mp4"]) {
+    }
+    else if ([path containsString:@".mp4"])
+    {
         return SGVideoFormatMPEG4;
-    } else if ([path containsString:@".m3u8"]) {
+    }
+    else if ([path containsString:@".m3u8"])
+    {
         return SGVideoFormatM3U8;
     }
     return SGVideoFormatUnknown;

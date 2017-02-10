@@ -12,6 +12,9 @@
 @interface SGPlayerDecoder : NSObject
 
 + (instancetype)defaultDecoder;
++ (instancetype)AVPlayerDecoder;
++ (instancetype)FFmpegDecoder;
+
 - (SGVideoFormat)formatForContentURL:(NSURL *)contentURL;
 - (SGDecoderType)decoderTypeForContentURL:(NSURL *)contentURL;
 
