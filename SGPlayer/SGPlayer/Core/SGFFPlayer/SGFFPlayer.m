@@ -158,20 +158,20 @@
             bufferDuration = 0;
         }
         _bufferDuration = bufferDuration;
-        if (!self.decoder.endOfFile && self.decoder.seekEnable) {
-            NSTimeInterval playableTtime = self.playableTime;
-            NSTimeInterval duration = self.duration;
-            if (playableTtime > duration) {
-                playableTtime = duration;
-            }
-            if (_bufferDuration == 0 || playableTtime == duration) {
+        
+        NSTimeInterval playableTtime = self.playableTime;
+        NSTimeInterval duration = self.duration;
+        if (playableTtime > duration) {
+            playableTtime = duration;
+        }
+        
+        if (_bufferDuration == 0 || playableTtime == duration) {
+            [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
+        } else if (!self.decoder.endOfFile && self.decoder.seekEnable) {
+            NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
+            if (currentTime - self.lastPostPlayableTime >= 1) {
+                self.lastPostPlayableTime = currentTime;
                 [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
-            } else {
-                NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
-                if (currentTime - self.lastPostPlayableTime >= 1) {
-                    self.lastPostPlayableTime = currentTime;
-                    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
-                }
             }
         }
     }
@@ -301,6 +301,7 @@
 {
     self.playing = NO;
     self.state = SGPlayerStateNone;
+    self.bufferDuration = 0;
     self.progress = 0;
     self.lastPostProgressTime = 0;
     self.lastPostPlayableTime = 0;
