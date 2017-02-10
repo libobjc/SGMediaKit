@@ -12,6 +12,7 @@
 #import "SGDisplayView.h"
 #import "SGAVPlayer.h"
 #import "SGFFPlayer.h"
+#import "SGAudioManager.h"
 
 @interface SGPlayer ()
 
@@ -350,6 +351,39 @@
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    SGWeakSelf
+    SGAudioManager * manager = [SGAudioManager manager];
+    [manager setInterruptionHandler:^(SGAudioManager * audioManager, SGAudioManagerInterruptionType type, SGAudioManagerInterruptionOption option) {
+        SGStrongSelf
+        if (type == SGAudioManagerInterruptionTypeBegin) {
+            switch (strongSelf.state) {
+                case SGPlayerStatePlaying:
+                case SGPlayerStateBuffering:
+                {
+                    [strongSelf pause];
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }];
+    [manager setRouteChangeHandler:^(SGAudioManager * audioManager, SGAudioManagerRouteChangeReason reason) {
+        SGStrongSelf
+        if (reason == SGAudioManagerRouteChangeReasonOldDeviceUnavailable) {
+            switch (strongSelf.state) {
+                case SGPlayerStatePlaying:
+                case SGPlayerStateBuffering:
+                {
+                    [strongSelf pause];
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+    }];
 }
 
 - (void)applicationDidEnterBackground:(NSNotification *)notification
