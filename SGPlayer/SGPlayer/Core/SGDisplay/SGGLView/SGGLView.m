@@ -94,7 +94,7 @@
 
 - (void)displayIfApplicationActive
 {
-    if ([UIApplication sharedApplication].applicationState != UIApplicationStateActive) return;
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) return;
     [self display];
 }
 
