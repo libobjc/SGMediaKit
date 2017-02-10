@@ -2186,7 +2186,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/lib\"",
-					"$(PROJECT_DIR)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/lib",
 				);
 				MACH_O_TYPE = staticlib;
 				PRODUCT_BUNDLE_IDENTIFIER = com.single.SGMediaKit;
@@ -2213,7 +2212,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/lib\"",
-					"$(PROJECT_DIR)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/lib",
 				);
 				MACH_O_TYPE = staticlib;
 				PRODUCT_BUNDLE_IDENTIFIER = com.single.SGMediaKit;
