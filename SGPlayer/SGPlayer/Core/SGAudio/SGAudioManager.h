@@ -8,6 +8,20 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_ENUM(NSUInteger, SGAudioManagerInterruptionType) {
+    SGAudioManagerInterruptionTypeBegin,
+    SGAudioManagerInterruptionTypeEnded,
+};
+
+typedef NS_ENUM(NSUInteger, SGAudioManagerInterruptionOption) {
+    SGAudioManagerInterruptionOptionNone,
+    SGAudioManagerInterruptionOptionShouldResume,
+};
+
+typedef NS_ENUM(NSUInteger, SGAudioManagerRouteChangeReason) {
+    SGAudioManagerRouteChangeReasonOldDeviceUnavailable,
+};
+
 @class SGAudioManager;
 
 @protocol SGAudioManagerDelegate <NSObject>
@@ -26,6 +40,9 @@
 
 @property (nonatomic, assign, readonly) Float64 samplingRate;
 @property (nonatomic, assign, readonly) UInt32 numberOfChannels;
+
+@property (nonatomic, copy) void (^interruptionHandler)(SGAudioManager * audioManager, SGAudioManagerInterruptionType type, SGAudioManagerInterruptionOption option);
+@property (nonatomic, copy) void (^routeChangeHandler)(SGAudioManager * audioManager, SGAudioManagerRouteChangeReason reason);
 
 - (void)playWithDelegate:(id <SGAudioManagerDelegate>)delegate;
 - (void)pause;

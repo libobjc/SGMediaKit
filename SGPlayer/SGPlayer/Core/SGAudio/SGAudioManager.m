@@ -53,9 +53,49 @@ static OSStatus renderCallback (void * inRefCon,
 - (instancetype)init
 {
     if (self = [super init]) {
+        self.audioSession = [AVAudioSession sharedInstance];
         self->_outData = (float *)calloc(max_frame_size * max_chan, sizeof(float));
+        [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(audioSessionInterruptionHandler:) name:AVAudioSessionInterruptionNotification object:nil];
+        [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(audioSessionRouteChangeHandler:) name:AVAudioSessionRouteChangeNotification object:nil];
     }
     return self;
+}
+
+- (void)audioSessionInterruptionHandler:(NSNotification *)notification
+{
+    if (self.interruptionHandler) {
+        AVAudioSessionInterruptionType avType = [[notification.userInfo objectForKey:AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];
+        SGAudioManagerInterruptionType type = SGAudioManagerInterruptionTypeBegin;
+        if (avType == AVAudioSessionInterruptionTypeEnded) {
+            type = SGAudioManagerInterruptionTypeEnded;
+        }
+        SGAudioManagerInterruptionOption option = SGAudioManagerInterruptionOptionNone;
+        id avOption = [notification.userInfo objectForKey:AVAudioSessionInterruptionOptionKey];
+        if (avOption) {
+            AVAudioSessionInterruptionOptions temp = [avOption unsignedIntegerValue];
+            if (temp == AVAudioSessionInterruptionOptionShouldResume) {
+                option = SGAudioManagerInterruptionOptionShouldResume;
+            }
+        }
+        self.interruptionHandler(self, type, option);
+    }
+}
+
+- (void)audioSessionRouteChangeHandler:(NSNotification *)notification
+{
+    if (self.routeChangeHandler) {
+        AVAudioSessionRouteChangeReason avReason = [[notification.userInfo objectForKey:AVAudioSessionRouteChangeReasonKey] unsignedIntegerValue];
+        switch (avReason) {
+            case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
+            {
+                self.routeChangeHandler(self, SGAudioManagerRouteChangeReasonOldDeviceUnavailable);
+            }
+                break;
+            default:
+                break;
+        }
+        
+    }
 }
 
 - (BOOL)registerAudioSession
@@ -88,8 +128,6 @@ static OSStatus renderCallback (void * inRefCon,
 
 - (BOOL)setupAudioUnit
 {
-    self.audioSession = [AVAudioSession sharedInstance];
-    
     OSStatus result;
     UInt32 size;
     
@@ -271,6 +309,7 @@ static OSStatus renderCallback (void * inRefCon,
         free(self->_outData);
         self->_outData = NULL;
     }
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end
