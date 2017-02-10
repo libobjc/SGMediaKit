@@ -7,6 +7,7 @@
 //
 
 #import <AVFoundation/AVFoundation.h>
+#import "SGPlayerMacro.h"
 #import "SGFormatFactory.h"
 #import "SGFormat.h"
 
@@ -135,7 +136,7 @@
 - (void)dealloc
 {
     [self clean];
-    NSLog(@"SGFormatFactory releas");
+    SGPlayerLog(@"SGFormatFactory releas");
 }
 
 @end

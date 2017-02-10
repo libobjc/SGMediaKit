@@ -10,6 +10,7 @@
 #import "SGFFDecoder.h"
 #import "SGAudioManager.h"
 #import "SGNotification.h"
+#import "SGPlayerMacro.h"
 #import "SGPlayer+DisplayView.h"
 
 @interface SGFFPlayer () <SGFFDecoderDelegate, SGFFDecoderAudioOutput, SGAudioManagerDelegate>
@@ -324,7 +325,7 @@
 {
     [self clean];
     [self.audioManager unregisterAudioSession];
-    NSLog(@"SGFFPlayer release");
+    SGPlayerLog(@"SGFFPlayer release");
 }
 
 #pragma mark - audio

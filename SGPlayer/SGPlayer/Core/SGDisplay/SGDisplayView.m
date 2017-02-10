@@ -162,16 +162,6 @@
     self.autoPauseFFPlayerView = NO;
 }
 
-- (void)resume
-{
-    NSLog(@"%s", __func__);
-}
-
-- (void)pause
-{
-    NSLog(@"%s", __func__);
-}
-
 - (void)reloadGravityMode
 {
     if (self.avplayerLayer) {

@@ -12,7 +12,7 @@
 void sg_ff_log(void * context, int level, const char * format, va_list args)
 {
     //    NSString * message = [[NSString alloc] initWithFormat:[NSString stringWithUTF8String:format] arguments:args];
-    //    NSLog(@"SGFFLog : %@", message);
+    //    SGFFFFmpegLog(@"SGFFLog : %@", message);
 }
 
 NSError * sg_ff_check_error(int result)

@@ -15,6 +15,7 @@
 #import "swresample.h"
 #import "swscale.h"
 #import <Accelerate/Accelerate.h>
+#import "SGPlayerMacro.h"
 
 static AVPacket flush_packet;
 
@@ -1083,7 +1084,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (void)dealloc
 {
     [self closeFileAsync:NO];
-    NSLog(@"SGFFDecoder release");
+    SGPlayerLog(@"SGFFDecoder release");
 }
 
 @end

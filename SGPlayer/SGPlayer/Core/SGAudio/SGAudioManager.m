@@ -10,6 +10,7 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <AVFoundation/AVFoundation.h>
 #import <Accelerate/Accelerate.h>
+#import "SGPlayerMacro.h"
 
 static int const max_frame_size = 4096;
 static int const max_chan = 2;
@@ -252,14 +253,14 @@ static OSStatus renderCallback (void * inRefCon,
 - (void)delegateErrorCallback
 {
     if (self.error) {
-        NSLog(@"SGAudioManager did error : %@", self.error);
+        SGPlayerLog(@"SGAudioManager did error : %@", self.error);
     }
 }
 
 - (void)delegateWarningCallback
 {
     if (self.warning) {
-        NSLog(@"SGAudioManager did warning : %@", self.warning);
+        SGPlayerLog(@"SGAudioManager did warning : %@", self.warning);
     }
 }
 

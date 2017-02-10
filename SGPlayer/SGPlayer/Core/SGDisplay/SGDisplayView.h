@@ -39,8 +39,6 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
 @property (nonatomic, assign) SGDisplayRendererType rendererType;
 @property (nonatomic, strong) SGFingerRotation * fingerRotation;
 
-//- (void)pause;
-//- (void)resume;
 - (void)reloadGravityMode;
 - (void)cleanEmptyBuffer;
 

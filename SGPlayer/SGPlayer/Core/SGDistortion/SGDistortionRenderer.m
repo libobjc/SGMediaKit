@@ -8,6 +8,7 @@
 
 #import "SGDistortionRenderer.h"
 #import "SGDistortionModel.h"
+#import "SGPlayerMacro.h"
 
 #define SG_GLES_STRINGIZE(x) #x
 
@@ -223,11 +224,11 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
     
     if (![self compileShader:&vertex_shader_id type:GL_VERTEX_SHADER string:vertexShaderString])
     {
-        NSLog(@"load vertex shader failure");
+        SGPlayerLog(@"load vertex shader failure");
     }
     if (![self compileShader:&fragment_shader_id type:GL_FRAGMENT_SHADER string:fragmentShaderString])
     {
-        NSLog(@"load fragment shader failure");
+        SGPlayerLog(@"load fragment shader failure");
     }
     glAttachShader(program_id, vertex_shader_id);
     glAttachShader(program_id, fragment_shader_id);
@@ -238,7 +239,7 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
     glGetProgramiv(program_id, GL_LINK_STATUS, &status);
     
     if (status == GL_FALSE) {
-        NSLog(@"link program failure");
+        SGPlayerLog(@"link program failure");
     }
     
     [self clearShader];
@@ -295,7 +296,7 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 {
     if (!shaderString)
     {
-        NSLog(@"Failed to load shader");
+        SGPlayerLog(@"Failed to load shader");
         return NO;
     }
     
@@ -312,7 +313,7 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
         if (logLength > 0) {
             GLchar * log = (GLchar *)malloc(logLength);
             glGetShaderInfoLog(* shader, logLength, &logLength, log);
-            NSLog(@"Shader compile log:\n%s", log);
+            SGPlayerLog(@"Shader compile log:\n%s", log);
             free(log);
         }
     }
@@ -336,7 +337,7 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
     GLenum err = glGetError();
     if (err != GL_NO_ERROR)
     {
-        NSLog(@"glError: 0x%04X", err);
+        SGPlayerLog(@"glError: 0x%04X", err);
     }
 }
 

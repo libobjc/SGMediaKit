@@ -7,6 +7,7 @@
 //
 
 #import "SGFormat.h"
+#import "SGPlayerMacro.h"
 #import <AVFoundation/AVFoundation.h>
 
 @interface SGFormat ()
@@ -140,7 +141,7 @@
 
 - (void)dealloc
 {
-    NSLog(@"SGFormat releas");
+    SGPlayerLog(@"SGFormat releas");
 }
 
 @end
