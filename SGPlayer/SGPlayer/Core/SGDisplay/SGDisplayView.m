@@ -17,13 +17,9 @@
 
 @property (nonatomic, weak) SGPlayer * abstractPlayer;
 
-@property (nonatomic, assign) BOOL backgroundToken;
-
 @property (nonatomic, assign) BOOL avplayerLayerToken;
 @property (nonatomic, strong) AVPlayerLayer * avplayerLayer;
-@property (nonatomic, assign) BOOL autoPauseAVPlayerView;
 @property (nonatomic, strong) SGGLAVView * avplayerView;
-@property (nonatomic, assign) BOOL autoPauseFFPlayerView;
 @property (nonatomic, strong) SGGLFFView * ffplayerView;
 @property (nonatomic, strong) UITapGestureRecognizer * tapGestureRecigbuzer;
 
@@ -74,7 +70,6 @@
 
 - (void)decoder:(SGFFDecoder *)decoder renderVideoFrame:(SGFFVideoFrame *)videoFrame
 {
-    if (self.autoPauseFFPlayerView) return;
     [self.ffplayerView renderFrame:videoFrame];
 }
 
@@ -94,7 +89,10 @@
             break;
         case SGDisplayRendererTypeAVPlayerLayer:
             if (!self.avplayerLayer) {
-                self.avplayerLayer = [AVPlayerLayer playerLayerWithPlayer:self.sgavplayer.avPlayer];
+                self.avplayerLayer = [AVPlayerLayer playerLayerWithPlayer:nil];
+                if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
+                    self.avplayerLayer.player = self.sgavplayer.avPlayer;
+                }
                 self.avplayerLayerToken = NO;
                 [self.layer insertSublayer:self.avplayerLayer atIndex:0];
                 [self reloadGravityMode];
@@ -114,7 +112,6 @@
             }
             break;
     }
-    [self checkBackgorundMode];
 }
 
 - (void)cleanView
@@ -158,8 +155,6 @@
         self.ffplayerView = nil;
     }
     self.avplayerLayerToken = NO;
-    self.autoPauseAVPlayerView = NO;
-    self.autoPauseFFPlayerView = NO;
 }
 
 - (void)reloadGravityMode
@@ -247,54 +242,26 @@
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
-    
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
-        self.backgroundToken = YES;
-    }
 }
 
 - (void)applicationDidEnterBackground:(NSNotification *)notification
 {
-    self.backgroundToken = YES;
-    [self checkBackgorundMode];
+    if (_avplayerLayer) {
+        _avplayerLayer.player = nil;
+    }
 }
 
 - (void)applicationWillEnterForeground:(NSNotification *)notification
 {
-    self.backgroundToken = NO;
-    [self checkForegroundMode];
-}
-
-- (void)checkBackgorundMode
-{
-    if (!self.backgroundToken) return;
-
-    if (_avplayerLayer) {
-        _avplayerLayer.player = nil;
-    }
-    if (_avplayerView) {
-        if (!_avplayerView.paused) {
-            self.autoPauseAVPlayerView = YES;
-            _avplayerView.paused = YES;
-        }
-    }
-    self.autoPauseFFPlayerView = YES;
-}
-
-- (void)checkForegroundMode
-{
-    if (self.backgroundToken) return;
-    
     if (_avplayerLayer) {
         _avplayerLayer.player = self.sgavplayer.avPlayer;
     }
-    if (_avplayerView) {
-        if (self.autoPauseAVPlayerView) {
-            self.autoPauseAVPlayerView = NO;
-            _avplayerView.paused = NO;
-        }
+    if (self.avplayerView) {
+        [self.avplayerView displayAsyncOnMainThread];
     }
-    self.autoPauseFFPlayerView = NO;
+    if (self.ffplayerView) {
+        [self.ffplayerView displayAsyncOnMainThread];
+    }
 }
 
 -(void)dealloc
