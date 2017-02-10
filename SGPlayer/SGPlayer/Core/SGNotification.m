@@ -12,13 +12,11 @@
 
 + (void)postPlayer:(SGPlayer *)player error:(SGError *)error
 {
-    if (!player) return;
-    NSDictionary * userInfo;
-    if (error) {
-        userInfo = @{
-                     SGPlayerErrorKey : error
-                     };
-    }
+    if (!player || !error) return;
+    NSDictionary * userInfo = @{
+                                SGPlayerErrorKey : error
+                                };
+    player.error = error;
     [self postNotificationName:SGPlayerErrorName object:player userInfo:userInfo];
 }
 

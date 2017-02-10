@@ -10,6 +10,10 @@
 #import "SGPlayerDefine.h"
 #import "SGPlayerDecoder.h"
 
+@class SGError;
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface SGPlayer : NSObject
 
 + (instancetype)new NS_UNAVAILABLE;
@@ -22,9 +26,11 @@
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 @property (nonatomic, assign, readonly) SGVideoType videoType;
 
+@property (nonatomic, strong, readonly, nullable) SGError * error;
+
 - (void)replaceEmpty;
-- (void)replaceVideoWithURL:(NSURL *)contentURL;
-- (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType;
+- (void)replaceVideoWithURL:(nullable NSURL *)contentURL;
+- (void)replaceVideoWithURL:(nullable NSURL *)contentURL videoType:(SGVideoType)videoType;
 
 // preview
 @property (nonatomic, assign) SGDisplayMode displayMode;
@@ -48,8 +54,10 @@
 - (void)play;
 - (void)pause;
 - (void)seekToTime:(NSTimeInterval)time;
-- (void)seekToTime:(NSTimeInterval)time completeHandler:(void(^)(BOOL finished))completeHandler;
+- (void)seekToTime:(NSTimeInterval)time completeHandler:(nullable void(^)(BOOL finished))completeHandler;
 
 @end
+
+NS_ASSUME_NONNULL_END
 
 #import "SGPlayer+Extension.h"

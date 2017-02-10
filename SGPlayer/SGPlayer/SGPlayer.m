@@ -53,13 +53,14 @@
     [self replaceVideoWithURL:nil];
 }
 
-- (void)replaceVideoWithURL:(NSURL *)contentURL
+- (void)replaceVideoWithURL:(nullable NSURL *)contentURL
 {
     [self replaceVideoWithURL:contentURL videoType:SGVideoTypeNormal];
 }
 
-- (void)replaceVideoWithURL:(NSURL *)contentURL videoType:(SGVideoType)videoType
+- (void)replaceVideoWithURL:(nullable NSURL *)contentURL videoType:(SGVideoType)videoType
 {
+    self.error = nil;
     self.contentURL = contentURL;
     self.decoderType = [self.decoder decoderTypeForContentURL:self.contentURL];
     self.videoType = videoType;
@@ -123,7 +124,7 @@
     [self seekToTime:time completeHandler:nil];
 }
 
-- (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL))completeHandler
+- (void)seekToTime:(NSTimeInterval)time completeHandler:(nullable void (^)(BOOL))completeHandler
 {
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
@@ -306,6 +307,13 @@
     }
 }
 
+- (void)setError:(SGError * _Nullable)error
+{
+    if (self.error != error) {
+        self->_error = error;
+    }
+}
+
 - (void)cleanPlayer
 {
     if (_avPlayer) {
@@ -319,6 +327,7 @@
     [self cleanPlayerView];
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     self.needAutoPlay = NO;
+    self.error = nil;
 }
 
 - (void)cleanPlayerView

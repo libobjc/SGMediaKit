@@ -200,6 +200,9 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     if (_state != state) {
         SGPlayerState temp = _state;
         _state = state;
+        if (_state != SGPlayerStateFailed) {
+            self.abstractPlayer.error = nil;
+        }
         [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
     }
 }
@@ -323,7 +326,6 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                     {
                         SGPlayerLog(@"SGAVPlayer item status failed");
                         self.readyToPlayTime = 0;
-                        self.state = SGPlayerStateFailed;
                         SGError * error = [[SGError alloc] init];
                         if (self.avPlayerItem.error) {
                             error.error = self.avPlayerItem.error;
@@ -351,6 +353,8 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                         } else {
                             error.error = [NSError errorWithDomain:@"AVPlayer playback error" code:-1 userInfo:nil];
                         }
+                        self.abstractPlayer.error = error;
+                        self.state = SGPlayerStateFailed;
                         [SGNotification postPlayer:self.abstractPlayer error:error];
                     }
                         break;

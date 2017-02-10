@@ -9,6 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "SGPlayer.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
+@interface SGPlayer (SGNotification)
+@property (nonatomic, strong, nullable) SGError * error;
+@end
+
 @interface SGNotification : NSObject
 
 + (void)postPlayer:(SGPlayer *)player error:(SGError *)error;
@@ -17,3 +23,5 @@
 + (void)postPlayer:(SGPlayer *)player playablePercent:(NSNumber *)percent current:(NSNumber *)current total:(NSNumber *)total;
 
 @end
+
+NS_ASSUME_NONNULL_END
