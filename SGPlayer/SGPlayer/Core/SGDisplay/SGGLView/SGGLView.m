@@ -101,6 +101,7 @@
 - (void)cleanEmptyBuffer
 {
     [self cleanTexture];
+    [self displayAsyncOnMainThread];
 }
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
