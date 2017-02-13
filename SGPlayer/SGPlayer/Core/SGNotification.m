@@ -17,7 +17,7 @@
                                 SGPlayerErrorKey : error
                                 };
     player.error = error;
-    [self postNotificationName:SGPlayerErrorName object:player userInfo:userInfo];
+    [self postNotificationName:SGPlayerErrorNotificationName object:player userInfo:userInfo];
 }
 
 + (void)postPlayer:(SGPlayer *)player statePrevious:(SGPlayerState)previous current:(SGPlayerState)current
@@ -27,7 +27,7 @@
                                 SGPlayerStatePreviousKey : @(previous),
                                 SGPlayerStateCurrentKey : @(current)
                                 };
-    [self postNotificationName:SGPlayerStateChangeName object:player userInfo:userInfo];
+    [self postNotificationName:SGPlayerStateChangeNotificationName object:player userInfo:userInfo];
 }
 
 + (void)postPlayer:(SGPlayer *)player progressPercent:(NSNumber *)percent current:(NSNumber *)current total:(NSNumber *)total
@@ -41,7 +41,7 @@
                                 SGPlayerProgressCurrentKey : current,
                                 SGPlayerProgressTotalKey : total
                                 };
-    [self postNotificationName:SGPlayerProgressChangeName object:player userInfo:userInfo];
+    [self postNotificationName:SGPlayerProgressChangeNotificationName object:player userInfo:userInfo];
 }
 
 + (void)postPlayer:(SGPlayer *)player playablePercent:(NSNumber *)percent current:(NSNumber *)current total:(NSNumber *)total
@@ -55,7 +55,7 @@
                                 SGPlayerPlayableCurrentKey : current,
                                 SGPlayerPlayableTotalKey : total,
                                 };
-    [self postNotificationName:SGPlayerPlayableChangeName object:player userInfo:userInfo];
+    [self postNotificationName:SGPlayerPlayableChangeNotificationName object:player userInfo:userInfo];
 }
 
 + (void)postNotificationName:(NSString *)name object:(id)object userInfo:(NSDictionary *)userInfo

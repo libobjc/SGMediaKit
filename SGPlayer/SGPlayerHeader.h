@@ -12,5 +12,5 @@ FOUNDATION_EXPORT double SGPlayerVersionNumber;     // version number
 FOUNDATION_EXPORT const unsigned char SGPlayerVersionString[];      // version string
 
 #import <SGPlayer/SGPlayer.h>
-#import <SGPlayer/SGPlayer+Extension.h>
-#import <SGPlayer/SGPlayerDefine.h>
+#import <SGPlayer/SGPlayerAction.h>
+#import <SGPlayer/SGPlayerDecoder.h>

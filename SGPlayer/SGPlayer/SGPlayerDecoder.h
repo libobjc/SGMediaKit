@@ -7,7 +7,24 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SGPlayerDefine.h"
+
+// decode type
+typedef NS_ENUM(NSUInteger, SGDecoderType) {
+    SGDecoderTypeError,
+    SGDecoderTypeAVPlayer,
+    SGDecoderTypeFFmpeg,
+};
+
+// video format
+typedef NS_ENUM(NSUInteger, SGVideoFormat) {
+    SGVideoFormatError,
+    SGVideoFormatUnknown,
+    SGVideoFormatMPEG4,
+    SGVideoFormatFLV,
+    SGVideoFormatM3U8,
+    SGVideoFormatRTMP,
+    SGVideoFormatRTSP,
+};
 
 @interface SGPlayerDecoder : NSObject
 

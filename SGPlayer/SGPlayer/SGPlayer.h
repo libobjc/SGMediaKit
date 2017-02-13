@@ -7,8 +7,47 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SGPlayerDefine.h"
 #import "SGPlayerDecoder.h"
+
+// video type
+typedef NS_ENUM(NSUInteger, SGVideoType) {
+    SGVideoTypeNormal,  // normal
+    SGVideoTypeVR,      // virtual reality
+};
+
+// player state
+typedef NS_ENUM(NSUInteger, SGPlayerState) {
+    SGPlayerStateNone = 0,          // none
+    SGPlayerStateBuffering = 1,     // buffering
+    SGPlayerStateReadyToPlay = 2,   // ready to play
+    SGPlayerStatePlaying = 3,       // playing
+    SGPlayerStateSuspend = 4,       // pause
+    SGPlayerStateFinished = 5,      // finished
+    SGPlayerStateFailed = 6,        // failed
+};
+
+// display mode
+typedef NS_ENUM(NSUInteger, SGDisplayMode) {
+    SGDisplayModeNormal,    // default
+    SGDisplayModeBox,
+};
+
+// video content mode
+typedef NS_ENUM(NSUInteger, SGGravityMode) {
+    SGGravityModeResize,
+    SGGravityModeResizeAspect,
+    SGGravityModeResizeAspectFill,
+};
+
+// background mode
+typedef NS_ENUM(NSUInteger, SGPlayerBackgroundMode) {
+    SGPlayerBackgroundModeNothing,
+    SGPlayerBackgroundModeAutoPlayAndPause,     // default
+    SGPlayerBackgroundModeContinue,
+};
+
+
+#pragma mark - SGPlayer
 
 @class SGError;
 
@@ -60,4 +99,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
-#import "SGPlayer+Extension.h"
+#import "SGPlayerAction.h"

@@ -6,7 +6,6 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "SGFFFrame.h"
 

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "SGPlayer.h"
+#import "SGPlayerAction.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

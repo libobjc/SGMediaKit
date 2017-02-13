@@ -7,7 +7,6 @@
 //
 
 #import <GLKit/GLKit.h>
-#import "SGPlayerDefine.h"
 #import "SGGLProgram.h"
 #import "SGDisplayView.h"
 

@@ -1,9 +1,9 @@
 //
-//  SGPlayer+Extsion.h
-//  SGPlayer
+//  SGPlayerAction.h
+//  SGMediaKit
 //
-//  Created by Single on 16/8/16.
-//  Copyright © 2016年 single. All rights reserved.
+//  Created by Single on 2017/2/13.
+//  Copyright © 2017年 single. All rights reserved.
 //
 
 #import "SGPlayer.h"
@@ -15,57 +15,80 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#pragma mark - SGPlayer Extsion Category
+// extern
+#if defined(__cplusplus)
+#define SGPLAYER_EXTERN extern "C"
+#else
+#define SGPLAYER_EXTERN extern
+#endif
 
-@interface SGPlayer (Extension)
+// notification name
+SGPLAYER_EXTERN NSString * const SGPlayerErrorNotificationName;             // player error
+SGPLAYER_EXTERN NSString * const SGPlayerStateChangeNotificationName;       // player state change
+SGPLAYER_EXTERN NSString * const SGPlayerProgressChangeNotificationName;    // player play progress change
+SGPLAYER_EXTERN NSString * const SGPlayerPlayableChangeNotificationName;    // player playable progress change
 
-+ (void)registerPlayerNotificationTarget:(id)target
-                             stateAction:(nullable SEL)stateAction
-                          progressAction:(nullable SEL)progressAction
-                          playableAction:(nullable SEL)playableAction;      // object's class is NSNotification
-+ (void)registerPlayerNotification:(nullable SGPlayer *)player
-                            target:(id)target
-                       stateAction:(nullable SEL)stateAction
-                    progressAction:(nullable SEL)progressAction
-                    playableAction:(nullable SEL)playableAction
-                       errorAction:(nullable SEL)errorAction;
+// notification userinfo key
+SGPLAYER_EXTERN NSString * const SGPlayerErrorKey;              // error
+
+SGPLAYER_EXTERN NSString * const SGPlayerStatePreviousKey;      // state
+SGPLAYER_EXTERN NSString * const SGPlayerStateCurrentKey;       // state
+
+SGPLAYER_EXTERN NSString * const SGPlayerProgressPercentKey;    // progress
+SGPLAYER_EXTERN NSString * const SGPlayerProgressCurrentKey;    // progress
+SGPLAYER_EXTERN NSString * const SGPlayerProgressTotalKey;      // progress
+
+SGPLAYER_EXTERN NSString * const SGPlayerPlayablePercentKey;    // playable
+SGPLAYER_EXTERN NSString * const SGPlayerPlayableCurrentKey;    // playable
+SGPLAYER_EXTERN NSString * const SGPlayerPlayableTotalKey;      // playable
+
+
+#pragma mark - SGPlayer Action Category
+
+@interface SGPlayer (SGPlayerAction)
+
 - (void)registerPlayerNotificationTarget:(id)target
                              stateAction:(nullable SEL)stateAction
                           progressAction:(nullable SEL)progressAction
                           playableAction:(nullable SEL)playableAction;      // object's class is NSNotification
+
 - (void)registerPlayerNotificationTarget:(id)target
                              stateAction:(nullable SEL)stateAction
                           progressAction:(nullable SEL)progressAction
                           playableAction:(nullable SEL)playableAction
                              errorAction:(nullable SEL)errorAction;
-+ (void)removePlayerNotificationTarget:(id)target;
+
 - (void)removePlayerNotificationTarget:(id)target;
 
 @end
 
-#pragma mark - Models
+
+#pragma mark - SGPlayer Action Models
 
 @interface SGModel : NSObject
+
++ (SGState *)stateFromUserInfo:(NSDictionary *)userInfo;
++ (SGProgress *)progressFromUserInfo:(NSDictionary *)userInfo;
++ (SGPlayable *)playableFromUserInfo:(NSDictionary *)userInfo;
++ (SGError *)errorFromUserInfo:(NSDictionary *)userInfo;
+
 @end
 
 @interface SGState : SGModel
 @property (nonatomic, assign) SGPlayerState previous;
 @property (nonatomic, assign) SGPlayerState current;
-+ (SGState *)stateFromUserInfo:(NSDictionary *)userInfo;
 @end
 
 @interface SGProgress : SGModel
 @property (nonatomic, assign) CGFloat percent;
 @property (nonatomic, assign) CGFloat current;
 @property (nonatomic, assign) CGFloat total;
-+ (SGProgress *)progressFromUserInfo:(NSDictionary *)userInfo;
 @end
 
 @interface SGPlayable : SGModel
 @property (nonatomic, assign) CGFloat percent;
 @property (nonatomic, assign) CGFloat current;
 @property (nonatomic, assign) CGFloat total;
-+ (SGPlayable *)playableFromUserInfo:(NSDictionary *)userInfo;
 @end
 
 @interface SGErrorEvent : SGModel
@@ -83,7 +106,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSData * extendedLogData;
 @property (nonatomic, assign) NSStringEncoding extendedLogDataStringEncoding;
 @property (nonatomic, copy, nullable) NSArray <SGErrorEvent *> * errorEvents;
-+ (SGError *)errorFromUserInfo:(NSDictionary *)userInfo;
 @end
 
 NS_ASSUME_NONNULL_END

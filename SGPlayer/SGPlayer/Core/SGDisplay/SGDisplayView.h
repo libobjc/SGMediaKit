@@ -8,12 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
-#import "SGPlayerDefine.h"
-#import "SGFFFrame.h"
-#import "SGFingerRotation.h"
+#import "SGPlayer.h"
 #import "SGFFDecoder.h"
+#import "SGFingerRotation.h"
 
-@class SGPlayer;
 @class SGAVPlayer;
 @class SGDisplayView;
 
