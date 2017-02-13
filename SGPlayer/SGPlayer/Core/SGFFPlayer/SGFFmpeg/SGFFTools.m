@@ -9,6 +9,8 @@
 #import "SGFFTools.h"
 #import "SGFFDecoder.h"
 
+#pragma mark - Util Function
+
 void sg_ff_log(void * context, int level, const char * format, va_list args)
 {
     if (SGFFFFmpegLogEnable) {
@@ -73,3 +75,25 @@ double sg_ff_get_timebase(AVStream * stream, double default_timebase)
     }
     return timebase;
 }
+
+NSDictionary * sg_ff_dict_conver(AVDictionary * avDictionary)
+{
+    if (avDictionary == NULL) return nil;
+    
+    int count = av_dict_count(avDictionary);
+    if (count <= 0) return nil;
+    
+    NSMutableDictionary * dictionary = [NSMutableDictionary dictionary];
+    
+    AVDictionaryEntry * entry = NULL;
+    while ((entry = av_dict_get(avDictionary, "", entry, AV_DICT_IGNORE_SUFFIX))) {
+        @autoreleasepool {
+            NSString * key = [NSString stringWithUTF8String:entry->key];
+            NSString * value = [NSString stringWithUTF8String:entry->value];
+            [dictionary setObject:value forKey:key];
+        }
+    }
+    
+    return dictionary;
+}
+

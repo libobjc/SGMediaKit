@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "SGFFDecoder.h"
 
+
+#pragma mark - Log Config
+
 #define SGFFFFmpegLogEnable     0
 #define SGFFSynLogEnable        0
 #define SGFFThreadLogEnable     0
@@ -59,6 +62,9 @@
 #define SGFFErrorLog(...)
 #endif
 
+
+#pragma mark - Util Function
+
 void sg_ff_log(void * context, int level, const char * format, va_list args);
 
 NSError * sg_ff_check_error(int result);
@@ -68,3 +74,5 @@ void sg_ff_convert_AVFrame_to_YUV(UInt8 * src, int linesize, int width, int heig
 
 double sg_ff_get_timebase(AVStream * stream, double default_timebase);
 double sg_ff_get_fps(AVStream * stream, double timebase);
+
+NSDictionary * sg_ff_dict_conver(AVDictionary * avDictionary);

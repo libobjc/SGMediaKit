@@ -10,7 +10,6 @@
 #import "SGFFTools.h"
 #import "SGFFPacketQueue.h"
 #import "SGFFFrameQueue.h"
-#import "NSDictionary+SGFFmpeg.h"
 #import "avformat.h"
 #import "swresample.h"
 #import "swscale.h"
@@ -274,7 +273,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         }
         return error;
     }
-    self.metadata = [NSDictionary sg_dictionaryWithAVDictionary:_format_context->metadata];
+    self.metadata = sg_ff_dict_conver(_format_context->metadata);
 
     return error;
 }
