@@ -31,6 +31,10 @@ static OSStatus renderCallback (void * inRefCon,
     AudioStreamBasicDescription _audioOutputFormat;
 }
 
+@property (nonatomic, weak) id handlerTarget;
+@property (nonatomic, copy) SGAudioManagerInterruptionHandler interruptionHandler;
+@property (nonatomic, copy) SGAudioManagerRouteChangeHandler routeChangeHandler;
+
 @property (nonatomic, assign) BOOL registered;
 @property (nonatomic, strong) AVAudioSession * audioSession;
 @property (nonatomic, strong) NSError * error;
@@ -61,9 +65,27 @@ static OSStatus renderCallback (void * inRefCon,
     return self;
 }
 
+- (void)setHandlerTarget:(id)handlerTarget
+            interruption:(SGAudioManagerInterruptionHandler)interruptionHandler
+             routeChange:(SGAudioManagerRouteChangeHandler)routeChangeHandler
+{
+    self.handlerTarget = handlerTarget;
+    self.interruptionHandler = interruptionHandler;
+    self.routeChangeHandler = routeChangeHandler;
+}
+
+- (void)removeHandlerTarget:(id)handlerTarget
+{
+    if (self.handlerTarget == handlerTarget || !self.handlerTarget) {
+        self.handlerTarget = nil;
+        self.interruptionHandler = nil;
+        self.routeChangeHandler = nil;
+    }
+}
+
 - (void)audioSessionInterruptionHandler:(NSNotification *)notification
 {
-    if (self.interruptionHandler) {
+    if (self.handlerTarget && self.interruptionHandler) {
         AVAudioSessionInterruptionType avType = [[notification.userInfo objectForKey:AVAudioSessionInterruptionTypeKey] unsignedIntegerValue];
         SGAudioManagerInterruptionType type = SGAudioManagerInterruptionTypeBegin;
         if (avType == AVAudioSessionInterruptionTypeEnded) {
@@ -77,18 +99,18 @@ static OSStatus renderCallback (void * inRefCon,
                 option = SGAudioManagerInterruptionOptionShouldResume;
             }
         }
-        self.interruptionHandler(self, type, option);
+        self.interruptionHandler(self.handlerTarget, self, type, option);
     }
 }
 
 - (void)audioSessionRouteChangeHandler:(NSNotification *)notification
 {
-    if (self.routeChangeHandler) {
+    if (self.handlerTarget && self.routeChangeHandler) {
         AVAudioSessionRouteChangeReason avReason = [[notification.userInfo objectForKey:AVAudioSessionRouteChangeReasonKey] unsignedIntegerValue];
         switch (avReason) {
             case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
             {
-                self.routeChangeHandler(self, SGAudioManagerRouteChangeReasonOldDeviceUnavailable);
+                self.routeChangeHandler(self.handlerTarget, self, SGAudioManagerRouteChangeReasonOldDeviceUnavailable);
             }
                 break;
             default:

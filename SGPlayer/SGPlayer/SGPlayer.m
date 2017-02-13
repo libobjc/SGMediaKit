@@ -343,6 +343,7 @@
     SGPlayerLog(@"SGPlayer release");
     [self cleanPlayer];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [[SGAudioManager manager] removeHandlerTarget:self];
 }
 
 #pragma mark - background mode
@@ -354,7 +355,7 @@
     
     SGWeakSelf
     SGAudioManager * manager = [SGAudioManager manager];
-    [manager setInterruptionHandler:^(SGAudioManager * audioManager, SGAudioManagerInterruptionType type, SGAudioManagerInterruptionOption option) {
+    [manager setHandlerTarget:self interruption:^(id handlerTarget, SGAudioManager *audioManager, SGAudioManagerInterruptionType type, SGAudioManagerInterruptionOption option) {
         SGStrongSelf
         if (type == SGAudioManagerInterruptionTypeBegin) {
             switch (strongSelf.state) {
@@ -368,8 +369,7 @@
                     break;
             }
         }
-    }];
-    [manager setRouteChangeHandler:^(SGAudioManager * audioManager, SGAudioManagerRouteChangeReason reason) {
+    } routeChange:^(id handlerTarget, SGAudioManager *audioManager, SGAudioManagerRouteChangeReason reason) {
         SGStrongSelf
         if (reason == SGAudioManagerRouteChangeReasonOldDeviceUnavailable) {
             switch (strongSelf.state) {

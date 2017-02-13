@@ -28,6 +28,9 @@ typedef NS_ENUM(NSUInteger, SGAudioManagerRouteChangeReason) {
 - (void)audioManager:(SGAudioManager *)audioManager outputData:(float *)outputData numberOfFrames:(UInt32)numberOfFrames numberOfChannels:(UInt32)numberOfChannels;
 @end
 
+typedef void (^SGAudioManagerInterruptionHandler)(id handlerTarget, SGAudioManager * audioManager, SGAudioManagerInterruptionType type, SGAudioManagerInterruptionOption option);
+typedef void (^SGAudioManagerRouteChangeHandler)(id handlerTarget, SGAudioManager * audioManager, SGAudioManagerRouteChangeReason reason);
+
 @interface SGAudioManager : NSObject
 
 + (instancetype)new NS_UNAVAILABLE;
@@ -41,8 +44,10 @@ typedef NS_ENUM(NSUInteger, SGAudioManagerRouteChangeReason) {
 @property (nonatomic, assign, readonly) Float64 samplingRate;
 @property (nonatomic, assign, readonly) UInt32 numberOfChannels;
 
-@property (nonatomic, copy) void (^interruptionHandler)(SGAudioManager * audioManager, SGAudioManagerInterruptionType type, SGAudioManagerInterruptionOption option);
-@property (nonatomic, copy) void (^routeChangeHandler)(SGAudioManager * audioManager, SGAudioManagerRouteChangeReason reason);
+- (void)setHandlerTarget:(id)handlerTarget
+            interruption:(SGAudioManagerInterruptionHandler)interruptionHandler
+             routeChange:(SGAudioManagerRouteChangeHandler)routeChangeHandler;
+- (void)removeHandlerTarget:(id)handlerTarget;
 
 - (void)playWithDelegate:(id <SGAudioManagerDelegate>)delegate;
 - (void)pause;
