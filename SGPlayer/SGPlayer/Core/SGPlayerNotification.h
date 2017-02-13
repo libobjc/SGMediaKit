@@ -12,11 +12,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SGPlayer (SGNotification)
+@interface SGPlayer (SGPlayerNotification)
 @property (nonatomic, strong, nullable) SGError * error;
 @end
 
-@interface SGNotification : NSObject
+@interface SGPlayerNotification : NSObject
 
 + (void)postPlayer:(SGPlayer *)player error:(SGError *)error;
 + (void)postPlayer:(SGPlayer *)player statePrevious:(SGPlayerState)previous current:(SGPlayerState)current;

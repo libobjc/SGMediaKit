@@ -9,7 +9,7 @@
 #import "SGAVPlayer.h"
 #import "SGPlayer+DisplayView.h"
 #import "SGPlayerMacro.h"
-#import "SGNotification.h"
+#import "SGPlayerNotification.h"
 #import <AVFoundation/AVFoundation.h>
 
 static CGFloat const PixelBufferRequestInterval = 0.03f;
@@ -203,7 +203,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
         if (_state != SGPlayerStateFailed) {
             self.abstractPlayer.error = nil;
         }
-        [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
+        [SGPlayerNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
     }
 }
 
@@ -229,7 +229,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     if (_playableTime != playableTime) {
         _playableTime = playableTime;
         CGFloat duration = self.duration;
-        [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTime/duration) current:@(playableTime) total:@(duration)];
+        [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(playableTime/duration) current:@(playableTime) total:@(duration)];
     }
 }
 
@@ -355,7 +355,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                         }
                         self.abstractPlayer.error = error;
                         self.state = SGPlayerStateFailed;
-                        [SGNotification postPlayer:self.abstractPlayer error:error];
+                        [SGPlayerNotification postPlayer:self.abstractPlayer error:error];
                     }
                         break;
                 }
@@ -452,7 +452,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
         if (strongSelf.state == SGPlayerStatePlaying) {
             CGFloat current = CMTimeGetSeconds(time);
             CGFloat duration = strongSelf.duration;
-            [SGNotification postPlayer:strongSelf.abstractPlayer progressPercent:@(current/duration) current:@(current) total:@(duration)];
+            [SGPlayerNotification postPlayer:strongSelf.abstractPlayer progressPercent:@(current/duration) current:@(current) total:@(duration)];
         }
     }];
     self.abstractPlayer.displayView.sgavplayer = self;
@@ -534,8 +534,8 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 
 - (void)replaceEmpty
 {
-    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(0) current:@(0) total:@(0)];
-    [SGNotification postPlayer:self.abstractPlayer progressPercent:@(0) current:@(0) total:@(0)];
+    [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(0) current:@(0) total:@(0)];
+    [SGPlayerNotification postPlayer:self.abstractPlayer progressPercent:@(0) current:@(0) total:@(0)];
     [self cleanOutput];
     [self replaceEmptyAVPlayer];
     [self cleanAVPlayerItem];

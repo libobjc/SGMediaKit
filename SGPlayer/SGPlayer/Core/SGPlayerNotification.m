@@ -6,9 +6,9 @@
 //  Copyright © 2016年 single. All rights reserved.
 //
 
-#import "SGNotification.h"
+#import "SGPlayerNotification.h"
 
-@implementation SGNotification
+@implementation SGPlayerNotification
 
 + (void)postPlayer:(SGPlayer *)player error:(SGError *)error
 {

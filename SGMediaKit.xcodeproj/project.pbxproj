@@ -460,10 +460,10 @@
 		9C7C71311DF904180098E2E7 /* SGAVPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71091DF904180098E2E7 /* SGAVPlayer.h */; };
 		9C7C71321DF904180098E2E7 /* SGAVPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710A1DF904180098E2E7 /* SGAVPlayer.m */; };
 		9C7C71331DF904180098E2E7 /* SGAVPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710A1DF904180098E2E7 /* SGAVPlayer.m */; };
-		9C7C71381DF904180098E2E7 /* SGNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710D1DF904180098E2E7 /* SGNotification.h */; };
-		9C7C71391DF904180098E2E7 /* SGNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710D1DF904180098E2E7 /* SGNotification.h */; };
-		9C7C713A1DF904180098E2E7 /* SGNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710E1DF904180098E2E7 /* SGNotification.m */; };
-		9C7C713B1DF904180098E2E7 /* SGNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710E1DF904180098E2E7 /* SGNotification.m */; };
+		9C7C71381DF904180098E2E7 /* SGPlayerNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710D1DF904180098E2E7 /* SGPlayerNotification.h */; };
+		9C7C71391DF904180098E2E7 /* SGPlayerNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710D1DF904180098E2E7 /* SGPlayerNotification.h */; };
+		9C7C713A1DF904180098E2E7 /* SGPlayerNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710E1DF904180098E2E7 /* SGPlayerNotification.m */; };
+		9C7C713B1DF904180098E2E7 /* SGPlayerNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710E1DF904180098E2E7 /* SGPlayerNotification.m */; };
 		9C7C713C1DF904180098E2E7 /* SGPlayerMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710F1DF904180098E2E7 /* SGPlayerMacro.h */; };
 		9C7C713D1DF904180098E2E7 /* SGPlayerMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710F1DF904180098E2E7 /* SGPlayerMacro.h */; };
 		9C7C71421DF904180098E2E7 /* SGPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71121DF904180098E2E7 /* SGPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -756,8 +756,8 @@
 		9C7C70F21DF9020A0098E2E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9C7C71091DF904180098E2E7 /* SGAVPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGAVPlayer.h; sourceTree = "<group>"; };
 		9C7C710A1DF904180098E2E7 /* SGAVPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGAVPlayer.m; sourceTree = "<group>"; };
-		9C7C710D1DF904180098E2E7 /* SGNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGNotification.h; sourceTree = "<group>"; };
-		9C7C710E1DF904180098E2E7 /* SGNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGNotification.m; sourceTree = "<group>"; };
+		9C7C710D1DF904180098E2E7 /* SGPlayerNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPlayerNotification.h; sourceTree = "<group>"; };
+		9C7C710E1DF904180098E2E7 /* SGPlayerNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPlayerNotification.m; sourceTree = "<group>"; };
 		9C7C710F1DF904180098E2E7 /* SGPlayerMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPlayerMacro.h; sourceTree = "<group>"; };
 		9C7C71121DF904180098E2E7 /* SGPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPlayer.h; sourceTree = "<group>"; };
 		9C7C71131DF904180098E2E7 /* SGPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPlayer.m; sourceTree = "<group>"; };
@@ -1221,8 +1221,8 @@
 				9C3335501E1B4EA100E4DDCC /* SGFFPlayer */,
 				9CA377F01E13AAD9001C923C /* SGDistortion */,
 				9C7C70FA1DF904180098E2E7 /* SGAVPlayer */,
-				9C7C710D1DF904180098E2E7 /* SGNotification.h */,
-				9C7C710E1DF904180098E2E7 /* SGNotification.m */,
+				9C7C710D1DF904180098E2E7 /* SGPlayerNotification.h */,
+				9C7C710E1DF904180098E2E7 /* SGPlayerNotification.m */,
 				9C7C710F1DF904180098E2E7 /* SGPlayerMacro.h */,
 			);
 			path = Core;
@@ -1547,7 +1547,7 @@
 				9C56BBA61E4DB01800F5201F /* dv_profile.h in Headers */,
 				9C56BCC61E4DB01800F5201F /* ossl_typ.h in Headers */,
 				9C56BBD61E4DB01800F5201F /* aes_ctr.h in Headers */,
-				9C7C71391DF904180098E2E7 /* SGNotification.h in Headers */,
+				9C7C71391DF904180098E2E7 /* SGPlayerNotification.h in Headers */,
 				9C56BC4C1E4DB01800F5201F /* samplefmt.h in Headers */,
 				9C56BCF81E4DB01800F5201F /* ui.h in Headers */,
 				9C56BC9C1E4DB01800F5201F /* ebcdic.h in Headers */,
@@ -1682,7 +1682,7 @@
 				9C56BC5D1E4DB01800F5201F /* tree.h in Headers */,
 				9C56BBAD1E4DB01800F5201F /* qsv.h in Headers */,
 				9C56BBBB1E4DB01800F5201F /* xvmc.h in Headers */,
-				9C7C71381DF904180098E2E7 /* SGNotification.h in Headers */,
+				9C7C71381DF904180098E2E7 /* SGPlayerNotification.h in Headers */,
 				9C56BBF51E4DB01800F5201F /* cpu.h in Headers */,
 				9C56BCA51E4DB01800F5201F /* err.h in Headers */,
 				9C56BCDF1E4DB01800F5201F /* sha.h in Headers */,
@@ -1916,7 +1916,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9C7C713B1DF904180098E2E7 /* SGNotification.m in Sources */,
+				9C7C713B1DF904180098E2E7 /* SGPlayerNotification.m in Sources */,
 				9C31006D1E1E50A2003C6611 /* SGFFDecoder.m in Sources */,
 				9C3A3A641E2F775A008CD0DB /* SGFFFrameQueue.m in Sources */,
 				9C8820E01E274B0E00EBEA93 /* SGPlayer+DisplayView.m in Sources */,
@@ -1977,7 +1977,7 @@
 				9C2161D01E2CDCA9005FAF08 /* SGGLFFProgram.m in Sources */,
 				9C2161B11E2CD929005FAF08 /* SGGLFFView.m in Sources */,
 				9C65E8C41E2DC9C3007D81A9 /* SGFingerRotation.m in Sources */,
-				9C7C713A1DF904180098E2E7 /* SGNotification.m in Sources */,
+				9C7C713A1DF904180098E2E7 /* SGPlayerNotification.m in Sources */,
 				9C2161B51E2CD929005FAF08 /* SGGLView.m in Sources */,
 				9C2161D61E2CDCBC005FAF08 /* SGGLAVProgram.m in Sources */,
 				9CE4184E1E2DB390009BCFB6 /* SGGLVRModel.m in Sources */,

@@ -9,7 +9,7 @@
 #import "SGFFPlayer.h"
 #import "SGFFDecoder.h"
 #import "SGAudioManager.h"
-#import "SGNotification.h"
+#import "SGPlayerNotification.h"
 #import "SGPlayerMacro.h"
 #import "SGPlayer+DisplayView.h"
 
@@ -126,7 +126,7 @@
         } else {
             [self.audioManager pause];
         }
-        [SGNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
+        [SGPlayerNotification postPlayer:self.abstractPlayer statePrevious:temp current:_state];
     }
     [self.stateLock unlock];
 }
@@ -137,7 +137,7 @@
         _progress = progress;
         NSTimeInterval duration = self.duration;
         if (_progress <= 0.000001 || _progress == duration) {
-            [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
+            [SGPlayerNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
         } else {
             NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
             if (currentTime - self.lastPostProgressTime >= 1) {
@@ -145,7 +145,7 @@
                 if (!self.decoder.seekEnable) {
                     duration = _progress;
                 }
-                [SGNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
+                [SGPlayerNotification postPlayer:self.abstractPlayer progressPercent:@(_progress/duration) current:@(_progress) total:@(duration)];
             }
         }
     }
@@ -166,12 +166,12 @@
         }
         
         if (_bufferDuration == 0 || playableTtime == duration) {
-            [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
+            [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
         } else if (!self.decoder.endOfFile && self.decoder.seekEnable) {
             NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
             if (currentTime - self.lastPostPlayableTime >= 1) {
                 self.lastPostPlayableTime = currentTime;
-                [SGNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
+                [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
             }
         }
     }
@@ -243,7 +243,7 @@
 
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder
 {
-    [SGNotification postPlayer:self.abstractPlayer playablePercent:@(self.playableTime/self.duration) current:@(self.playableTime) total:@(self.duration)];
+    [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(self.playableTime/self.duration) current:@(self.playableTime) total:@(self.duration)];
 }
 
 - (void)decoderDidPlaybackFinished:(SGFFDecoder *)decoder
@@ -285,7 +285,7 @@
     obj.error = error;
     self.abstractPlayer.error = obj;
     self.state = SGPlayerStateFailed;
-    [SGNotification postPlayer:self.abstractPlayer error:obj];
+    [SGPlayerNotification postPlayer:self.abstractPlayer error:obj];
 }
 
 #pragma mark - clean
