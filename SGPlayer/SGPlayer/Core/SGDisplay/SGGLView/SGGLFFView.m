@@ -8,14 +8,24 @@
 
 #import "SGGLFFView.h"
 #import "SGGLFFProgram.h"
+#import "SGGLAVProgram.h"
+#import "SGGLAVTexture.h"
 
 @interface SGGLFFView ()
 
 {
-    GLuint _textures[3];
+    GLuint _avTexture[3];
 }
 
-@property (nonatomic, strong) SGGLFFProgram * program;
+@property (nonatomic, strong) SGGLAVTexture * cvTexture;
+
+@property (nonatomic, assign) BOOL avSetupToken;
+@property (nonatomic, assign) BOOL cvSetupToken;
+
+@property (nonatomic, strong) SGGLProgram * program;
+@property (nonatomic, strong) SGGLFFProgram * avProgram;
+@property (nonatomic, strong) SGGLAVProgram * cvProgram;
+
 @property (atomic, strong) SGFFVideoFrame * videoFrame;
 
 @end
@@ -31,13 +41,18 @@
 - (BOOL)updateTextureAspect:(CGFloat *)aspect
 {
     if (!self.videoFrame) return NO;
-    
-//    assert(self.videoFrame.luma.length == self.videoFrame.width * self.videoFrame.height);
-//    assert(self.videoFrame.chromaB.length == (self.videoFrame.width * self.videoFrame.height) / 4);
-//    assert(self.videoFrame.chromaR.length == (self.videoFrame.width * self.videoFrame.height) / 4);
+
+    /*
+    assert(self.videoFrame.luma.length == self.videoFrame.width * self.videoFrame.height);
+    assert(self.videoFrame.chromaB.length == (self.videoFrame.width * self.videoFrame.height) / 4);
+    assert(self.videoFrame.chromaR.length == (self.videoFrame.width * self.videoFrame.height) / 4);
+     */
     
     if ([self.videoFrame isKindOfClass:[SGFFAVYUVVideoFrame class]])
     {
+        [self setupAVFrame];
+        self.program = self.avProgram;
+        
         SGFFAVYUVVideoFrame * frame = (SGFFAVYUVVideoFrame *)self.videoFrame;
         
         const int frameWidth = frame.width;
@@ -60,7 +75,7 @@
         for (SGYUVChannel channel = SGYUVChannelLuma; channel < SGYUVChannelCount; channel++)
         {
             glActiveTexture(GL_TEXTURE0 + channel);
-            glBindTexture(GL_TEXTURE_2D, _textures[channel]);
+            glBindTexture(GL_TEXTURE_2D, self->_avTexture[channel]);
             glTexImage2D(GL_TEXTURE_2D,
                          0,
                          GL_LUMINANCE,
@@ -76,8 +91,42 @@
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
     }
+    else if ([self.videoFrame isKindOfClass:[SGFFCVYUVVideoFrame class]])
+    {
+        [self setupCVPixelBuffer];
+        self.program = self.cvProgram;
+        
+        SGFFCVYUVVideoFrame * frame = (SGFFCVYUVVideoFrame *)self.videoFrame;
+        
+        if (!frame.pixelBuffer && !self.cvTexture.hasTexture) return NO;
+        [self.cvTexture updateTextureWithPixelBuffer:frame.pixelBuffer aspect:aspect];
+    }
     
     return YES;
+}
+
+- (void)setupAVFrame
+{
+    if (!self.avSetupToken) {
+        glGenTextures(3, self->_avTexture);
+        self.avProgram = [SGGLFFProgram program];
+        self.avSetupToken = YES;
+    }
+}
+
+- (void)setupCVPixelBuffer
+{
+    if (!self.cvSetupToken) {
+        self.cvTexture = [[SGGLAVTexture alloc] initWithContext:self.context];
+        self.cvProgram = [SGGLAVProgram program];
+        self.cvSetupToken = YES;
+    }
+}
+
+- (void)setupSubClass
+{
+    [self setupAVFrame];
+    [self setupCVPixelBuffer];
 }
 
 - (void)cleanTexture
@@ -85,19 +134,12 @@
     self.videoFrame = nil;
 }
 
-- (void)setupProgram
-{
-    self.program = [SGGLFFProgram program];
-}
-
-- (void)setupSubClass
-{
-    glGenTextures(3, _textures);
-}
-
 - (void)willDealloc
 {
-    glDeleteTextures(3, _textures);
+    if (self.avSetupToken) {
+        glDeleteTextures(3, self->_avTexture);
+        self.avSetupToken = NO;
+    }
 }
 
 @end

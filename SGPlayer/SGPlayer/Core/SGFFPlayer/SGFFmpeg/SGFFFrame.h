@@ -59,8 +59,7 @@ typedef NS_ENUM(int, SGYUVChannel) {
 // CoreVideo YUV frame
 @interface SGFFCVYUVVideoFrame : SGFFVideoFrame
 
-@property (nonatomic, assign, readonly) int width;
-@property (nonatomic, assign, readonly) int height;
+@property (nonatomic, assign, readonly) CVPixelBufferRef pixelBuffer;
 
 - (instancetype)initWithAVPixelBuffer:(CVPixelBufferRef)pixelBuffer;
 
