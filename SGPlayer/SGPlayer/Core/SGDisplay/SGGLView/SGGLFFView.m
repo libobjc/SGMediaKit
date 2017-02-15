@@ -99,7 +99,7 @@
         SGFFCVYUVVideoFrame * frame = (SGFFCVYUVVideoFrame *)self.videoFrame;
         
         if (!frame.pixelBuffer && !self.cvTexture.hasTexture) return NO;
-        [self.cvTexture updateTextureWithPixelBuffer:frame.pixelBuffer aspect:aspect];
+        [self.cvTexture updateTextureWithPixelBuffer:frame.pixelBuffer aspect:aspect needRelease:NO];
     }
     
     return YES;

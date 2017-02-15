@@ -44,7 +44,7 @@
     }
 }
 
-- (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer aspect:(CGFloat *)aspect
+- (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer aspect:(CGFloat *)aspect needRelease:(BOOL)needRelease
 {
     if (pixelBuffer == nil) {
         if (self.lumaTexture) {
@@ -122,7 +122,9 @@
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
-    CVPixelBufferRelease(pixelBuffer);
+    if (needRelease) {
+        CVPixelBufferRelease(pixelBuffer);
+    }
     
     _hasTexture = YES;
 }

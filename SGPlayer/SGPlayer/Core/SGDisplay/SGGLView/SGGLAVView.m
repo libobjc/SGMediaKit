@@ -26,7 +26,7 @@
     CVPixelBufferRef pixelBuffer = [self.displayView.sgavplayer pixelBufferAtCurrentTime];
     if (!pixelBuffer && !self.texture.hasTexture) return NO;
     
-    [self.texture updateTextureWithPixelBuffer:pixelBuffer aspect:aspect];
+    [self.texture updateTextureWithPixelBuffer:pixelBuffer aspect:aspect needRelease:YES];
     return YES;
 }
 
