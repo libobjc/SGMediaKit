@@ -68,8 +68,6 @@ double sg_ff_get_timebase(AVStream * stream, double default_timebase)
     double timebase;
     if (stream->time_base.den > 0 && stream->time_base.num > 0) {
         timebase = av_q2d(stream->time_base);
-    } else if (stream->codec->time_base.den > 0 && stream->codec->time_base.num > 0) {
-        timebase = av_q2d(stream->codec->time_base);
     } else {
         timebase = default_timebase;
     }

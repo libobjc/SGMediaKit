@@ -292,7 +292,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
                     self.videoStreamIndex = index;
                     _video_frame = av_frame_alloc();
                     self.videoEnable = YES;
-                    self.videoTimebase = sg_ff_get_timebase(_format_context->streams[self.videoStreamIndex], 0.04);
+                    self.videoTimebase = sg_ff_get_timebase(_format_context->streams[self.videoStreamIndex], 0.00004);
                     self.fps = sg_ff_get_fps(_format_context->streams[self.videoStreamIndex], self.videoTimebase);
                     break;
                 }
@@ -360,7 +360,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
                 self.audioStreamIndex = index;
                 _audio_frame = av_frame_alloc();
                 self.audioEnable = YES;
-                self.audioTimebase = sg_ff_get_timebase(_format_context->streams[self.audioStreamIndex], 0.025);
+                self.audioTimebase = sg_ff_get_timebase(_format_context->streams[self.audioStreamIndex], 0.000025);
                 break;
             }
         }
