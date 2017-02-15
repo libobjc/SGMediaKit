@@ -328,7 +328,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return error;
     }
     av_codec_set_pkt_timebase(codec_context, stream->time_base);
-    codec_context->get_format = get_video_pixel_format;
+//    codec_context->get_format = get_video_pixel_format;
     
     AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
     if (!codec) {
@@ -759,9 +759,22 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
 
 - (SGFFVideoFrame *)getVideoFrameFromAVFrame
 {
-    if (!_video_frame->data[0]) return nil;
+    SGFFVideoFrame * videoFrame;
     
-    SGFFVideoFrame * videoFrame = [[SGFFVideoFrame alloc] initWithAVFrame:_video_frame width:_video_codec->width height:_video_codec->height];
+    enum AVPixelFormat pix_fmt = _video_frame->format;
+    if (pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX)
+    {
+        AVBufferRef * buffer = _video_frame->buf[0];
+        if (!buffer) return nil;
+        
+        CVPixelBufferRef pixel_buffer = (CVPixelBufferRef)buffer->data;
+        videoFrame = [[SGFFCVYUVVideoFrame alloc] initWithAVPixelBuffer:pixel_buffer];
+    }
+    else
+    {
+        if (!_video_frame->data[0]) return nil;
+        videoFrame = [[SGFFAVYUVVideoFrame alloc] initWithAVFrame:_video_frame width:_video_codec->width height:_video_codec->height];
+    }
     
     videoFrame.position = av_frame_get_best_effort_timestamp(_video_frame) * self.videoTimebase;
     

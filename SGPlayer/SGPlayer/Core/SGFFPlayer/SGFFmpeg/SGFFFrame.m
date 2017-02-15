@@ -13,7 +13,24 @@
 
 @end
 
+
+#pragma mark - Video Frame
+
 @implementation SGFFVideoFrame
+
+- (SGFFFrameType)type
+{
+    return SGFFFrameTypeVideo;
+}
+
+@end
+
+@implementation SGFFAVYUVVideoFrame
+
+- (SGFFFrameType)type
+{
+    return SGFFFrameTypeAVYUVVideo;
+}
 
 - (instancetype)initWithAVFrame:(AVFrame *)frame width:(int)width height:(int)height
 {
@@ -42,11 +59,6 @@
     return self;
 }
 
-- (SGFFFrameType)type
-{
-    return SGFFFrameTypeVideo;
-}
-
 - (int)size
 {
     return channel_lenghts[SGYUVChannelLuma] + channel_lenghts[SGYUVChannelChromaB] + channel_lenghts[SGYUVChannelChromaR];
@@ -65,6 +77,26 @@
 
 @end
 
+@implementation SGFFCVYUVVideoFrame
+
+- (SGFFFrameType)type
+{
+    return SGFFFrameTypeCVYUVVideo;
+}
+
+- (instancetype)initWithAVPixelBuffer:(CVPixelBufferRef)pixelBuffer
+{
+    if (self = [super init]) {
+        
+    }
+    return self;
+}
+
+@end
+
+
+#pragma mark - Audio Frame
+
 @implementation SGFFAudioFrame
 
 - (SGFFFrameType)type
@@ -78,6 +110,9 @@
 }
 
 @end
+
+
+#pragma mark - Other Frame
 
 @implementation SGFFSubtileFrame
 

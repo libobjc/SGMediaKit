@@ -22,7 +22,7 @@
 
 @implementation SGGLFFView
 
-- (void)renderFrame:(SGFFVideoFrame *)frame
+- (void)renderFrame:(__kindof SGFFVideoFrame *)frame
 {
     self.videoFrame = frame;
     [self displayAsyncOnMainThread];
@@ -36,40 +36,45 @@
 //    assert(self.videoFrame.chromaB.length == (self.videoFrame.width * self.videoFrame.height) / 4);
 //    assert(self.videoFrame.chromaR.length == (self.videoFrame.width * self.videoFrame.height) / 4);
     
-    const int frameWidth = self.videoFrame.width;
-    const int frameHeight = self.videoFrame.height;
-    * aspect = (frameWidth * 1.0) / (frameHeight * 1.0);
-    
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    
-    const int widths[3]  = {
-        frameWidth,
-        frameWidth / 2,
-        frameWidth / 2
-    };
-    const int heights[3] = {
-        frameHeight,
-        frameHeight / 2,
-        frameHeight / 2
-    };
-    
-    for (SGYUVChannel channel = SGYUVChannelLuma; channel < SGYUVChannelCount; channel++)
+    if ([self.videoFrame isKindOfClass:[SGFFAVYUVVideoFrame class]])
     {
-        glActiveTexture(GL_TEXTURE0 + channel);
-        glBindTexture(GL_TEXTURE_2D, _textures[channel]);
-        glTexImage2D(GL_TEXTURE_2D,
-                     0,
-                     GL_LUMINANCE,
-                     widths[channel],
-                     heights[channel],
-                     0,
-                     GL_LUMINANCE,
-                     GL_UNSIGNED_BYTE,
-                     self.videoFrame->channel_pixels[channel]);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        SGFFAVYUVVideoFrame * frame = (SGFFAVYUVVideoFrame *)self.videoFrame;
+        
+        const int frameWidth = frame.width;
+        const int frameHeight = frame.height;
+        * aspect = (frameWidth * 1.0) / (frameHeight * 1.0);
+        
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+        
+        const int widths[3]  = {
+            frameWidth,
+            frameWidth / 2,
+            frameWidth / 2
+        };
+        const int heights[3] = {
+            frameHeight,
+            frameHeight / 2,
+            frameHeight / 2
+        };
+        
+        for (SGYUVChannel channel = SGYUVChannelLuma; channel < SGYUVChannelCount; channel++)
+        {
+            glActiveTexture(GL_TEXTURE0 + channel);
+            glBindTexture(GL_TEXTURE_2D, _textures[channel]);
+            glTexImage2D(GL_TEXTURE_2D,
+                         0,
+                         GL_LUMINANCE,
+                         widths[channel],
+                         heights[channel],
+                         0,
+                         GL_LUMINANCE,
+                         GL_UNSIGNED_BYTE,
+                         frame->channel_pixels[channel]);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        }
     }
     
     return YES;

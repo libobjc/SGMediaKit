@@ -751,6 +751,8 @@
 		9C6E6D7C1E2CC8D7003D62D5 /* SGMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGMatrix.m; sourceTree = "<group>"; };
 		9C6E6D811E2CC8F7003D62D5 /* SGSensors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGSensors.h; sourceTree = "<group>"; };
 		9C6E6D821E2CC8F7003D62D5 /* SGSensors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGSensors.m; sourceTree = "<group>"; };
+		9C7393DB1E545459008E3283 /* CoreVideo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreVideo.framework; path = System/Library/Frameworks/CoreVideo.framework; sourceTree = SDKROOT; };
+		9C7393DD1E545461008E3283 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = System/Library/Frameworks/CoreMedia.framework; sourceTree = SDKROOT; };
 		9C7C70EF1DF9020A0098E2E7 /* SGPlayer.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SGPlayer.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C7C70F11DF9020A0098E2E7 /* SGPlayerHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SGPlayerHeader.h; sourceTree = "<group>"; };
 		9C7C70F21DF9020A0098E2E7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -1313,6 +1315,8 @@
 		9CA476701DE53CAB00B1B0D1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				9C7393DD1E545461008E3283 /* CoreMedia.framework */,
+				9C7393DB1E545459008E3283 /* CoreVideo.framework */,
 				9CDEFB621E1DE5F5005510C9 /* libbz2.1.0.tbd */,
 				9CDEFB601E1DE50E005510C9 /* libbz2.tbd */,
 				9CDEFB5E1E1DE506005510C9 /* VideoToolbox.framework */,

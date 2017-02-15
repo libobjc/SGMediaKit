@@ -10,6 +10,6 @@
 
 @interface SGGLFFView : SGGLView
 
-- (void)renderFrame:(SGFFVideoFrame *)frame;
+- (void)renderFrame:(__kindof SGFFVideoFrame *)frame;
 
 @end
