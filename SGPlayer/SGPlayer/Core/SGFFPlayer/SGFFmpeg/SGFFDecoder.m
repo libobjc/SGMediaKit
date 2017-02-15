@@ -772,7 +772,7 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
     }
     else
     {
-        if (!_video_frame->data[0]) return nil;
+        if (!_video_frame->data[0] || !_video_frame->data[1] || !_video_frame->data[2]) return nil;
         videoFrame = [[SGFFAVYUVVideoFrame alloc] initWithAVFrame:_video_frame width:_video_codec->width height:_video_codec->height];
     }
     
