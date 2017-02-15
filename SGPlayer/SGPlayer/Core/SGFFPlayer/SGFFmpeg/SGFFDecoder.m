@@ -374,30 +374,48 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 - (NSError *)openAudioStream:(NSInteger)audioStreamIndex
 {
+    int result = 0;
     NSError * error = nil;
     AVStream * stream = _format_context->streams[audioStreamIndex];
     
-    AVCodec * codec = avcodec_find_decoder(stream->codec->codec_id);
-    if (!codec) {
-        error = [NSError errorWithDomain:@"audio codec not found decoder" code:SGFFDecoderErrorCodeCodecFindDecoder userInfo:nil];
+    AVCodecContext * codec_context = avcodec_alloc_context3(NULL);
+    if (!codec_context) {
+        error = [NSError errorWithDomain:@"audio codec context create error" code:SGFFDecoderErrorCodeCodecContextCreate userInfo:nil];
         return error;
     }
     
-    int result = avcodec_open2(stream->codec, codec, NULL);
+    result = avcodec_parameters_to_context(codec_context, stream->codecpar);
+    error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecContextSetParam);
+    if (error) {
+        avcodec_free_context(&codec_context);
+        return error;
+    }
+    av_codec_set_pkt_timebase(codec_context, stream->time_base);
+    
+    AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
+    if (!codec) {
+        avcodec_free_context(&codec_context);
+        error = [NSError errorWithDomain:@"audio codec not found decoder" code:SGFFDecoderErrorCodeCodecFindDecoder userInfo:nil];
+        return error;
+    }
+    codec_context->codec_id = codec->id;
+    
+    result = avcodec_open2(codec_context, codec, NULL);
     error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecOpen2);
     if (error) {
+        avcodec_free_context(&codec_context);
         return error;
     }
     
     BOOL needSwr = YES;
-    if (stream->codec->sample_fmt == AV_SAMPLE_FMT_S16) {
-        if (self.audioOutput.samplingRate == stream->codec->sample_rate && self.audioOutput.numberOfChannels == stream->codec->channels) {
+    if (codec_context->sample_fmt == AV_SAMPLE_FMT_S16) {
+        if (self.audioOutput.samplingRate == codec_context->sample_rate && self.audioOutput.numberOfChannels == codec_context->channels) {
             needSwr = NO;
         }
     }
     
     if (needSwr) {
-        _audio_swr_context = swr_alloc_set_opts(NULL, av_get_default_channel_layout(self.audioOutput.numberOfChannels), AV_SAMPLE_FMT_S16, self.audioOutput.samplingRate, av_get_default_channel_layout(stream->codec->channels), stream->codec->sample_fmt, stream->codec->sample_rate, 0, NULL);
+        _audio_swr_context = swr_alloc_set_opts(NULL, av_get_default_channel_layout(self.audioOutput.numberOfChannels), AV_SAMPLE_FMT_S16, self.audioOutput.samplingRate, av_get_default_channel_layout(codec_context->channels), codec_context->sample_fmt, codec_context->sample_rate, 0, NULL);
         
         result = swr_init(_audio_swr_context);
         error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeAuidoSwrInit);
@@ -405,12 +423,12 @@ static int ffmpeg_interrupt_callback(void *ctx)
             if (_audio_swr_context) {
                 swr_free(&_audio_swr_context);
             }
-            avcodec_close(stream->codec);
+            avcodec_close(codec_context);
             return error;
         }
     }
     
-    _audio_codec = stream->codec;
+    _audio_codec = codec_context;
     
     return error;
 }
@@ -760,25 +778,21 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 - (void)putAudioPacket:(AVPacket)packet
 {
-    int packet_size = packet.size;
-    while (packet_size > 0)
-    {
-        int gotframe = 0;
-        int lenght = avcodec_decode_audio4(_audio_codec, _audio_frame, &gotframe, &packet);
-        if (lenght < 0) {
+    if (packet.stream_index != self.audioStreamIndex) return;
+    if (packet.data == NULL) return;
+    
+    int result = avcodec_send_packet(_audio_codec, &packet);
+    if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) return;
+    
+    while (result >= 0) {
+        result = avcodec_receive_frame(_audio_codec, _audio_frame);
+        if (result == AVERROR(EAGAIN) || result == AVERROR_EOF || result < 0) {
             break;
         }
-        if (gotframe) {
-            SGFFAudioFrame * audioFrame = [self getAudioFrameFromAVFrame];
-            if (audioFrame) {
-                [self.audioFrameQueue putFrame:audioFrame];
-                break;
-            }
+        SGFFAudioFrame * audioFrame = [self getAudioFrameFromAVFrame];
+        if (audioFrame) {
+            [self.audioFrameQueue putFrame:audioFrame];
         }
-        if (lenght == 0) {
-            break;
-        }
-        packet_size -= lenght;
     }
     av_packet_unref(&packet);
 }
