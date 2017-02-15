@@ -80,6 +80,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, copy, readonly) NSDictionary * metadata;
 @property (nonatomic, assign, readonly) CGSize presentationSize;
 @property (nonatomic, assign, readonly) NSTimeInterval fps;
+@property (nonatomic, assign, readonly) NSTimeInterval bitrate;
 @property (nonatomic, assign, readonly) NSTimeInterval progress;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
 @property (nonatomic, assign, readonly) NSTimeInterval bufferedDuration;

@@ -206,6 +206,18 @@
     }
 }
 
+- (NSTimeInterval)bitrate
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return self.avPlayer.bitrate;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.bitrate;
+        case SGDecoderTypeError:
+            return 0;
+    }
+}
+
 - (NSTimeInterval)progress
 {
     switch (self.decoderType) {

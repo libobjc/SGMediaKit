@@ -193,6 +193,14 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     return CMTimeGetSeconds(self.avPlayerItem.duration);
 }
 
+- (NSTimeInterval)bitrate
+{
+//    if (self.avPlayerItem.status == AVPlayerItemStatusReadyToPlay) {
+//        return (self.avPlayerItem.accessLog.events.lastObject.observedBitrate / 1000.0f);
+//    }
+    return 0;
+}
+
 #pragma mark - Setter/Getter
 
 - (void)setState:(SGPlayerState)state

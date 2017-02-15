@@ -20,6 +20,7 @@
 
 @property (nonatomic, assign, readonly) SGPlayerState state;
 @property (nonatomic, assign, readonly) CGSize presentationSize;
+@property (nonatomic, assign, readonly) NSTimeInterval bitrate;
 @property (nonatomic, assign, readonly) NSTimeInterval progress;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
 @property (nonatomic, assign, readonly) NSTimeInterval playableTime;

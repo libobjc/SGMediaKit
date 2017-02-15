@@ -198,6 +198,14 @@
     return CGSizeZero;
 }
 
+- (NSTimeInterval)bitrate
+{
+    if (self.decoder.prepareToDecode) {
+        return self.decoder.bitrate;
+    }
+    return 0;
+}
+
 - (void)reloadVolume
 {
     self.decoder.volume = self.abstractPlayer.volume;
