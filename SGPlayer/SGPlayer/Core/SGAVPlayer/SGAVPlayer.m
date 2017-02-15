@@ -25,7 +25,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 @property (atomic, strong) id playBackTimeObserver;
 @property (nonatomic, strong) AVPlayer * avPlayer;
 @property (nonatomic, strong) AVPlayerItem * avPlayerItem;
-@property (atomic, strong) AVAsset * avAsset;
+@property (atomic, strong) AVURLAsset * avAsset;
 @property (atomic, strong) AVPlayerItemVideoOutput * avOutput;
 @property (atomic, assign) NSTimeInterval readyToPlayTime;
 
@@ -195,9 +195,11 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 
 - (NSTimeInterval)bitrate
 {
-//    if (self.avPlayerItem.status == AVPlayerItemStatusReadyToPlay) {
-//        return (self.avPlayerItem.accessLog.events.lastObject.observedBitrate / 1000.0f);
-//    }
+/*
+    if (self.avPlayerItem.status == AVPlayerItemStatusReadyToPlay) {
+        return (self.avPlayerItem.accessLog.events.lastObject.observedBitrate / 1000.0f);
+    }
+ */
     return 0;
 }
 
@@ -409,7 +411,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     [self replaceEmpty];
     if (!self.abstractPlayer.contentURL) return;
     
-    self.avAsset = [AVAsset assetWithURL:self.abstractPlayer.contentURL];
+    self.avAsset = [AVURLAsset assetWithURL:self.abstractPlayer.contentURL];
     switch (self.abstractPlayer.videoType) {
         case SGVideoTypeNormal:
             [self setupAVPlayerItemAutoLoadedAsset:YES];
@@ -547,6 +549,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     [self cleanOutput];
     [self replaceEmptyAVPlayer];
     [self cleanAVPlayerItem];
+    [self.avAsset cancelLoading];
     self.avAsset = nil;
     self.state = SGPlayerStateNone;
     self.needPlay = NO;
