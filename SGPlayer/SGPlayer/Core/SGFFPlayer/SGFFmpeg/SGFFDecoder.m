@@ -308,22 +308,40 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 - (NSError *)openVideoStream:(NSInteger)videoStreamIndex
 {
+    int result = 0;
     NSError * error = nil;
     AVStream * stream = _format_context->streams[videoStreamIndex];
     
-    AVCodec * codec = avcodec_find_decoder(stream->codec->codec_id);
+    AVCodecContext * codec_context = avcodec_alloc_context3(NULL);
+    if (!codec_context) {
+        error = [NSError errorWithDomain:@"video codec context create error" code:SGFFDecoderErrorCodeCodecContextCreate userInfo:nil];
+        return error;
+    }
+    
+    result = avcodec_parameters_to_context(codec_context, stream->codecpar);
+    error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecContextSetParam);
+    if (error) {
+        avcodec_free_context(&codec_context);
+        return error;
+    }
+    av_codec_set_pkt_timebase(codec_context, stream->time_base);
+    
+    AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
     if (!codec) {
+        avcodec_free_context(&codec_context);
         error = [NSError errorWithDomain:@"video codec not found decoder" code:SGFFDecoderErrorCodeCodecFindDecoder userInfo:nil];
         return error;
     }
+    codec_context->codec_id = codec->id;
     
-    int result = avcodec_open2(stream->codec, codec, NULL);
+    result = avcodec_open2(codec_context, codec, NULL);
     error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecOpen2);
     if (error) {
+        avcodec_free_context(&codec_context);
         return error;
     }
     
-    _video_codec = stream->codec;
+    _video_codec = codec_context;
     self.presentationSize = CGSizeMake(_video_codec->width, _video_codec->height);
     
     return error;
@@ -402,7 +420,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     NSMutableArray * array = [NSMutableArray array];
     for (NSInteger i = 0; i < _format_context->nb_streams; i++) {
         AVStream * stream = _format_context->streams[i];
-        if (stream->codec->codec_type == mediaType) {
+        if (stream->codecpar->codec_type == mediaType) {
             [array addObject:[NSNumber numberWithInteger:i]];
         }
     }
@@ -685,24 +703,17 @@ static int ffmpeg_interrupt_callback(void *ctx)
             continue;
         }
         if (packet.stream_index != self.videoStreamIndex) return nil;
-        int packet_size = packet.size;
-        while (packet_size > 0)
-        {
-            int gotframe = 0;
-            int lenght = avcodec_decode_video2(_video_codec, _video_frame, &gotframe, &packet);
-            if (lenght < 0) {
+        if (packet.data == NULL) return nil;
+        
+        int result = avcodec_send_packet(_video_codec, &packet);
+        if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) return nil;
+        
+        while (result >= 0) {
+            result = avcodec_receive_frame(_video_codec, _video_frame);
+            if (result == AVERROR(EAGAIN) || result == AVERROR_EOF || result < 0) {
                 break;
             }
-            if (gotframe) {
-                videoFrame = [self getVideoFrameFromAVFrame];
-                if (videoFrame) {
-                    break;
-                }
-            }
-            if (lenght == 0) {
-                break;
-            }
-            packet_size -= lenght;
+            videoFrame = [self getVideoFrameFromAVFrame];
         }
         av_packet_unref(&packet);
     }
