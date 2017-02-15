@@ -108,6 +108,8 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * audioStreamIndexs;
 
+@property (nonatomic, copy, readonly) NSString * videoPixelForamtName;
+
 - (void)pause;
 - (void)resume;
 - (SGFFAudioFrame *)fetchAudioFrame;

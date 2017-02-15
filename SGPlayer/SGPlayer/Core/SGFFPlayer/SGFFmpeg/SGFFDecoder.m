@@ -10,11 +10,14 @@
 #import "SGFFTools.h"
 #import "SGFFPacketQueue.h"
 #import "SGFFFrameQueue.h"
+#import "SGPlayerMacro.h"
+
 #import "avformat.h"
 #import "swresample.h"
 #import "swscale.h"
+#import "videotoolbox.h"
+#import "pixdesc.h"
 #import <Accelerate/Accelerate.h>
-#import "SGPlayerMacro.h"
 
 static AVPacket flush_packet;
 
@@ -325,6 +328,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return error;
     }
     av_codec_set_pkt_timebase(codec_context, stream->time_base);
+    codec_context->get_format = get_video_pixel_format;
     
     AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
     if (!codec) {
@@ -345,6 +349,21 @@ static int ffmpeg_interrupt_callback(void *ctx)
     self.presentationSize = CGSizeMake(_video_codec->width, _video_codec->height);
     
     return error;
+}
+
+enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum AVPixelFormat * fmt)
+{
+    const enum AVPixelFormat * tmp = fmt;
+    while (*tmp != AV_PIX_FMT_NONE) {
+        if (*tmp == AV_PIX_FMT_VIDEOTOOLBOX) {
+            int result = av_videotoolbox_default_init(s);
+            if (result >= 0) {
+                return AV_PIX_FMT_VIDEOTOOLBOX;
+            }
+            break;
+        }
+    }
+    return *fmt;
 }
 
 - (NSError *)openAutioStreams
@@ -1047,6 +1066,14 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (BOOL)seekEnable
 {
     return self.duration > 0;
+}
+
+- (NSString *)videoPixelForamtName
+{
+    if (!_video_codec || !self.videoEnable) return nil;
+    const char * name = av_get_pix_fmt_name(_video_codec->pix_fmt);
+    const char * sw_name = av_get_pix_fmt_name(_video_codec->sw_pix_fmt);
+    return [NSString stringWithFormat:@"%s, %s", name, sw_name];
 }
 
 - (NSString *)contentURLString
