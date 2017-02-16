@@ -363,8 +363,16 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
+static void clean_codec_context_hwaccel(struct AVCodecContext *s, const enum AVPixelFormat fmt)
+{
+    if (s->hwaccel_context) {
+        av_videotoolbox_default_free(s);
+    }
+}
+
 static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum AVPixelFormat * fmt)
 {
+    clean_codec_context_hwaccel(s, AV_PIX_FMT_VIDEOTOOLBOX);
     const enum AVPixelFormat * tmp;
     for (tmp = fmt; * tmp != AV_PIX_FMT_NONE; tmp++)
     {
@@ -979,6 +987,7 @@ static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const
         _video_frame = NULL;
     }
     if (_video_codec) {
+        clean_codec_context_hwaccel(_video_codec, AV_PIX_FMT_VIDEOTOOLBOX);
         avcodec_close(_video_codec);
         _video_codec = NULL;
     }
