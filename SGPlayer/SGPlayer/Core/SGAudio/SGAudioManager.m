@@ -290,9 +290,8 @@ static OSStatus renderCallback (void * inRefCon,
         self.error = checkError(result, @"stop output unit error");
         if (self.error) {
             [self delegateErrorCallback];
-        } else {
-            self->_playing = NO;
         }
+        self->_playing = NO;
     }
 }
 
@@ -339,7 +338,7 @@ static OSStatus renderCallback (void * inRefCon,
 static NSError * checkError(OSStatus result, NSString * domain)
 {
     if (result == noErr) return nil;
-    NSError * error = [NSError errorWithDomain:domain code:-1 userInfo:nil];
+    NSError * error = [NSError errorWithDomain:domain code:result userInfo:nil];
     return error;
 }
 
