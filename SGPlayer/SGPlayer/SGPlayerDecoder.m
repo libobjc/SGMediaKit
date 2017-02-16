@@ -46,6 +46,14 @@
     return decoder;
 }
 
+- (instancetype)init
+{
+    if (self = [super init]) {
+        self.ffmpegHardwareDecoderEnable = YES;
+    }
+    return self;
+}
+
 - (SGVideoFormat)formatForContentURL:(NSURL *)contentURL
 {
     if (!contentURL) return SGVideoFormatError;

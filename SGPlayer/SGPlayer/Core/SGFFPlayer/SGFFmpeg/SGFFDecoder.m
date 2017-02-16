@@ -130,12 +130,17 @@ static int ffmpeg_interrupt_callback(void *ctx)
         self.videoStreamIndex = -1;
         self.audioStreamIndex = -1;
         
-        [self setupOperationQueue];
+        self.hardwareDecoderEnabel = YES;
     }
     return self;
 }
 
 #pragma mark - setup operations
+
+- (void)open
+{
+    [self setupOperationQueue];
+}
 
 - (void)setupOperationQueue
 {
@@ -333,7 +338,9 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return error;
     }
     av_codec_set_pkt_timebase(codec_context, stream->time_base);
-    codec_context->get_format = get_video_pixel_format;
+    if (self.hardwareDecoderEnable) {
+        codec_context->get_format = get_video_pixel_format;
+    }
     
     AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
     if (!codec) {

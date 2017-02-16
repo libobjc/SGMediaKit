@@ -91,6 +91,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 @property (nonatomic, assign) NSTimeInterval minBufferedDruation;
 @property (nonatomic, assign) CGFloat volume;
+@property (nonatomic, assign) BOOL hardwareDecoderEnable;       // default is YES;
 
 @property (nonatomic, assign, readonly) BOOL buffering;
 
@@ -122,6 +123,7 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 - (void)seekToTime:(NSTimeInterval)time;
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void (^)(BOOL finished))completeHandler;
 
+- (void)open;
 - (void)closeFile;      // when release of active calls, or when called in dealloc might block the thread
 
 @end

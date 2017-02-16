@@ -35,11 +35,13 @@ typedef NS_ENUM(NSUInteger, SGVideoFormat) {
 - (SGVideoFormat)formatForContentURL:(NSURL *)contentURL;
 - (SGDecoderType)decoderTypeForContentURL:(NSURL *)contentURL;
 
-@property (nonatomic, assign) SGDecoderType unkonwnFormat;   // default is SGDecodeTypeFFmpeg
-@property (nonatomic, assign) SGDecoderType mpeg4Format;     // default is SGDecodeTypeAVPlayer
-@property (nonatomic, assign) SGDecoderType flvFormat;       // default is SGDecodeTypeFFmpeg
-@property (nonatomic, assign) SGDecoderType m3u8Format;      // default is SGDecodeTypeAVPlayer
-@property (nonatomic, assign) SGDecoderType rtmpFormat;      // default is SGDecodeTypeFFmpeg
-@property (nonatomic, assign) SGDecoderType rtspFormat;      // default is SGDecodeTypeFFmpeg
+@property (nonatomic, assign) BOOL ffmpegHardwareDecoderEnable; // default is YES
+
+@property (nonatomic, assign) SGDecoderType unkonwnFormat;      // default is SGDecodeTypeFFmpeg
+@property (nonatomic, assign) SGDecoderType mpeg4Format;        // default is SGDecodeTypeAVPlayer
+@property (nonatomic, assign) SGDecoderType flvFormat;          // default is SGDecodeTypeFFmpeg
+@property (nonatomic, assign) SGDecoderType m3u8Format;         // default is SGDecodeTypeAVPlayer
+@property (nonatomic, assign) SGDecoderType rtmpFormat;         // default is SGDecodeTypeFFmpeg
+@property (nonatomic, assign) SGDecoderType rtspFormat;         // default is SGDecodeTypeFFmpeg
 
 @end
