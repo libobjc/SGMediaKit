@@ -236,6 +236,11 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return;
     }
     
+    // if the first video frame is not key frame, maybe crash in VideoToolBox when call av_send_packet()
+    if (self.videoEnable) {
+        avformat_seek_file(_format_context, -1, 0, 0, 0, 0);
+    }
+    
     self.prepareToDecode = YES;
     if ([self.delegate respondsToSelector:@selector(decoderDidPrepareToDecodeFrames:)]) {
         [self.delegate decoderDidPrepareToDecodeFrames:self];
@@ -328,7 +333,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return error;
     }
     av_codec_set_pkt_timebase(codec_context, stream->time_base);
-//    codec_context->get_format = get_video_pixel_format;
+    codec_context->get_format = get_video_pixel_format;
     
     AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
     if (!codec) {
