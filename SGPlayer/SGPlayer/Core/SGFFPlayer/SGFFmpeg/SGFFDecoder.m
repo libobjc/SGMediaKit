@@ -242,7 +242,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
     
     // if the first video frame is not key frame, maybe crash in VideoToolBox when call av_send_packet()
-    if (self.videoEnable) {
+    if (self.videoEnable && self.seekEnable) {
         avformat_seek_file(_format_context, -1, 0, 0, 0, 0);
     }
     
