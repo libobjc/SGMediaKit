@@ -860,9 +860,12 @@ static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const
             }
             break;
         }
-        SGFFAudioFrame * audioFrame = [self getAudioFrameFromAVFrame];
-        if (audioFrame) {
-            [self.audioFrameQueue putFrame:audioFrame];
+        @autoreleasepool
+        {
+            SGFFAudioFrame * audioFrame = [self getAudioFrameFromAVFrame];
+            if (audioFrame) {
+                [self.audioFrameQueue putFrame:audioFrame];
+            }
         }
     }
     av_packet_unref(&packet);
