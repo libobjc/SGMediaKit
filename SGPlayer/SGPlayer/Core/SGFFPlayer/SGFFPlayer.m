@@ -27,7 +27,6 @@
 
 @property (nonatomic, assign) SGPlayerState state;
 @property (nonatomic, assign) NSTimeInterval progress;
-@property (nonatomic, assign) NSTimeInterval bufferDuration;
 
 @property (nonatomic, assign) NSTimeInterval lastPostProgressTime;
 @property (nonatomic, assign) NSTimeInterval lastPostPlayableTime;
@@ -151,38 +150,27 @@
     }
 }
 
-- (void)setBufferDuration:(NSTimeInterval)bufferDuration
+- (void)setPlayableTime:(NSTimeInterval)playableTime
 {
-    if (_bufferDuration != bufferDuration) {
-        if (bufferDuration < 0) {
-            bufferDuration = 0;
-        }
-        _bufferDuration = bufferDuration;
-        
-        NSTimeInterval playableTtime = self.playableTime;
-        NSTimeInterval duration = self.duration;
-        if (playableTtime > duration) {
-            playableTtime = duration;
-        }
-        
-        if (_bufferDuration == 0 || playableTtime == duration) {
-            [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
+    NSTimeInterval duration = self.duration;
+    if (playableTime > duration) {
+        playableTime = duration;
+    } else if (playableTime < 0) {
+        playableTime = 0;
+    }
+    
+    if (_playableTime != playableTime) {
+        _playableTime = playableTime;
+        if (_playableTime == 0 || _playableTime == duration) {
+            [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(_playableTime/self.duration) current:@(_playableTime) total:@(duration)];
         } else if (!self.decoder.endOfFile && self.decoder.seekEnable) {
             NSTimeInterval currentTime = [NSDate date].timeIntervalSince1970;
             if (currentTime - self.lastPostPlayableTime >= 1) {
                 self.lastPostPlayableTime = currentTime;
-                [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(playableTtime/duration) current:@(playableTtime) total:@(duration)];
+                [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(_playableTime/duration) current:@(_playableTime) total:@(duration)];
             }
         }
     }
-}
-
-- (NSTimeInterval)playableTime
-{
-    if (self.decoder.endOfFile) {
-        return self.duration;
-    }
-    return self.progress + self.bufferDuration;
 }
 
 - (NSTimeInterval)duration
@@ -253,7 +241,7 @@
 
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder
 {
-    [SGPlayerNotification postPlayer:self.abstractPlayer playablePercent:@(self.playableTime/self.duration) current:@(self.playableTime) total:@(self.duration)];
+    self.playableTime = self.duration;
 }
 
 - (void)decoderDidPlaybackFinished:(SGFFDecoder *)decoder
@@ -276,7 +264,7 @@
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBufferedDuration:(NSTimeInterval)bufferedDuration
 {
-    self.bufferDuration = bufferedDuration;
+    self.playableTime = self.progress + bufferedDuration;
 }
 
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfProgress:(NSTimeInterval)progress
@@ -311,8 +299,8 @@
 {
     self.playing = NO;
     self.state = SGPlayerStateNone;
-    self.bufferDuration = 0;
     self.progress = 0;
+    self.playableTime = 0;
     self.lastPostProgressTime = 0;
     self.lastPostPlayableTime = 0;
     [self.abstractPlayer.displayView cleanEmptyBuffer];
