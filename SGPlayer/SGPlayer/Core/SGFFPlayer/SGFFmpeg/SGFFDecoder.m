@@ -90,6 +90,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (nonatomic, copy) NSArray <NSNumber *> * audioStreamIndexs;
 
 @property (nonatomic, assign) NSTimeInterval seekToTime;
+@property (nonatomic, assign) NSTimeInterval seekMinTime;
 @property (nonatomic, copy) void (^seekCompleteHandler)(BOOL finished);
 
 @property (nonatomic, strong) SGFFVideoFrame * currentVideoFrame;
@@ -729,8 +730,18 @@ static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const
     if (!self.audioEnable) {
         tempDuration = 10;
     }
-    self.progress = self.duration - time > (self.minBufferedDruation + 1) ? time : self.duration - (self.minBufferedDruation + tempDuration);
-    self.seekToTime = self.progress;
+    
+    NSTimeInterval seekMaxTime = self.duration - (self.minBufferedDruation + tempDuration);
+    if (seekMaxTime < self.seekMinTime) {
+        seekMaxTime = self.seekMinTime;
+    }
+    if (time > seekMaxTime) {
+        time = seekMaxTime;
+    } else if (time < self.seekMinTime) {
+        time = self.seekMinTime;
+    }
+    self.progress = time;
+    self.seekToTime = time;
     self.seekCompleteHandler = completeHandler;
     self.seeking = YES;
     
