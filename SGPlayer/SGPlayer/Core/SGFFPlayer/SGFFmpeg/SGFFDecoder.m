@@ -363,19 +363,22 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum AVPixelFormat * fmt)
+static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum AVPixelFormat * fmt)
 {
-    const enum AVPixelFormat * tmp = fmt;
-    while (*tmp != AV_PIX_FMT_NONE) {
-        if (*tmp == AV_PIX_FMT_VIDEOTOOLBOX) {
+    const enum AVPixelFormat * tmp;
+    for (tmp = fmt; * tmp != AV_PIX_FMT_NONE; tmp++)
+    {
+        if (* tmp == AV_PIX_FMT_VIDEOTOOLBOX)
+        {
             int result = av_videotoolbox_default_init(s);
-            if (result >= 0) {
+            if (result >= 0)
+            {
                 return AV_PIX_FMT_VIDEOTOOLBOX;
             }
             break;
         }
     }
-    return *fmt;
+    return * fmt;
 }
 
 - (NSError *)openAutioStreams
