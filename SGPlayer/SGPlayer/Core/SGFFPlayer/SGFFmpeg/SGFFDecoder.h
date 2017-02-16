@@ -17,6 +17,10 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
     SGFFDecoderErrorCodeCodecContextCreate,
     SGFFDecoderErrorCodeCodecContextSetParam,
     SGFFDecoderErrorCodeCodecFindDecoder,
+    SGFFDecoderErrorCodeCodecVideoSendPacket,
+    SGFFDecoderErrorCodeCodecAudioSendPacket,
+    SGFFDecoderErrorCodeCodecVideoReceiveFrame,
+    SGFFDecoderErrorCodeCodecAudioReceiveFrame,
     SGFFDecoderErrorCodeCodecOpen2,
     SGFFDecoderErrorCodeAuidoSwrInit,
 };

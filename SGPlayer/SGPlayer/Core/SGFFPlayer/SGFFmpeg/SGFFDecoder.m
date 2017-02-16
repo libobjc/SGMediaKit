@@ -490,7 +490,7 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
     BOOL finished = NO;
     AVPacket packet;
     while (!finished) {
-        if (self.closed) {
+        if (self.closed || self.error) {
             SGFFThreadLog(@"read packet thread quit");
             break;
         }
@@ -579,7 +579,7 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
     self.decoding = YES;
     BOOL finished = NO;
     while (!finished) {
-        if (self.closed) {
+        if (self.closed || self.error) {
             SGFFThreadLog(@"解线程退出");
             break;
         }
@@ -615,7 +615,7 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
 - (void)displayThread
 {
     while (1) {
-        if (self.closed) {
+        if (self.closed || self.error) {
             SGFFThreadLog(@"display thread quit");
             break;
         }
@@ -727,7 +727,7 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
 {
     SGFFVideoFrame * videoFrame;
     while (!videoFrame) {
-        if (self.closed) {
+        if (self.closed || self.error) {
             return nil;
         }
         if (self.endOfFile && self.videoPacketQueue.count == 0) {
@@ -748,12 +748,21 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
         if (packet.data == NULL) return nil;
         
         int result = avcodec_send_packet(_video_codec, &packet);
-        if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) return nil;
-        
+        if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
+            self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecVideoSendPacket);
+            [self delegateErrorCallback];
+            return nil;
+        }
         while (result >= 0) {
             result = avcodec_receive_frame(_video_codec, _video_frame);
-            if (result == AVERROR(EAGAIN) || result == AVERROR_EOF || result < 0) {
-                break;
+            if (result < 0) {
+                if (result == AVERROR(EAGAIN) || result == AVERROR_EOF) {
+                    break;
+                } else {
+                    self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecVideoReceiveFrame);
+                    [self delegateErrorCallback];
+                    return nil;
+                }
             }
             videoFrame = [self getVideoFrameFromAVFrame];
         }
@@ -819,11 +828,18 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
     if (packet.data == NULL) return;
     
     int result = avcodec_send_packet(_audio_codec, &packet);
-    if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) return;
+    if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
+        self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecAudioSendPacket);
+        [self delegateErrorCallback];
+    }
     
     while (result >= 0) {
         result = avcodec_receive_frame(_audio_codec, _audio_frame);
-        if (result == AVERROR(EAGAIN) || result == AVERROR_EOF || result < 0) {
+        if (result < 0) {
+            if (result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
+                self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecAudioReceiveFrame);
+                [self delegateErrorCallback];
+            }
             break;
         }
         SGFFAudioFrame * audioFrame = [self getAudioFrameFromAVFrame];
@@ -895,12 +911,22 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
 
 - (void)closeFileAsync:(BOOL)async
 {
-    self.closed = YES;
-    [self.videoPacketQueue destroy];
-    [self.videoFrameQueue destroy];
-    [self.audioFrameQueue destroy];
-    if (async) {
-        dispatch_async(dispatch_get_global_queue(0, 0), ^{
+    if (!self.closed) {
+        self.closed = YES;
+        [self.videoPacketQueue destroy];
+        [self.videoFrameQueue destroy];
+        [self.audioFrameQueue destroy];
+        if (async) {
+            dispatch_async(dispatch_get_global_queue(0, 0), ^{
+                [self.ffmpegOperationQueue cancelAllOperations];
+                [self.ffmpegOperationQueue waitUntilAllOperationsAreFinished];
+                [self closePropertyValue];
+                [self closeAudioStream];
+                [self closeVideoStream];
+                [self closeInputStream];
+                [self closeOperation];
+            });
+        } else {
             [self.ffmpegOperationQueue cancelAllOperations];
             [self.ffmpegOperationQueue waitUntilAllOperationsAreFinished];
             [self closePropertyValue];
@@ -908,15 +934,7 @@ enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum A
             [self closeVideoStream];
             [self closeInputStream];
             [self closeOperation];
-        });
-    } else {
-        [self.ffmpegOperationQueue cancelAllOperations];
-        [self.ffmpegOperationQueue waitUntilAllOperationsAreFinished];
-        [self closePropertyValue];
-        [self closeAudioStream];
-        [self closeVideoStream];
-        [self closeInputStream];
-        [self closeOperation];
+        }
     }
 }
 
