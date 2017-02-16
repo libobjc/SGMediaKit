@@ -90,7 +90,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (nonatomic, copy) NSArray <NSNumber *> * audioStreamIndexs;
 
 @property (nonatomic, assign) NSTimeInterval seekToTime;
-@property (nonatomic, assign) NSTimeInterval seekMinTime;
+@property (nonatomic, assign) NSTimeInterval seekMinTime;       // default is 0
 @property (nonatomic, copy) void (^seekCompleteHandler)(BOOL finished);
 
 @property (nonatomic, strong) SGFFVideoFrame * currentVideoFrame;
@@ -99,6 +99,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (nonatomic, strong) NSLock * clockLock;
 @property (nonatomic, assign) NSTimeInterval audioTimeClock;
 @property (nonatomic, assign) BOOL needUpdateAudioTimeClock;
+
+@property (nonatomic, assign) BOOL ffmpegVideoToolBoxDisable;
 
 @end
 
@@ -364,6 +366,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
+static int ffmpeg_videotoolbox_enable = 0;
+
 static void clean_codec_context_hwaccel(struct AVCodecContext *s, const enum AVPixelFormat fmt)
 {
     if (s->hwaccel_context) {
@@ -374,20 +378,22 @@ static void clean_codec_context_hwaccel(struct AVCodecContext *s, const enum AVP
 static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum AVPixelFormat * fmt)
 {
     clean_codec_context_hwaccel(s, AV_PIX_FMT_VIDEOTOOLBOX);
+    
+    enum AVPixelFormat * format;
     const enum AVPixelFormat * tmp;
+    
     for (tmp = fmt; * tmp != AV_PIX_FMT_NONE; tmp++)
     {
-        if (* tmp == AV_PIX_FMT_VIDEOTOOLBOX)
+        format = * tmp;
+        if (format == AV_PIX_FMT_VIDEOTOOLBOX && ffmpeg_videotoolbox_enable == 0)
         {
             int result = av_videotoolbox_default_init(s);
-            if (result >= 0)
-            {
+            if (result >= 0)    {
                 return AV_PIX_FMT_VIDEOTOOLBOX;
             }
-            break;
         }
     }
-    return * fmt;
+    return format;
 }
 
 - (NSError *)openAutioStreams
@@ -776,11 +782,21 @@ static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const
         if (packet.stream_index != self.videoStreamIndex) return nil;
         if (packet.data == NULL) return nil;
         
+        if (self.ffmpegVideoToolBoxDisable) {
+            ffmpeg_videotoolbox_enable = -1;
+        } else {
+            ffmpeg_videotoolbox_enable = 0;
+        }
         int result = avcodec_send_packet(_video_codec, &packet);
         if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
-            self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecVideoSendPacket);
-            [self delegateErrorCallback];
-            return nil;
+            if (_video_codec->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX) {
+                self.ffmpegVideoToolBoxDisable = YES;
+                [self seekToTime:0];
+            } else {
+                self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecVideoSendPacket);
+                [self delegateErrorCallback];
+                return nil;
+            }
         }
         while (result >= 0) {
             result = avcodec_receive_frame(_video_codec, _video_frame);
