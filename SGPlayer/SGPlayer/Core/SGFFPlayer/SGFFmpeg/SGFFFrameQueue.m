@@ -99,7 +99,7 @@
     return self.frames.count;
 }
 
-+ (int)maxVideoDuration
++ (NSTimeInterval)maxVideoDuration
 {
     return 0.6;
 }

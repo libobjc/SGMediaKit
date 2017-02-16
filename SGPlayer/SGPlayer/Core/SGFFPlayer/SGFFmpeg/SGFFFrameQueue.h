@@ -13,7 +13,7 @@
 
 + (instancetype)frameQueue;
 
-+ (int)maxVideoDuration;
++ (NSTimeInterval)maxVideoDuration;
 
 + (NSTimeInterval)sleepTimeIntervalForFull;
 + (NSTimeInterval)sleepTimeIntervalForFullAndPaused;
