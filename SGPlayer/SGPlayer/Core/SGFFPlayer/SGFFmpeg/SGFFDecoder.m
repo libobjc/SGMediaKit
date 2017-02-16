@@ -130,7 +130,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         self.videoStreamIndex = -1;
         self.audioStreamIndex = -1;
         
-        self.hardwareDecoderEnabel = YES;
+        self.hardwareDecoderEnable = YES;
     }
     return self;
 }
