@@ -101,7 +101,7 @@
 
 + (int)maxVideoDuration
 {
-    return 1;
+    return 0.6;
 }
 
 + (NSTimeInterval)sleepTimeIntervalForFull
