@@ -15,8 +15,6 @@
 #import "avformat.h"
 #import "swresample.h"
 #import "swscale.h"
-#import "videotoolbox.h"
-#import "pixdesc.h"
 #import <Accelerate/Accelerate.h>
 
 static AVPacket flush_packet;
@@ -99,8 +97,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (nonatomic, strong) NSLock * clockLock;
 @property (nonatomic, assign) NSTimeInterval audioTimeClock;
 @property (nonatomic, assign) BOOL needUpdateAudioTimeClock;
-
-@property (nonatomic, assign) BOOL ffmpegVideoToolBoxDisable;
 
 @end
 
@@ -244,11 +240,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return;
     }
     
-    // if the first video frame is not key frame, maybe crash in VideoToolBox when call av_send_packet()
-    if (self.videoEnable && self.seekEnable) {
-        avformat_seek_file(_format_context, -1, 0, 0, 0, 0);
-    }
-    
     self.prepareToDecode = YES;
     if ([self.delegate respondsToSelector:@selector(decoderDidPrepareToDecodeFrames:)]) {
         [self.delegate decoderDidPrepareToDecodeFrames:self];
@@ -341,9 +332,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return error;
     }
     av_codec_set_pkt_timebase(codec_context, stream->time_base);
-    if (self.hardwareDecoderEnable) {
-        codec_context->get_format = get_video_pixel_format;
-    }
     
     AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
     if (!codec) {
@@ -364,36 +352,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
     self.presentationSize = CGSizeMake(_video_codec->width, _video_codec->height);
     
     return error;
-}
-
-static int ffmpeg_videotoolbox_enable = 0;
-
-static void clean_codec_context_hwaccel(struct AVCodecContext *s, const enum AVPixelFormat fmt)
-{
-    if (s->hwaccel_context) {
-        av_videotoolbox_default_free(s);
-    }
-}
-
-static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const enum AVPixelFormat * fmt)
-{
-    clean_codec_context_hwaccel(s, AV_PIX_FMT_VIDEOTOOLBOX);
-    
-    enum AVPixelFormat * format;
-    const enum AVPixelFormat * tmp;
-    
-    for (tmp = fmt; * tmp != AV_PIX_FMT_NONE; tmp++)
-    {
-        format = * tmp;
-        if (format == AV_PIX_FMT_VIDEOTOOLBOX && ffmpeg_videotoolbox_enable == 0)
-        {
-            int result = av_videotoolbox_default_init(s);
-            if (result >= 0)    {
-                return AV_PIX_FMT_VIDEOTOOLBOX;
-            }
-        }
-    }
-    return format;
 }
 
 - (NSError *)openAutioStreams
@@ -782,21 +740,11 @@ static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const
         if (packet.stream_index != self.videoStreamIndex) return nil;
         if (packet.data == NULL) return nil;
         
-        if (self.ffmpegVideoToolBoxDisable) {
-            ffmpeg_videotoolbox_enable = -1;
-        } else {
-            ffmpeg_videotoolbox_enable = 0;
-        }
         int result = avcodec_send_packet(_video_codec, &packet);
         if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
-            if (_video_codec->pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX) {
-                self.ffmpegVideoToolBoxDisable = YES;
-                [self seekToTime:0];
-            } else {
-                self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecVideoSendPacket);
-                [self delegateErrorCallback];
-                return nil;
-            }
+            self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecVideoSendPacket);
+            [self delegateErrorCallback];
+            return nil;
         }
         while (result >= 0) {
             result = avcodec_receive_frame(_video_codec, _video_frame);
@@ -1017,7 +965,6 @@ static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const
         _video_frame = NULL;
     }
     if (_video_codec) {
-        clean_codec_context_hwaccel(_video_codec, AV_PIX_FMT_VIDEOTOOLBOX);
         avcodec_close(_video_codec);
         _video_codec = NULL;
     }
@@ -1151,14 +1098,6 @@ static enum AVPixelFormat get_video_pixel_format(struct AVCodecContext *s, const
 - (BOOL)seekEnable
 {
     return self.duration > 0;
-}
-
-- (NSString *)videoPixelForamtName
-{
-    if (!_video_codec || !self.videoEnable) return nil;
-    const char * name = av_get_pix_fmt_name(_video_codec->pix_fmt);
-    const char * sw_name = av_get_pix_fmt_name(_video_codec->sw_pix_fmt);
-    return [NSString stringWithFormat:@"%s, %s", name, sw_name];
 }
 
 - (NSString *)contentURLString
