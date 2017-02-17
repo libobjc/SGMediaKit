@@ -66,9 +66,6 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 - (Float64)samplingRate;
 - (UInt32)numberOfChannels;
 
-@optional
-- (void)decoder:(SGFFDecoder *)decoder audioOutputEnable:(BOOL)audioOutputEnable;
-
 @end
 
 @interface SGFFDecoder : NSObject

@@ -10,12 +10,10 @@
 #import "SGFFTools.h"
 #import "SGFFPacketQueue.h"
 #import "SGFFFrameQueue.h"
+#import "SGFFAudioDecoder.h"
 #import "SGPlayerMacro.h"
 
 #import "avformat.h"
-#import "swresample.h"
-#import "swscale.h"
-#import <Accelerate/Accelerate.h>
 
 static AVPacket flush_packet;
 
@@ -25,19 +23,12 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return obj.closed;
 }
 
-@interface SGFFDecoder ()
+@interface SGFFDecoder () <SGFFAudioDecoderDelegate>
 
 {
     AVFormatContext * _format_context;
     AVCodecContext * _video_codec;
-    AVCodecContext * _audio_codec;
     AVFrame * _video_frame;
-    AVFrame * _audio_frame;
-    
-    struct SwsContext * _video_sws_context;
-    SwrContext * _audio_swr_context;
-    void * _audio_swr_buffer;
-    NSUInteger _audio_swr_buffer_size;
 }
 
 @property (nonatomic, weak) id <SGFFDecoderDelegate> delegate;
@@ -52,7 +43,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 @property (nonatomic, strong) SGFFPacketQueue * videoPacketQueue;
 @property (nonatomic, strong) SGFFFrameQueue * videoFrameQueue;
-@property (nonatomic, strong) SGFFFrameQueue * audioFrameQueue;
+@property (nonatomic, strong) SGFFAudioDecoder * audioDecoder;
 
 @property (nonatomic, strong) NSError * error;
 
@@ -82,7 +73,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (atomic, assign) int audioStreamIndex;
 
 @property (atomic, assign) NSTimeInterval videoTimebase;
-@property (atomic, assign) NSTimeInterval audioTimebase;
 
 @property (nonatomic, copy) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy) NSArray <NSNumber *> * audioStreamIndexs;
@@ -362,12 +352,15 @@ static int ffmpeg_interrupt_callback(void *ctx)
     if (self.audioStreamIndexs.count > 0) {
         for (NSNumber * number in self.audioStreamIndexs) {
             int index = number.intValue;
-            error = [self openAudioStream:index];
+            AVCodecContext * codec_context;
+            error = [self openAudioStream:index codecContext:&codec_context];
             if (!error) {
                 self.audioStreamIndex = index;
-                _audio_frame = av_frame_alloc();
                 self.audioEnable = YES;
-                self.audioTimebase = sg_ff_get_timebase(_format_context->streams[self.audioStreamIndex], 0.000025);
+                NSTimeInterval timebase = sg_ff_get_timebase(_format_context->streams[self.audioStreamIndex], 0.000025);
+                self.audioDecoder = [SGFFAudioDecoder decoderWithCodecContext:codec_context
+                                                                     timebase:timebase
+                                                                     delegate:self];
                 break;
             }
         }
@@ -379,7 +372,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-- (NSError *)openAudioStream:(NSInteger)audioStreamIndex
+- (NSError *)openAudioStream:(NSInteger)audioStreamIndex codecContext:(AVCodecContext **)codecContext
 {
     int result = 0;
     NSError * error = nil;
@@ -414,28 +407,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return error;
     }
     
-    BOOL needSwr = YES;
-    if (codec_context->sample_fmt == AV_SAMPLE_FMT_S16) {
-        if (self.audioOutput.samplingRate == codec_context->sample_rate && self.audioOutput.numberOfChannels == codec_context->channels) {
-            needSwr = NO;
-        }
-    }
-    
-    if (needSwr) {
-        _audio_swr_context = swr_alloc_set_opts(NULL, av_get_default_channel_layout(self.audioOutput.numberOfChannels), AV_SAMPLE_FMT_S16, self.audioOutput.samplingRate, av_get_default_channel_layout(codec_context->channels), codec_context->sample_fmt, codec_context->sample_rate, 0, NULL);
-        
-        result = swr_init(_audio_swr_context);
-        error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeAuidoSwrInit);
-        if (error || !_audio_swr_context) {
-            if (_audio_swr_context) {
-                swr_free(&_audio_swr_context);
-            }
-            avcodec_close(codec_context);
-            return error;
-        }
-    }
-    
-    _audio_codec = codec_context;
+    * codecContext = codec_context;
     
     return error;
 }
@@ -464,10 +436,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         self.videoPacketQueue = [SGFFPacketQueue packetQueueWithTimebase:self.videoTimebase];
     }
     
-    [self.audioFrameQueue flush];
-    if (self.audioEnable && !self.audioFrameQueue) {
-        self.audioFrameQueue = [SGFFFrameQueue frameQueue];
-    }
+    [self.audioDecoder flush];
     
     self.reading = YES;
     BOOL finished = NO;
@@ -498,11 +467,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
             self.buffering = YES;
             [self.videoPacketQueue flush];
             [self.videoFrameQueue flush];
-            [self.audioFrameQueue flush];
+            [self.audioDecoder flush];
             [self.videoPacketQueue putPacket:flush_packet];
-            if (self.audioEnable) {
-                avcodec_flush_buffers(_audio_codec);
-            }
             self.seeking = NO;
             self.seekToTime = 0;
             if (self.seekCompleteHandler) {
@@ -516,7 +482,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
             [self updateBufferedDurationByAudio];
             continue;
         }
-        if (self.audioFrameQueue.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
+        if (self.audioDecoder.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
             NSTimeInterval interval = 0;
             if (self.paused) {
                 interval = [SGFFPacketQueue sleepTimeIntervalForFullAndPaused];
@@ -527,8 +493,11 @@ static int ffmpeg_interrupt_callback(void *ctx)
             [NSThread sleepForTimeInterval:interval];
             continue;
         }
+        
+        // read frame
         int result = av_read_frame(self->_format_context, &packet);
-        if (result < 0) {
+        if (result < 0)
+        {
             SGFFPacketLog(@"read packet finished");
             self.endOfFile = YES;
             finished = YES;
@@ -537,13 +506,21 @@ static int ffmpeg_interrupt_callback(void *ctx)
             }
             break;
         }
-        if (packet.stream_index == self.videoStreamIndex) {
+        if (packet.stream_index == self.videoStreamIndex)
+        {
             SGFFPacketLog(@"video : put packet");
             [self.videoPacketQueue putPacket:packet];
             [self updateBufferedDurationByVideo];
-        } else if (packet.stream_index == self.audioStreamIndex) {
+        }
+        else if (packet.stream_index == self.audioStreamIndex)
+        {
             SGFFPacketLog(@"audio : put packet");
-            [self putAudioPacket:packet];
+            int result = [self.audioDecoder putPacket:packet];
+            if (result < 0) {
+                self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecAudioSendPacket);
+                [self delegateErrorCallback];
+                continue;
+            }
             [self updateBufferedDurationByAudio];
         }
     }
@@ -800,11 +777,11 @@ static int ffmpeg_interrupt_callback(void *ctx)
 {
     BOOL check = self.closed || self.seeking || self.buffering || self.paused || self.playbackFinished || !self.audioEnable;
     if (check) return nil;
-    if (self.audioFrameQueue.count <= 0) {
+    if (self.audioDecoder.empty) {
         [self updateBufferedDurationByAudio];
         return nil;
     }
-    self.currentAudioFrame = [self.audioFrameQueue getFrame];
+    self.currentAudioFrame = [self.audioDecoder getFrame];
     if (!self.currentAudioFrame) return nil;
     
     if (self.endOfFile) {
@@ -813,89 +790,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
     [self updateProgressByAudio];
     self.audioTimeClock = self.currentAudioFrame.position;
     return self.currentAudioFrame;
-}
-
-- (void)putAudioPacket:(AVPacket)packet
-{
-    if (packet.stream_index != self.audioStreamIndex) return;
-    if (packet.data == NULL) return;
-    
-    int result = avcodec_send_packet(_audio_codec, &packet);
-    if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
-        self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecAudioSendPacket);
-        [self delegateErrorCallback];
-    }
-    
-    while (result >= 0) {
-        result = avcodec_receive_frame(_audio_codec, _audio_frame);
-        if (result < 0) {
-            if (result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
-                self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecAudioReceiveFrame);
-                [self delegateErrorCallback];
-            }
-            break;
-        }
-        @autoreleasepool
-        {
-            SGFFAudioFrame * audioFrame = [self getAudioFrameFromAVFrame];
-            if (audioFrame) {
-                [self.audioFrameQueue putFrame:audioFrame];
-            }
-        }
-    }
-    av_packet_unref(&packet);
-}
-
-- (SGFFAudioFrame *)getAudioFrameFromAVFrame
-{
-    if (!_audio_frame->data[0]) return nil;
-    
-    int numberOfFrames;
-    void * audioDataBuffer;
-    
-    if (_audio_swr_context) {
-        const int ratio = MAX(1, self.audioOutput.samplingRate / _audio_codec->sample_rate) * MAX(1, self.audioOutput.numberOfChannels / _audio_codec->channels) * 2;
-        const int buffer_size = av_samples_get_buffer_size(NULL, self.audioOutput.numberOfChannels, _audio_frame->nb_samples * ratio, AV_SAMPLE_FMT_S16, 1);
-        
-        if (!_audio_swr_buffer || _audio_swr_buffer_size < buffer_size) {
-            _audio_swr_buffer_size = buffer_size;
-            _audio_swr_buffer = realloc(_audio_swr_buffer, _audio_swr_buffer_size);
-        }
-        
-        Byte * outyput_buffer[2] = {_audio_swr_buffer, 0};
-        numberOfFrames = swr_convert(_audio_swr_context, outyput_buffer, _audio_frame->nb_samples * ratio, (const uint8_t **)_audio_frame->data, _audio_frame->nb_samples);
-        NSError * error = sg_ff_check_error(numberOfFrames);
-        if (error) {
-            SGFFErrorLog(@"audio codec error : %@", error);
-            return nil;
-        }
-        audioDataBuffer = _audio_swr_buffer;
-    } else {
-        if (_audio_codec->sample_fmt != AV_SAMPLE_FMT_S16) {
-            SGFFErrorLog(@"audio format error");
-            return nil;
-        }
-        audioDataBuffer = _audio_frame->data[0];
-        numberOfFrames = _audio_frame->nb_samples;
-    }
-    
-    const NSUInteger numberOfElements = numberOfFrames * self.audioOutput.numberOfChannels;
-    NSMutableData *data = [NSMutableData dataWithLength:numberOfElements * sizeof(float)];
-    
-    float scale = 1.0 / (float)INT16_MAX ;
-    vDSP_vflt16((SInt16 *)audioDataBuffer, 1, data.mutableBytes, 1, numberOfElements);
-    vDSP_vsmul(data.mutableBytes, 1, &scale, data.mutableBytes, 1, numberOfElements);
-    
-    SGFFAudioFrame * audioFrame = [[SGFFAudioFrame alloc] init];
-    audioFrame.position = av_frame_get_best_effort_timestamp(_audio_frame) * self.audioTimebase;
-    audioFrame.duration = av_frame_get_pkt_duration(_audio_frame) * self.audioTimebase;
-    audioFrame.samples = data;
-    
-    if (audioFrame.duration == 0) {
-        audioFrame.duration = audioFrame.samples.length / (sizeof(float) * self.audioOutput.numberOfChannels * self.audioOutput.samplingRate);
-    }
-    
-    return audioFrame;
 }
 
 #pragma mark - close stream
@@ -911,7 +805,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         self.closed = YES;
         [self.videoPacketQueue destroy];
         [self.videoFrameQueue destroy];
-        [self.audioFrameQueue destroy];
+        [self.audioDecoder destroy];
         if (async) {
             dispatch_async(dispatch_get_global_queue(0, 0), ^{
                 [self.ffmpegOperationQueue cancelAllOperations];
@@ -974,24 +868,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
 {
     self.audioEnable = NO;
     self.audioStreamIndex = -1;
-    
-    if (_audio_swr_buffer) {
-        free(_audio_swr_buffer);
-        _audio_swr_buffer = NULL;
-        _audio_swr_buffer_size = 0;
-    }
-    if (_audio_swr_context) {
-        swr_free(&_audio_swr_context);
-        _audio_swr_context = NULL;
-    }
-    if (_audio_frame) {
-        av_free(_audio_frame);
-        _audio_frame = NULL;
-    }
-    if (_audio_codec) {
-        avcodec_close(_audio_codec);
-        _audio_codec = NULL;
-    }
 }
 
 - (void)closeInputStream
@@ -1132,7 +1008,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (void)updateBufferedDurationByAudio
 {
     if (!self.videoEnable) {
-        self.bufferedDuration = self.audioFrameQueue.duration;
+        self.bufferedDuration = self.audioDecoder.duration;
     }
 }
 
@@ -1166,6 +1042,16 @@ static int ffmpeg_interrupt_callback(void *ctx)
 {
     [self closeFileAsync:NO];
     SGPlayerLog(@"SGFFDecoder release");
+}
+
+- (void)audioDecoder:(SGFFAudioDecoder *)audioDecoder samplingRate:(Float64 *)samplingRate
+{
+    * samplingRate = self.audioOutput.samplingRate;
+}
+
+- (void)audioDecoder:(SGFFAudioDecoder *)audioDecoder channelCount:(UInt32 *)channelCount
+{
+    * channelCount = self.audioOutput.numberOfChannels;
 }
 
 @end
