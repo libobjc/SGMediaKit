@@ -29,7 +29,7 @@ NSError * sg_ff_check_error_code(int result, NSUInteger errorCode)
     if (result < 0) {
         char * error_string_buffer = malloc(256);
         av_strerror(result, error_string_buffer, 256);
-        NSString * error_string = [[NSString alloc] initWithUTF8String:error_string_buffer];
+        NSString * error_string = [NSString stringWithFormat:@"ffmpeg code : %d, ffmpeg msg : %s", result, error_string_buffer];
         NSError * error = [NSError errorWithDomain:error_string code:errorCode userInfo:nil];
         return error;
     }
