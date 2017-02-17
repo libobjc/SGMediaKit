@@ -50,10 +50,6 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfBufferedDuration:(NSTimeInterval)bufferedDuration;
 - (void)decoder:(SGFFDecoder *)decoder didChangeValueOfProgress:(NSTimeInterval)progress;
 
-/*
-- (void)decoder:(SGFFDecoder *)decoder didChangeValueOfPaused:(BOOL)paused;
-*/
-
 @end
 
 @protocol SGFFDecoderVideoOutput <NSObject>

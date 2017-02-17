@@ -450,17 +450,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
             self.endOfFile = NO;
             self.playbackFinished = NO;
 
-            /*
-            if (self.videoEnable) {
-                int64_t ts = (int64_t)(self.seekToTime / self.videoTimebase);
-                avformat_seek_file(_format_context, self.videoStreamIndex, ts, ts, ts, 0);
-            }
-            if (self.audioEnable) {
-                int64_t ts = (int64_t)(self.seekToTime / self.audioTimebase);
-                avformat_seek_file(_format_context, self.audioStreamIndex, ts, ts, ts, AVSEEK_FLAG_FRAME);
-            }
-             */
-            
             int64_t ts = av_rescale(self.seekToTime * 1000, AV_TIME_BASE, 1000);
             avformat_seek_file(_format_context, -1, ts, ts, ts, 0);
             
@@ -882,20 +871,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 #pragma mark - setter/getter
 
-/*
-- (void)setPaused:(BOOL)paused
-{
-    [self.commonLock lock];
-    if (_paused != paused) {
-        _paused = paused;
-        if ([self.delegate respondsToSelector:@selector(decoder:didChangeValueOfPaused:)]) {
-            [self.delegate decoder:self didChangeValueOfPaused:_paused];
-        }
-    }
-    [self.commonLock unlock];
-}
-*/
-
 - (void)setProgress:(NSTimeInterval)progress
 {
     if (_progress != progress) {
@@ -1037,6 +1012,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
     [self closeFileAsync:NO];
     SGPlayerLog(@"SGFFDecoder release");
 }
+
+#pragma delegate callback
 
 - (void)audioDecoder:(SGFFAudioDecoder *)audioDecoder samplingRate:(Float64 *)samplingRate
 {
