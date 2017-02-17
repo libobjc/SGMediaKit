@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SGFFFrame.h"
+#import "SGFFAudioFrame.h"
+#import "SGFFVideoFrame.h"
 
 typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
     SGFFDecoderErrorCodeFormatCreate,

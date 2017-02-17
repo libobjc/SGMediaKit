@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SGFFFrame.h"
+#import "SGFFAudioFrame.h"
 #import "avformat.h"
 
 @class SGFFAudioDecoder;
