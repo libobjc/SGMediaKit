@@ -565,7 +565,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
         SGFFVideoFrame * videoFrame = [self getVideoFrameFromPacketQueue];
         if (videoFrame) {
             [self.videoFrameQueue putFrame:videoFrame];
-            [self updateVideoDecodedDuration];
         }
     }
     self.decoding = NO;
@@ -1022,11 +1021,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (void)updateProgressByAudio
 {
     self.progress = self.currentAudioFrame.position;
-}
-
-- (void)updateVideoDecodedDuration
-{
-    
 }
 
 - (void)delegateErrorCallback
