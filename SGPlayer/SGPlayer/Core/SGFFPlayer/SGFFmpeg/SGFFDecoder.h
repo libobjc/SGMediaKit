@@ -10,35 +10,11 @@
 #import "SGFFAudioFrame.h"
 #import "SGFFVideoFrame.h"
 
-typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
-    SGFFDecoderErrorCodeFormatCreate,
-    SGFFDecoderErrorCodeFormatOpenInput,
-    SGFFDecoderErrorCodeFormatFindStreamInfo,
-    SGFFDecoderErrorCodeStreamNotFound,
-    SGFFDecoderErrorCodeCodecContextCreate,
-    SGFFDecoderErrorCodeCodecContextSetParam,
-    SGFFDecoderErrorCodeCodecFindDecoder,
-    SGFFDecoderErrorCodeCodecVideoSendPacket,
-    SGFFDecoderErrorCodeCodecAudioSendPacket,
-    SGFFDecoderErrorCodeCodecVideoReceiveFrame,
-    SGFFDecoderErrorCodeCodecAudioReceiveFrame,
-    SGFFDecoderErrorCodeCodecOpen2,
-    SGFFDecoderErrorCodeAuidoSwrInit,
-};
-
 @class SGFFDecoder;
 
 @protocol SGFFDecoderDelegate <NSObject>
 
 @optional
-
-// open input stream
-- (void)decoderWillOpenInputStream:(SGFFDecoder *)decoder;
-- (void)decoderDidOpenInputStream:(SGFFDecoder *)decoder;
-
-// open video/audio stream
-- (void)decoderDidOpenVideoStream:(SGFFDecoder *)decoder;
-- (void)decoderDidOpenAudioStream:(SGFFDecoder *)decoder;
 
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder;     // prepare decode frames
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder;     // end of file
@@ -75,9 +51,8 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (nonatomic, strong, readonly) NSError * error;
 
 @property (nonatomic, copy, readonly) NSURL * contentURL;
-@property (nonatomic, copy, readonly) NSDictionary * metadata;
+
 @property (nonatomic, assign, readonly) CGSize presentationSize;
-@property (nonatomic, assign, readonly) NSTimeInterval fps;
 @property (nonatomic, assign, readonly) NSTimeInterval bitrate;
 @property (nonatomic, assign, readonly) NSTimeInterval progress;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;
@@ -96,15 +71,6 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (atomic, assign, readonly) BOOL seeking;
 @property (atomic, assign, readonly) BOOL reading;
 @property (atomic, assign, readonly) BOOL prepareToDecode;
-
-@property (atomic, assign, readonly) BOOL videoEnable;
-@property (atomic, assign, readonly) BOOL audioEnable;
-
-@property (atomic, assign, readonly) int videoStreamIndex;
-@property (atomic, assign, readonly) int audioStreamIndex;
-
-@property (nonatomic, copy, readonly) NSArray <NSNumber *> * videoStreamIndexs;
-@property (nonatomic, copy, readonly) NSArray <NSNumber *> * audioStreamIndexs;
 
 - (void)pause;
 - (void)resume;

@@ -10,6 +10,21 @@
 #import "SGPlayerMacro.h"
 #import "avformat.h"
 
+typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
+    SGFFDecoderErrorCodeFormatCreate,
+    SGFFDecoderErrorCodeFormatOpenInput,
+    SGFFDecoderErrorCodeFormatFindStreamInfo,
+    SGFFDecoderErrorCodeStreamNotFound,
+    SGFFDecoderErrorCodeCodecContextCreate,
+    SGFFDecoderErrorCodeCodecContextSetParam,
+    SGFFDecoderErrorCodeCodecFindDecoder,
+    SGFFDecoderErrorCodeCodecVideoSendPacket,
+    SGFFDecoderErrorCodeCodecAudioSendPacket,
+    SGFFDecoderErrorCodeCodecVideoReceiveFrame,
+    SGFFDecoderErrorCodeCodecAudioReceiveFrame,
+    SGFFDecoderErrorCodeCodecOpen2,
+    SGFFDecoderErrorCodeAuidoSwrInit,
+};
 
 #pragma mark - Log Config
 

@@ -211,10 +211,6 @@
         av_free(_temp_frame);
         _temp_frame = NULL;
     }
-    if (_codec_context) {
-        avcodec_close(_codec_context);
-        _codec_context = NULL;
-    }
     SGPlayerLog(@"SGFFAudioDecoder release");
 }
 

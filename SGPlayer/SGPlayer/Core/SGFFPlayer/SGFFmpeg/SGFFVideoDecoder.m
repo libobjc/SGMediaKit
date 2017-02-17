@@ -232,10 +232,6 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
         av_free(_temp_frame);
         _temp_frame = NULL;
     }
-    if (_codec_context) {
-        avcodec_close(_codec_context);
-        _codec_context = NULL;
-    }
     SGPlayerLog(@"SGFFVideoDecoder release");
 }
 
