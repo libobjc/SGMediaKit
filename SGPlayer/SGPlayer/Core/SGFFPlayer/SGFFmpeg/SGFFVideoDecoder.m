@@ -135,7 +135,7 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
     BOOL finished = NO;
     while (!finished) {
         if (self.canceled || self.error) {
-            SGFFThreadLog(@"解线程退出");
+            SGFFThreadLog(@"decode video thread quit");
             break;
         }
         if (self.paused) {
@@ -143,7 +143,7 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
             continue;
         }
         if (self.endOfFile && self.packetEmpty) {
-            SGFFThreadLog(@"decode video frame finished");
+            SGFFThreadLog(@"decode video finished");
             break;
         }
         if (self.frameDuration >= max_video_frame_buffer_duration) {
@@ -153,7 +153,7 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
             } else {
                 interval = max_video_frame_sleep_full_time_interval;
             }
-            SGFFThreadLog(@"decode thread sleep : %f", interval);
+            SGFFSleepLog(@"decode video thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
             continue;
         }

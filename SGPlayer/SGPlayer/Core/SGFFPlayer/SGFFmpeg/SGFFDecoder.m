@@ -555,9 +555,11 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
 
                 if (self.needUpdateAudioTimeClock && self.audioEnable) {
                     SGFFSynLog(@"------ delay : %f, video position : %f, duraion : %f", 1 / self.videoDecoder.fps, self.currentVideoFrame.position, self.currentVideoFrame.duration);
+                    SGFFSleepLog(@"display thread sleep : %f", interval);
                     [NSThread sleepForTimeInterval:1 / self.videoDecoder.fps];
                 } else {
                     SGFFSynLog(@"------ delay : %f, video position : %f, duraion : %f", delay, self.currentVideoFrame.position, self.currentVideoFrame.duration);
+                    SGFFSleepLog(@"display thread sleep : %f", interval);
                     [NSThread sleepForTimeInterval:delay];
                 }
             } else {
