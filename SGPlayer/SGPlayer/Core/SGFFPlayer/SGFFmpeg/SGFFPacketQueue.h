@@ -13,11 +13,6 @@
 
 + (instancetype)packetQueueWithTimebase:(NSTimeInterval)timebase;
 
-+ (int)maxCommonSize;
-
-+ (NSTimeInterval)sleepTimeIntervalForFull;
-+ (NSTimeInterval)sleepTimeIntervalForFullAndPaused;
-
 @property (nonatomic, assign, readonly) NSUInteger count;
 @property (nonatomic, assign, readonly) int size;
 @property (atomic, assign, readonly) NSTimeInterval duration;

@@ -7,7 +7,53 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SGFFVideoFrame.h"
+#import "avformat.h"
+
+@class SGFFVideoDecoder;
+
+@protocol SGFFVideoDecoderDlegate <NSObject>
+
+- (void)videoDecoder:(SGFFVideoDecoder *)videoDecoder didError:(NSError *)error;
+- (void)videoDecoderNeedUpdateBufferedDuration:(SGFFVideoDecoder *)videoDecoder;
+- (void)videoDecoderNeedCheckBufferingStatus:(SGFFVideoDecoder *)videoDecoder;
+
+@end
 
 @interface SGFFVideoDecoder : NSObject
+
++ (instancetype)decoderWithCodecContext:(AVCodecContext *)codec_context
+                               timebase:(NSTimeInterval)timebase
+                                    fps:(NSTimeInterval)fps
+                               delegate:(id <SGFFVideoDecoderDlegate>)delegate;
+
+@property (nonatomic, weak) id <SGFFVideoDecoderDlegate> delegate;
+
+@property (nonatomic, assign) NSTimeInterval timebase;
+@property (nonatomic, assign) NSTimeInterval fps;
+
+@property (nonatomic, strong, readonly) NSError * error;
+@property (nonatomic, assign, readonly) BOOL decoding;
+
+@property (nonatomic, assign) BOOL paused;
+@property (nonatomic, assign) BOOL endOfFile;
+
+- (int)packetSize;
+
+- (BOOL)empty;
+- (BOOL)packetEmpty;
+- (BOOL)frameEmpty;
+
+- (NSTimeInterval)duration;
+- (NSTimeInterval)packetDuration;
+- (NSTimeInterval)frameDuration;
+
+- (SGFFVideoFrame *)getFrameSync;
+- (void)putPacket:(AVPacket)packet;
+
+- (void)flush;
+- (void)destroy;
+
+- (void)decodeFrameThread;
 
 @end

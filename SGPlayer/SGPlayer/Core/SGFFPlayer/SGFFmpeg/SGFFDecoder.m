@@ -7,15 +7,9 @@
 //
 
 #import "SGFFDecoder.h"
-#import "SGFFTools.h"
-#import "SGFFPacketQueue.h"
-#import "SGFFFrameQueue.h"
 #import "SGFFAudioDecoder.h"
-#import "SGPlayerMacro.h"
-
-#import "avformat.h"
-
-static AVPacket flush_packet;
+#import "SGFFVideoDecoder.h"
+#import "SGFFTools.h"
 
 static int ffmpeg_interrupt_callback(void *ctx)
 {
@@ -23,12 +17,10 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return obj.closed;
 }
 
-@interface SGFFDecoder () <SGFFAudioDecoderDelegate>
+@interface SGFFDecoder () <SGFFAudioDecoderDelegate, SGFFVideoDecoderDlegate>
 
 {
     AVFormatContext * _format_context;
-    AVCodecContext * _video_codec;
-    AVFrame * _video_frame;
 }
 
 @property (nonatomic, weak) id <SGFFDecoderDelegate> delegate;
@@ -41,9 +33,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (nonatomic, strong) NSInvocationOperation * decodeFrameOperation;
 @property (nonatomic, strong) NSInvocationOperation * displayOperation;
 
-@property (nonatomic, strong) SGFFPacketQueue * videoPacketQueue;
-@property (nonatomic, strong) SGFFFrameQueue * videoFrameQueue;
 @property (nonatomic, strong) SGFFAudioDecoder * audioDecoder;
+@property (nonatomic, strong) SGFFVideoDecoder * videoDecoder;
 
 @property (nonatomic, strong) NSError * error;
 
@@ -51,7 +42,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (nonatomic, copy, readonly) NSString * contentURLString;
 @property (nonatomic, copy) NSDictionary * metadata;
 @property (nonatomic, assign) CGSize presentationSize;
-@property (nonatomic, assign) NSTimeInterval fps;
 @property (nonatomic, assign) NSTimeInterval progress;
 @property (nonatomic, assign) NSTimeInterval bufferedDuration;
 
@@ -63,7 +53,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (atomic, assign) BOOL paused;
 @property (atomic, assign) BOOL seeking;
 @property (atomic, assign) BOOL reading;
-@property (atomic, assign) BOOL decoding;
 @property (atomic, assign) BOOL prepareToDecode;
 
 @property (atomic, assign) BOOL videoEnable;
@@ -106,9 +95,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
             av_log_set_callback(sg_ff_log);
             av_register_all();
             avformat_network_init();
-            av_init_packet(&flush_packet);
-            flush_packet.data = (uint8_t *)&flush_packet;
-            flush_packet.duration = 0;
         });
         
         self.contentURL = contentURL;
@@ -168,7 +154,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     
     if (self.videoEnable) {
         if (!self.decodeFrameOperation || self.decodeFrameOperation.isFinished) {
-            self.decodeFrameOperation = [[NSInvocationOperation alloc] initWithTarget:self selector:@selector(decodeFrameThread) object:nil];
+            self.decodeFrameOperation = [[NSInvocationOperation alloc] initWithTarget:self.videoDecoder selector:@selector(decodeFrameThread) object:nil];
             self.decodeFrameOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
             self.decodeFrameOperation.qualityOfService = NSQualityOfServiceUserInteractive;
             [self.decodeFrameOperation addDependency:self.openFileOperation];
@@ -284,13 +270,17 @@ static int ffmpeg_interrupt_callback(void *ctx)
         for (NSNumber * number in self.videoStreamIndexs) {
             int index = number.intValue;
             if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0) {
-                error = [self openVideoStream:index];
+                AVCodecContext * codec_context;
+                error = [self openVideoStream:index codecContext:&codec_context];
                 if (!error) {
                     self.videoStreamIndex = index;
-                    _video_frame = av_frame_alloc();
                     self.videoEnable = YES;
-                    self.videoTimebase = sg_ff_get_timebase(_format_context->streams[self.videoStreamIndex], 0.00004);
-                    self.fps = sg_ff_get_fps(_format_context->streams[self.videoStreamIndex], self.videoTimebase);
+                    NSTimeInterval timebase = sg_ff_get_timebase(_format_context->streams[self.videoStreamIndex], 0.00004);
+                    NSTimeInterval fps = sg_ff_get_fps(_format_context->streams[self.videoStreamIndex], self.videoTimebase);
+                    self.videoDecoder = [SGFFVideoDecoder decoderWithCodecContext:codec_context
+                                                                         timebase:timebase
+                                                                              fps:fps
+                                                                         delegate:self];
                     break;
                 }
             }
@@ -303,7 +293,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-- (NSError *)openVideoStream:(NSInteger)videoStreamIndex
+- (NSError *)openVideoStream:(NSInteger)videoStreamIndex codecContext:(AVCodecContext **)codecContext
 {
     int result = 0;
     NSError * error = nil;
@@ -338,8 +328,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return error;
     }
     
-    _video_codec = codec_context;
-    self.presentationSize = CGSizeMake(_video_codec->width, _video_codec->height);
+    self.presentationSize = CGSizeMake(codec_context->width, codec_context->height);
+    * codecContext = codec_context;
     
     return error;
 }
@@ -429,13 +419,13 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 #pragma mark - operation thread
 
+static int max_packet_buffer_size = 20 * 1024 * 1024;
+static NSTimeInterval max_packet_sleep_full_time_interval = 0.1;
+static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
+
 - (void)readPacketThread
 {
-    [self.videoPacketQueue flush];
-    if (self.videoEnable && !self.videoPacketQueue) {
-        self.videoPacketQueue = [SGFFPacketQueue packetQueueWithTimebase:self.videoTimebase];
-    }
-    
+    [self.videoDecoder flush];
     [self.audioDecoder flush];
     
     self.reading = YES;
@@ -454,10 +444,10 @@ static int ffmpeg_interrupt_callback(void *ctx)
             avformat_seek_file(_format_context, -1, ts, ts, ts, 0);
             
             self.buffering = YES;
-            [self.videoPacketQueue flush];
-            [self.videoFrameQueue flush];
             [self.audioDecoder flush];
-            [self.videoPacketQueue putPacket:flush_packet];
+            [self.videoDecoder flush];
+            self.videoDecoder.paused = NO;
+            self.videoDecoder.endOfFile = NO;
             self.seeking = NO;
             self.seekToTime = 0;
             if (self.seekCompleteHandler) {
@@ -471,12 +461,12 @@ static int ffmpeg_interrupt_callback(void *ctx)
             [self updateBufferedDurationByAudio];
             continue;
         }
-        if (self.audioDecoder.size + self.videoPacketQueue.size >= [SGFFPacketQueue maxCommonSize]) {
+        if (self.audioDecoder.size + self.videoDecoder.packetSize >= max_packet_buffer_size) {
             NSTimeInterval interval = 0;
             if (self.paused) {
-                interval = [SGFFPacketQueue sleepTimeIntervalForFullAndPaused];
+                interval = max_packet_sleep_full_and_pause_time_interval;
             } else {
-                interval = [SGFFPacketQueue sleepTimeIntervalForFull];
+                interval = max_packet_sleep_full_time_interval;
             }
             SGFFSleepLog(@"read thread sleep : %f", interval);
             [NSThread sleepForTimeInterval:interval];
@@ -489,6 +479,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         {
             SGFFPacketLog(@"read packet finished");
             self.endOfFile = YES;
+            self.videoDecoder.endOfFile = YES;
             finished = YES;
             if ([self.delegate respondsToSelector:@selector(decoderDidEndOfFile:)]) {
                 [self.delegate decoderDidEndOfFile:self];
@@ -498,7 +489,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         if (packet.stream_index == self.videoStreamIndex)
         {
             SGFFPacketLog(@"video : put packet");
-            [self.videoPacketQueue putPacket:packet];
+            [self.videoDecoder putPacket:packet];
             [self updateBufferedDurationByVideo];
         }
         else if (packet.stream_index == self.audioStreamIndex)
@@ -514,49 +505,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
         }
     }
     self.reading = NO;
-    [self checkBufferingStatus];
-}
-
-- (void)decodeFrameThread
-{
-    if (self.videoFrameQueue) {
-        [self.videoFrameQueue flush];
-    } else {
-        self.videoFrameQueue = [SGFFFrameQueue frameQueue];
-    }
-    
-    self.decoding = YES;
-    BOOL finished = NO;
-    while (!finished) {
-        if (self.closed || self.error) {
-            SGFFThreadLog(@"解线程退出");
-            break;
-        }
-        if (self.seeking) {
-            [NSThread sleepForTimeInterval:0.01];
-            continue;
-        }
-        if (self.endOfFile && self.videoPacketQueue.count == 0) {
-            SGFFDecodeLog(@"decode video frame finished");
-            break;
-        }
-        if (self.videoFrameQueue.duration >= [SGFFFrameQueue maxVideoDuration]) {
-            NSTimeInterval interval = 0;
-            if (self.paused) {
-                interval = [SGFFFrameQueue sleepTimeIntervalForFullAndPaused];
-            } else {
-                interval = [SGFFFrameQueue sleepTimeIntervalForFull];
-            }
-            SGFFThreadLog(@"decode thread sleep : %f", interval);
-            [NSThread sleepForTimeInterval:interval];
-            continue;
-        }
-        SGFFVideoFrame * videoFrame = [self getVideoFrameFromPacketQueue];
-        if (videoFrame) {
-            [self.videoFrameQueue putFrame:videoFrame];
-        }
-    }
-    self.decoding = NO;
     [self checkBufferingStatus];
 }
 
@@ -578,16 +526,15 @@ static int ffmpeg_interrupt_callback(void *ctx)
             [NSThread sleepForTimeInterval:0.03];
             continue;
         }
-        if (self.endOfFile && self.videoPacketQueue.count == 0 && self.videoFrameQueue.count == 0) {
+        if (self.endOfFile && self.videoDecoder.empty) {
             SGFFThreadLog(@"display finished");
             break;
         }
-        if (self.videoFrameQueue.count <= 0) {
+        if (self.videoDecoder.frameEmpty) {
             [self updateBufferedDurationByVideo];
         }
-        self.currentVideoFrame = [self.videoFrameQueue getFrame];
+        self.currentVideoFrame = [self.videoDecoder getFrameSync];
         if (self.currentVideoFrame) {
-            
             NSTimeInterval delay = self.currentVideoFrame.duration;
             if (self.audioEnable) {
                 NSTimeInterval audioTimeClock = self.audioTimeClock;
@@ -597,7 +544,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
                     delay = self.currentVideoFrame.duration - (audioTimeClock - self.currentVideoFrame.position);
                 }
             }
-            
             if (delay > 0.001) {
                 if ([self.videoOutput respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
                     [self.videoOutput decoder:self renderVideoFrame:self.currentVideoFrame];
@@ -606,9 +552,10 @@ static int ffmpeg_interrupt_callback(void *ctx)
                 if (self.endOfFile) {
                     [self updateBufferedDurationByVideo];
                 }
+
                 if (self.needUpdateAudioTimeClock && self.audioEnable) {
-                    SGFFSynLog(@"------ delay : %f, video position : %f, duraion : %f", 1 / self.fps, self.currentVideoFrame.position, self.currentVideoFrame.duration);
-                    [NSThread sleepForTimeInterval:1 / self.fps];
+                    SGFFSynLog(@"------ delay : %f, video position : %f, duraion : %f", 1 / self.videoDecoder.fps, self.currentVideoFrame.position, self.currentVideoFrame.duration);
+                    [NSThread sleepForTimeInterval:1 / self.videoDecoder.fps];
                 } else {
                     SGFFSynLog(@"------ delay : %f, video position : %f, duraion : %f", delay, self.currentVideoFrame.position, self.currentVideoFrame.duration);
                     [NSThread sleepForTimeInterval:delay];
@@ -673,92 +620,11 @@ static int ffmpeg_interrupt_callback(void *ctx)
     self.seekToTime = time;
     self.seekCompleteHandler = completeHandler;
     self.seeking = YES;
+    self.videoDecoder.paused = YES;
     
     if (self.endOfFile) {
         [self setupReadPacketOperation];
     }
-}
-
-#pragma mark - decode frames
-
-- (SGFFVideoFrame *)getVideoFrameFromPacketQueue
-{
-    SGFFVideoFrame * videoFrame;
-    while (!videoFrame) {
-        if (self.closed || self.error) {
-            return nil;
-        }
-        if (self.endOfFile && self.videoPacketQueue.count == 0) {
-            return nil;
-        }
-        AVPacket packet = [self.videoPacketQueue getPacket];
-        if (self.endOfFile) {
-            [self updateBufferedDurationByVideo];
-        }
-        if (packet.data == flush_packet.data) {
-            SGFFDecodeLog(@"video codec flush");
-            if (self.videoEnable) {
-                avcodec_flush_buffers(_video_codec);
-            }
-            continue;
-        }
-        if (packet.stream_index != self.videoStreamIndex) return nil;
-        if (packet.data == NULL) return nil;
-        
-        int result = avcodec_send_packet(_video_codec, &packet);
-        if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
-            self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecVideoSendPacket);
-            [self delegateErrorCallback];
-            return nil;
-        }
-        while (result >= 0) {
-            result = avcodec_receive_frame(_video_codec, _video_frame);
-            if (result < 0) {
-                if (result == AVERROR(EAGAIN) || result == AVERROR_EOF) {
-                    break;
-                } else {
-                    self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecVideoReceiveFrame);
-                    [self delegateErrorCallback];
-                    return nil;
-                }
-            }
-            videoFrame = [self getVideoFrameFromAVFrame];
-        }
-        av_packet_unref(&packet);
-    }
-    return videoFrame;
-}
-
-- (SGFFVideoFrame *)getVideoFrameFromAVFrame
-{
-    SGFFVideoFrame * videoFrame;
-    
-    enum AVPixelFormat pix_fmt = _video_frame->format;
-    if (pix_fmt == AV_PIX_FMT_VIDEOTOOLBOX)
-    {
-        AVBufferRef * buffer = _video_frame->buf[0];
-        if (!buffer) return nil;
-        
-        CVPixelBufferRef pixel_buffer = (CVPixelBufferRef)buffer->data;
-        videoFrame = [[SGFFCVYUVVideoFrame alloc] initWithAVPixelBuffer:pixel_buffer];
-    }
-    else
-    {
-        if (!_video_frame->data[0] || !_video_frame->data[1] || !_video_frame->data[2]) return nil;
-        videoFrame = [[SGFFAVYUVVideoFrame alloc] initWithAVFrame:_video_frame width:_video_codec->width height:_video_codec->height];
-    }
-    
-    videoFrame.position = av_frame_get_best_effort_timestamp(_video_frame) * self.videoTimebase;
-    
-    const int64_t frame_duration = av_frame_get_pkt_duration(_video_frame);
-    if (frame_duration) {
-        videoFrame.duration = frame_duration * self.videoTimebase;
-        videoFrame.duration += _video_frame->repeat_pict * self.videoTimebase * 0.5;
-    } else {
-        videoFrame.duration = 1.0 / self.fps;
-    }
-    
-    return videoFrame;
 }
 
 - (SGFFAudioFrame *)fetchAudioFrame
@@ -769,7 +635,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         [self updateBufferedDurationByAudio];
         return nil;
     }
-    self.currentAudioFrame = [self.audioDecoder getFrame];
+    self.currentAudioFrame = [self.audioDecoder getFrameSync];
     if (!self.currentAudioFrame) return nil;
     
     if (self.endOfFile) {
@@ -791,8 +657,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 {
     if (!self.closed) {
         self.closed = YES;
-        [self.videoPacketQueue destroy];
-        [self.videoFrameQueue destroy];
+        [self.videoDecoder destroy];
         [self.audioDecoder destroy];
         if (async) {
             dispatch_async(dispatch_get_global_queue(0, 0), ^{
@@ -835,21 +700,14 @@ static int ffmpeg_interrupt_callback(void *ctx)
     self.playbackFinished = NO;
     self.currentVideoFrame = nil;
     self.currentAudioFrame = nil;
+    self.videoDecoder.paused = NO;
+    self.videoDecoder.endOfFile = NO;
 }
 
 - (void)closeVideoStream
 {
     self.videoEnable = NO;
     self.videoStreamIndex = -1;
-    
-    if (_video_frame) {
-        av_free(_video_frame);
-        _video_frame = NULL;
-    }
-    if (_video_codec) {
-        avcodec_close(_video_codec);
-        _video_codec = NULL;
-    }
 }
 
 - (void)closeAudioStream
@@ -945,6 +803,11 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return (_format_context->bit_rate / 1000.0f);
 }
 
+- (NSTimeInterval)fps
+{
+    return self.videoDecoder.fps;
+}
+
 - (BOOL)seekEnable
 {
     return self.duration > 0;
@@ -976,7 +839,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 - (void)updateBufferedDurationByVideo
 {
-    self.bufferedDuration = self.videoPacketQueue.duration + self.videoFrameQueue.duration;
+    self.bufferedDuration = self.videoDecoder.duration;
 }
 
 - (void)updateBufferedDurationByAudio
@@ -1023,6 +886,22 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (void)audioDecoder:(SGFFAudioDecoder *)audioDecoder channelCount:(UInt32 *)channelCount
 {
     * channelCount = self.audioOutput.numberOfChannels;
+}
+
+- (void)videoDecoderNeedUpdateBufferedDuration:(SGFFVideoDecoder *)videoDecoder
+{
+    [self updateBufferedDurationByVideo];
+}
+
+- (void)videoDecoderNeedCheckBufferingStatus:(SGFFVideoDecoder *)videoDecoder
+{
+    [self checkBufferingStatus];
+}
+
+- (void)videoDecoder:(SGFFVideoDecoder *)videoDecoder didError:(NSError *)error
+{
+    self.error = error;
+    [self delegateErrorCallback];
 }
 
 @end

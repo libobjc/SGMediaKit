@@ -24,7 +24,7 @@ NSError * sg_ff_check_error(int result)
     return sg_ff_check_error_code(result, -1);
 }
 
-NSError * sg_ff_check_error_code(int result, SGFFDecoderErrorCode errorCode)
+NSError * sg_ff_check_error_code(int result, NSUInteger errorCode)
 {
     if (result < 0) {
         char * error_string_buffer = malloc(256);

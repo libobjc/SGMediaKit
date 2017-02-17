@@ -102,7 +102,7 @@
     [self.frameQueue destroy];
 }
 
-- (SGFFAudioFrame *)getFrame
+- (SGFFAudioFrame *)getFrameSync
 {
     return [self.frameQueue getFrame];
 }

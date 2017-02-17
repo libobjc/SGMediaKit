@@ -95,7 +95,6 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 @property (atomic, assign, readonly) BOOL paused;
 @property (atomic, assign, readonly) BOOL seeking;
 @property (atomic, assign, readonly) BOOL reading;
-@property (atomic, assign, readonly) BOOL decoding;
 @property (atomic, assign, readonly) BOOL prepareToDecode;
 
 @property (atomic, assign, readonly) BOOL videoEnable;

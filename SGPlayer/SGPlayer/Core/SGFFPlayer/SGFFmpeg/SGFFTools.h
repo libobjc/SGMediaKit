@@ -7,7 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SGFFDecoder.h"
+#import "SGPlayerMacro.h"
+#import "avformat.h"
 
 
 #pragma mark - Log Config
@@ -68,7 +69,7 @@
 void sg_ff_log(void * context, int level, const char * format, va_list args);
 
 NSError * sg_ff_check_error(int result);
-NSError * sg_ff_check_error_code(int result, SGFFDecoderErrorCode errorCode);
+NSError * sg_ff_check_error_code(int result, NSUInteger errorCode);
 
 void sg_ff_convert_AVFrame_to_YUV(UInt8 * src, int linesize, int width, int height, UInt8 ** dst, int * lenght);
 

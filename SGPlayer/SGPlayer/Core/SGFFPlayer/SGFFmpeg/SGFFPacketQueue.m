@@ -107,19 +107,4 @@
     return self.packets.count;
 }
 
-+ (int)maxCommonSize
-{
-    return 20 * 1024 * 1024;
-}
-
-+ (NSTimeInterval)sleepTimeIntervalForFull
-{
-    return 0.1;
-}
-
-+ (NSTimeInterval)sleepTimeIntervalForFullAndPaused
-{
-    return 0.5;
-}
-
 @end

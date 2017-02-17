@@ -29,7 +29,7 @@
 - (BOOL)empty;
 - (NSTimeInterval)duration;
 
-- (SGFFAudioFrame *)getFrame;
+- (SGFFAudioFrame *)getFrameSync;
 - (int)putPacket:(AVPacket)packet;
 
 - (void)flush;
