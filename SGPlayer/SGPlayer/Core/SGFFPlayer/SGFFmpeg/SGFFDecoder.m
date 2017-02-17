@@ -690,9 +690,9 @@ static int ffmpeg_interrupt_callback(void *ctx)
         }
         return;
     }
-    NSTimeInterval tempDuration = 2;
+    NSTimeInterval tempDuration = 8;
     if (!self.audioEnable) {
-        tempDuration = 10;
+        tempDuration = 15;
     }
     
     NSTimeInterval seekMaxTime = self.duration - (self.minBufferedDruation + tempDuration);
