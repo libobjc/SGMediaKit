@@ -29,6 +29,8 @@
 
 @property (nonatomic, weak) id <SGFFVideoDecoderDlegate> delegate;
 
+@property (nonatomic, assign) NSTimeInterval maxDecodeDuration;     // default is 2s;
+
 @property (nonatomic, assign) NSTimeInterval timebase;
 @property (nonatomic, assign) NSTimeInterval fps;
 

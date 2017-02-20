@@ -62,6 +62,7 @@ static AVPacket flush_packet;
         self.fps = fps;
         self.packetQueue = [SGFFPacketQueue packetQueueWithTimebase:timebase];
         self.frameQueue = [SGFFFrameQueue frameQueue];
+        self.maxDecodeDuration = 2.f;
     }
     return self;
 }
@@ -125,7 +126,6 @@ static AVPacket flush_packet;
     [self.packetQueue destroy];
 }
 
-static NSTimeInterval max_video_frame_buffer_duration = 1.0;
 static NSTimeInterval max_video_frame_sleep_full_time_interval = 0.1;
 static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
 
@@ -146,7 +146,7 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
             SGFFThreadLog(@"decode video finished");
             break;
         }
-        if (self.frameDuration >= max_video_frame_buffer_duration) {
+        if (self.frameDuration >= self.maxDecodeDuration) {
             NSTimeInterval interval = 0;
             if (self.paused) {
                 interval = max_video_frame_sleep_full_and_pause_time_interval;
