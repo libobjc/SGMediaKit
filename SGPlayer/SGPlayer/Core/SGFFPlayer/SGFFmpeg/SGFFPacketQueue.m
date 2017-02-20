@@ -72,7 +72,7 @@
     [self.packets.firstObject getValue:&packet];
     [self.packets removeObjectAtIndex:0];
     self.size -= packet.size;
-    if (self.size < 0) {
+    if (self.size < 0 || self.count <= 0) {
         self.size = 0;
     }
     self.duration -= packet.duration * self.timebase;
