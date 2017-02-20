@@ -203,8 +203,7 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
             self.endOfFile = NO;
             self.playbackFinished = NO;
 
-            int64_t ts = av_rescale(self.seekToTime * 1000, AV_TIME_BASE, 1000);
-            [self.formatContext seek_file:ts];
+            [self.formatContext seekFile:self.seekToTime];
             
             self.buffering = YES;
             [self.audioDecoder flush];
@@ -237,7 +236,7 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
         }
         
         // read frame
-        int result = [self.formatContext read_frame:&packet];
+        int result = [self.formatContext readFrame:&packet];
         if (result < 0)
         {
             SGFFPacketLog(@"read packet finished");

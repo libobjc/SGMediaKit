@@ -289,12 +289,13 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
 }
 
-- (void)seek_file:(int64_t)ts
+- (void)seekFile:(NSTimeInterval)time
 {
+    int64_t ts = av_rescale(time * 1000, AV_TIME_BASE, 1000);
     avformat_seek_file(self->_format_context, -1, ts, ts, ts, 0);
 }
 
-- (int)read_frame:(AVPacket *)packet
+- (int)readFrame:(AVPacket *)packet
 {
     return av_read_frame(self->_format_context, packet);
 }

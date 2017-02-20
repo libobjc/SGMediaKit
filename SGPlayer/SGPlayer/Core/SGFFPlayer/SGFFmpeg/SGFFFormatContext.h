@@ -54,7 +54,7 @@
 - (void)setupSync;
 - (void)destroy;
 
-- (void)seek_file:(int64_t)ts;
-- (int)read_frame:(AVPacket *)packet;
+- (void)seekFile:(NSTimeInterval)time;
+- (int)readFrame:(AVPacket *)packet;
 
 @end
