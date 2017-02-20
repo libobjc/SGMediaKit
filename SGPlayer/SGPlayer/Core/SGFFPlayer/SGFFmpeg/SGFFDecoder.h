@@ -16,6 +16,7 @@
 
 @optional
 
+- (void)decoderWillOpenInputStream:(SGFFDecoder *)decoder;      // open input stream
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder;     // prepare decode frames
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder;     // end of file
 - (void)decoderDidPlaybackFinished:(SGFFDecoder *)decoder;

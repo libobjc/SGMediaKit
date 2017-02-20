@@ -150,6 +150,10 @@
 
 - (void)openFormatContext
 {
+    if ([self.delegate respondsToSelector:@selector(decoderWillOpenInputStream:)]) {
+        [self.delegate decoderWillOpenInputStream:self];
+    }
+    
     self.formatContext = [SGFFFormatContext formatContextWithContentURL:self.contentURL delegate:self];
     [self.formatContext setupSync];
     
