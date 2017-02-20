@@ -194,6 +194,7 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
 {
     [self.videoDecoder flush];
     [self.audioDecoder flush];
+    self.needUpdateAudioTimeClock = YES;
     
     self.reading = YES;
     BOOL finished = NO;
