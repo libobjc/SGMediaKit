@@ -109,14 +109,18 @@ static AVPacket flush_packet;
 
 - (void)putPacket:(AVPacket)packet
 {
-    [self.packetQueue putPacket:packet];
+    NSTimeInterval duration = 0;
+    if (packet.duration <= 0 && packet.size > 0 && packet.data != flush_packet.data) {
+        duration = 1.0 / self.fps;
+    }
+    [self.packetQueue putPacket:packet duration:duration];
 }
 
 - (void)flush
 {
     [self.frameQueue flush];
     [self.packetQueue flush];
-    [self.packetQueue putPacket:flush_packet];
+    [self putPacket:flush_packet];
 }
 
 - (void)destroy

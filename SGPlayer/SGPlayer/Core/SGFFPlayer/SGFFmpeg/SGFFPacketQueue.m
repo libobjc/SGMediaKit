@@ -38,7 +38,7 @@
     return self;
 }
 
-- (void)putPacket:(AVPacket)packet
+- (void)putPacket:(AVPacket)packet duration:(NSTimeInterval)duration
 {
     [self.condition lock];
     if (self.destoryToken) {
@@ -48,7 +48,11 @@
     NSValue * value = [NSValue value:&packet withObjCType:@encode(AVPacket)];
     [self.packets addObject:value];
     self.size += packet.size;
-    self.duration += packet.duration * self.timebase;
+    if (packet.duration > 0) {
+        self.duration += packet.duration * self.timebase;
+    } else if (duration > 0) {
+        self.duration += duration;
+    }
     [self.condition signal];
     [self.condition unlock];
 }
