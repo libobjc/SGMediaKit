@@ -571,12 +571,14 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
 
 - (void)updateBufferedDurationByVideo
 {
-    self.bufferedDuration = self.videoDecoder.duration;
+    if (!self.formatContext.audioEnable) {
+        self.bufferedDuration = self.videoDecoder.duration;
+    }
 }
 
 - (void)updateBufferedDurationByAudio
 {
-    if (!self.formatContext.videoEnable) {
+    if (self.formatContext.audioEnable) {
         self.bufferedDuration = self.audioDecoder.duration;
     }
 }
@@ -590,7 +592,9 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
 
 - (void)updateProgressByAudio
 {
-    self.progress = self.currentAudioFrame.position;
+    if (self.formatContext.audioEnable) {
+        self.progress = self.currentAudioFrame.position;
+    }
 }
 
 - (void)delegateErrorCallback
