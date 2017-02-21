@@ -29,6 +29,7 @@
 
 @property (nonatomic, weak) id <SGFFVideoDecoderDlegate> delegate;
 
+@property (nonatomic, assign) BOOL videoToolBoxEnable;      // default is YES;
 @property (nonatomic, assign) NSTimeInterval maxDecodeDuration;     // default is 2s;
 
 @property (nonatomic, assign) NSTimeInterval timebase;

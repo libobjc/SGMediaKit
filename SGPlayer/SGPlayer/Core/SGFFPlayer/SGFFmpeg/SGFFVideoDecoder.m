@@ -63,6 +63,7 @@ static AVPacket flush_packet;
         self.packetQueue = [SGFFPacketQueue packetQueueWithTimebase:timebase];
         self.frameQueue = [SGFFFrameQueue frameQueue];
         self.maxDecodeDuration = 2.f;
+        self.videoToolBoxEnable = YES;
     }
     return self;
 }
@@ -173,27 +174,31 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
         }
         if (packet.stream_index < 0 || packet.data == NULL) continue;
         
-        int result = avcodec_send_packet(_codec_context, &packet);
-        if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
-            self.error = sg_ff_check_error(result);
-            [self delegateErrorCallback];
-            goto end;
-        }
-        while (result >= 0) {
-            result = avcodec_receive_frame(_codec_context, _temp_frame);
-            if (result < 0) {
-                if (result == AVERROR(EAGAIN) || result == AVERROR_EOF) {
-                    break;
-                } else {
-                    self.error = sg_ff_check_error(result);
-                    goto end;
+//        if (self.videoToolBoxEnable) {
+//            
+//        } else {
+            int result = avcodec_send_packet(_codec_context, &packet);
+            if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
+                self.error = sg_ff_check_error(result);
+                [self delegateErrorCallback];
+                goto end;
+            }
+            while (result >= 0) {
+                result = avcodec_receive_frame(_codec_context, _temp_frame);
+                if (result < 0) {
+                    if (result == AVERROR(EAGAIN) || result == AVERROR_EOF) {
+                        break;
+                    } else {
+                        self.error = sg_ff_check_error(result);
+                        goto end;
+                    }
+                }
+                SGFFVideoFrame * videoFrame = [self decode];
+                if (videoFrame) {
+                    [self.frameQueue putFrame:videoFrame];
                 }
             }
-            SGFFVideoFrame * videoFrame = [self decode];
-            if (videoFrame) {
-                [self.frameQueue putFrame:videoFrame];
-            }
-        }
+//        }
         
     end:
         av_packet_unref(&packet);

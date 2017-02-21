@@ -173,6 +173,7 @@
                                                              timebase:self.formatContext.videoTimebase
                                                                   fps:self.formatContext.videoFPS
                                                              delegate:self];
+        self.videoDecoder.videoToolBoxEnable = self.hardwareDecoderEnable;
     }
     if (self.formatContext.audioEnable) {
         self.audioDecoder = [SGFFAudioDecoder decoderWithCodecContext:self.formatContext->_audio_codec_context
