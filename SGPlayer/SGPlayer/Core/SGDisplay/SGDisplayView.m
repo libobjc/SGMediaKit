@@ -90,9 +90,7 @@
         case SGDisplayRendererTypeAVPlayerLayer:
             if (!self.avplayerLayer) {
                 self.avplayerLayer = [AVPlayerLayer playerLayerWithPlayer:nil];
-                if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
-                    self.avplayerLayer.player = self.sgavplayer.avPlayer;
-                }
+                [self reloadSGAVPlayer];
                 self.avplayerLayerToken = NO;
                 [self.layer insertSublayer:self.avplayerLayer atIndex:0];
                 [self reloadGravityMode];
@@ -261,6 +259,15 @@
     }
     if (self.ffplayerView) {
         [self.ffplayerView displayAsyncOnMainThread];
+    }
+}
+
+- (void)reloadSGAVPlayer
+{
+    if (self.sgavplayer.avPlayer && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
+        self.avplayerLayer.player = self.sgavplayer.avPlayer;
+    } else {
+        self.avplayerLayer.player = nil;
     }
 }
 
