@@ -326,6 +326,9 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
                     SGFFSleepLog(@"display thread sleep : %f", 1 / self.videoDecoder.fps);
                     [NSThread sleepForTimeInterval:1 / self.videoDecoder.fps];
                 } else {
+                    if (delay > 5.0f) {
+                        delay = 2.5f;
+                    }
                     SGFFSynLog(@"------ delay : %f, video position : %f, duraion : %f", delay, self.currentVideoFrame.position, self.currentVideoFrame.duration);
                     SGFFSleepLog(@"display thread sleep : %f", delay);
                     [NSThread sleepForTimeInterval:delay];
