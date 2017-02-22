@@ -52,6 +52,35 @@
     [self.condition unlock];
 }
 
+- (void)putSortFrame:(__kindof SGFFFrame *)frame
+{
+    if (!frame) return;
+    [self.condition lock];
+    if (self.destoryToken) {
+        [self.condition unlock];
+        return;
+    }
+    BOOL added = NO;
+    if (self.frames.count > 0) {
+        for (int i = (int)self.frames.count - 1; i >= 0; i--) {
+            SGFFFrame * obj = [self.frames objectAtIndex:i];
+            if (frame.position > obj.position) {
+                [self.frames insertObject:frame atIndex:i + 1];
+                added = YES;
+                break;
+            }
+        }
+    }
+    if (!added) {
+        [self.frames addObject:frame];
+        added = YES;
+    }
+    self.duration += frame.duration;
+    self.size += frame.size;
+    [self.condition signal];
+    [self.condition unlock];
+}
+
 - (__kindof SGFFFrame *)getFrame
 {
     [self.condition lock];

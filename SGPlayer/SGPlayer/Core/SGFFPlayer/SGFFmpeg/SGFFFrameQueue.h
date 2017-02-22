@@ -23,6 +23,7 @@
 @property (atomic, assign, readonly) NSTimeInterval duration;
 
 - (void)putFrame:(__kindof SGFFFrame *)frame;
+- (void)putSortFrame:(__kindof SGFFFrame *)frame;
 - (__kindof SGFFFrame *)getFrame;
 
 - (void)flush;
