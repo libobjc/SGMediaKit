@@ -10,6 +10,7 @@
 #import "SGFFPacketQueue.h"
 #import "SGFFFrameQueue.h"
 #import "SGFFTools.h"
+#import "SGFFVideoToolBox.h"
 
 static AVPacket flush_packet;
 
@@ -27,6 +28,8 @@ static AVPacket flush_packet;
 
 @property (nonatomic, strong) SGFFPacketQueue * packetQueue;
 @property (nonatomic, strong) SGFFFrameQueue * frameQueue;
+
+@property (nonatomic, strong) SGFFVideoToolBox * videoToolBox;
 
 @end
 
@@ -170,13 +173,18 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
         if (packet.data == flush_packet.data) {
             SGFFDecodeLog(@"video codec flush");
             avcodec_flush_buffers(_codec_context);
+            [self.videoToolBox flush];
             continue;
         }
         if (packet.stream_index < 0 || packet.data == NULL) continue;
         
-//        if (self.videoToolBoxEnable) {
-//            
-//        } else {
+        SGFFVideoFrame * videoFrame = nil;
+        if (self.videoToolBoxEnable) {
+            BOOL result = [self.videoToolBox sendPacket:packet];
+            if (result) {
+                videoFrame = [self videoFrameFromVideoToolBox:packet];
+            }
+        } else {
             int result = avcodec_send_packet(_codec_context, &packet);
             if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
                 self.error = sg_ff_check_error(result);
@@ -193,12 +201,12 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
                         goto end;
                     }
                 }
-                SGFFVideoFrame * videoFrame = [self decode];
-                if (videoFrame) {
-                    [self.frameQueue putFrame:videoFrame];
-                }
+                videoFrame = [self videoFrameFromTempFrame];
             }
-//        }
+        }
+        if (videoFrame) {
+            [self.frameQueue putSortFrame:videoFrame];
+        }
         
     end:
         av_packet_unref(&packet);
@@ -207,11 +215,11 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
     [self.delegate videoDecoderNeedCheckBufferingStatus:self];
 }
 
-- (SGFFVideoFrame *)decode
+- (SGFFAVYUVVideoFrame *)videoFrameFromTempFrame
 {
     if (!_temp_frame->data[0] || !_temp_frame->data[1] || !_temp_frame->data[2]) return nil;
     
-    SGFFVideoFrame * videoFrame = [[SGFFAVYUVVideoFrame alloc] initWithAVFrame:_temp_frame
+    SGFFAVYUVVideoFrame * videoFrame = [[SGFFAVYUVVideoFrame alloc] initWithAVFrame:_temp_frame
                                                                          width:_codec_context->width
                                                                         height:_codec_context->height];
     
@@ -224,7 +232,28 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
     } else {
         videoFrame.duration = 1.0 / self.fps;
     }
+    return videoFrame;
+}
+
+- (SGFFVideoFrame *)videoFrameFromVideoToolBox:(AVPacket)packet
+{
+    CVImageBufferRef * imageBuffer = [self.videoToolBox imageBuffer];
+    if (imageBuffer == NULL) return nil;
     
+    SGFFCVYUVVideoFrame * videoFrame = [[SGFFCVYUVVideoFrame alloc] initWithAVPixelBuffer:imageBuffer];
+    
+    if (packet.pts != AV_NOPTS_VALUE) {
+        videoFrame.position = packet.pts * self.timebase;
+    } else {
+        videoFrame.position = packet.dts;
+    }
+    
+    const int64_t frame_duration = packet.duration;
+    if (frame_duration) {
+        videoFrame.duration = frame_duration * self.timebase;
+    } else {
+        videoFrame.duration = 1.0 / self.fps;
+    }
     return videoFrame;
 }
 
@@ -233,6 +262,14 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
     if (self.error) {
         [self.delegate videoDecoder:self didError:self.error];
     }
+}
+
+- (SGFFVideoToolBox *)videoToolBox
+{
+    if (!_videoToolBox) {
+        _videoToolBox = [SGFFVideoToolBox videoToolBoxWithCodecContext:self->_codec_context];
+    }
+    return _videoToolBox;
 }
 
 - (void)dealloc

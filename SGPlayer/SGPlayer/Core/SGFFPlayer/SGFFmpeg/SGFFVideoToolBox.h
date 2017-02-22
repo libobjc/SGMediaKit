@@ -7,7 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <VideoToolbox/VideoToolbox.h>
+#import "avformat.h"
 
 @interface SGFFVideoToolBox : NSObject
+
++ (instancetype)videoToolBoxWithCodecContext:(AVCodecContext *)codecContext;
+
+- (BOOL)sendPacket:(AVPacket)packet;
+- (CVImageBufferRef)imageBuffer;
+
+- (void)flush;
 
 @end

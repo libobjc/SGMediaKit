@@ -83,9 +83,9 @@
 {
     if (self = [super init]) {
         self->_pixelBuffer = pixelBuffer;
-        if (self->_pixelBuffer) {
-            CVPixelBufferRetain(self->_pixelBuffer);
-        }
+//        if (self->_pixelBuffer) {
+//            CVPixelBufferRetain(self->_pixelBuffer);
+//        }
     }
     return self;
 }
