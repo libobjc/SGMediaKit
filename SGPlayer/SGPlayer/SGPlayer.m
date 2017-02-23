@@ -97,7 +97,10 @@
 
 - (void)play
 {
+#if SGPLATFORM_OS_MOBILE
     [UIApplication sharedApplication].idleTimerDisabled = YES;
+#endif
+    
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
             [self.avPlayer play];
@@ -112,7 +115,10 @@
 
 - (void)pause
 {
+#if SGPLATFORM_OS_MOBILE
     [UIApplication sharedApplication].idleTimerDisabled = NO;
+#endif
+    
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
             [self.avPlayer pause];
@@ -343,7 +349,11 @@
         self.ffPlayer = nil;
     }
     [self cleanPlayerView];
+    
+#if SGPLATFORM_OS_MOBILE
     [UIApplication sharedApplication].idleTimerDisabled = NO;
+#endif
+    
     self.needAutoPlay = NO;
     self.error = nil;
 }
