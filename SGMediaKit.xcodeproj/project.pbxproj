@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9C06D2EC1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EB1E5EBEF2000EA7AC /* SGPLFMacro.h */; };
-		9C06D2ED1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EB1E5EBEF2000EA7AC /* SGPLFMacro.h */; };
-		9C06D2EF1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EE1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h */; };
-		9C06D2F01E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EE1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h */; };
+		9C06D2EC1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EB1E5EBEF2000EA7AC /* SGPLFMacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C06D2ED1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EB1E5EBEF2000EA7AC /* SGPLFMacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C06D2EF1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EE1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C06D2F01E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EE1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C0AF8641E5BEDC200147998 /* SGFFVideoToolBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0AF8621E5BEDC200147998 /* SGFFVideoToolBox.h */; };
 		9C0AF8651E5BEDC200147998 /* SGFFVideoToolBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0AF8621E5BEDC200147998 /* SGFFVideoToolBox.h */; };
 		9C0AF8661E5BEDC200147998 /* SGFFVideoToolBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C0AF8631E5BEDC200147998 /* SGFFVideoToolBox.m */; };
@@ -1447,6 +1447,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C06D2ED1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */,
+				9C06D2F01E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */,
 				9C7C71431DF904180098E2E7 /* SGPlayer.h in Headers */,
 				9C56BCE81E4DB01800F5201F /* ssl2.h in Headers */,
 				9C56BC0C1E4DB01800F5201F /* frame.h in Headers */,
@@ -1461,7 +1463,6 @@
 				9C56BCE01E4DB01800F5201F /* sha.h in Headers */,
 				9C56BC261E4DB01800F5201F /* log.h in Headers */,
 				9C56BC421E4DB01800F5201F /* random_seed.h in Headers */,
-				9C06D2F01E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */,
 				9C56BBB61E4DB01800F5201F /* version.h in Headers */,
 				9C56BBB81E4DB01800F5201F /* videotoolbox.h in Headers */,
 				9C8820CB1E2735B000EBEA93 /* SGDisplayView.h in Headers */,
@@ -1656,7 +1657,6 @@
 				9C56BBD21E4DB01800F5201F /* adler32.h in Headers */,
 				9C56BBF01E4DB01800F5201F /* cast5.h in Headers */,
 				9C56BCCE1E4DB01800F5201F /* pkcs7.h in Headers */,
-				9C06D2ED1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */,
 				9C2161C91E2CD99C005FAF08 /* SGGLAVTexture.h in Headers */,
 				9C2161C51E2CD99C005FAF08 /* SGGLModel.h in Headers */,
 				9C56BC401E4DB01800F5201F /* pixfmt.h in Headers */,
@@ -1673,6 +1673,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C06D2EC1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */,
+				9C06D2EF1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */,
 				9C56BBB31E4DB01800F5201F /* vdpau.h in Headers */,
 				9C5056501E56FA83007B18FA /* SGFFFormatContext.h in Headers */,
 				9C56BC671E4DB01800F5201F /* version.h in Headers */,
@@ -1726,7 +1728,6 @@
 				9C0AF8641E5BEDC200147998 /* SGFFVideoToolBox.h in Headers */,
 				9C65E8C21E2DC9C3007D81A9 /* SGFingerRotation.h in Headers */,
 				9C56BC731E4DB01800F5201F /* asn1t.h in Headers */,
-				9C06D2EF1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */,
 				9C56BC4F1E4DB01800F5201F /* sha512.h in Headers */,
 				9C56BC891E4DB01800F5201F /* conf_api.h in Headers */,
 				9C56BBBD1E4DB01800F5201F /* avdevice.h in Headers */,
@@ -1819,7 +1820,6 @@
 				9C56BCD71E4DB01800F5201F /* ripemd.h in Headers */,
 				9C56BBC31E4DB01800F5201F /* avfiltergraph.h in Headers */,
 				9C56BC9D1E4DB01800F5201F /* ec.h in Headers */,
-				9C06D2EC1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */,
 				9C56BB9F1E4DB01800F5201F /* avfft.h in Headers */,
 				9C56BC611E4DB01800F5201F /* version.h in Headers */,
 				9CEC9A881E233A6D00657B35 /* SGAudioManager.h in Headers */,

@@ -6,7 +6,7 @@
 //  Copyright © 2016年 single. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "SGPLFGraphicMacro.h"
 #import "SGPlayerDecoder.h"
 
 // video type
