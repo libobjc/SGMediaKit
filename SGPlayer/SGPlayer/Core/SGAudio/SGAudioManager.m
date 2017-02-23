@@ -11,6 +11,11 @@
 #import <AVFoundation/AVFoundation.h>
 #import <Accelerate/Accelerate.h>
 #import "SGPlayerMacro.h"
+#import "SGPLFMacro.h"
+
+#if SGPLATFORM_OS_MAC
+#import "SGMacAudioSession.h"
+#endif
 
 static int const max_frame_size = 4096;
 static int const max_chan = 2;
@@ -36,7 +41,13 @@ static OSStatus renderCallback (void * inRefCon,
 @property (nonatomic, copy) SGAudioManagerRouteChangeHandler routeChangeHandler;
 
 @property (nonatomic, assign) BOOL registered;
+
+#if SGPLATFORM_OS_MAC
+@property (nonatomic, strong) SGMacAudioSession * audioSession;
+#elif SGPLATFORM_OS_MOBILE
 @property (nonatomic, strong) AVAudioSession * audioSession;
+#endif
+
 @property (nonatomic, strong) NSError * error;
 @property (nonatomic, strong) NSError * warning;
 
@@ -57,10 +68,15 @@ static OSStatus renderCallback (void * inRefCon,
 - (instancetype)init
 {
     if (self = [super init]) {
-        self.audioSession = [AVAudioSession sharedInstance];
         self->_outData = (float *)calloc(max_frame_size * max_chan, sizeof(float));
+        
+#if SGPLATFORM_OS_MAC
+        self.audioSession = [SGMacAudioSession sharedInstance];
+#elif SGPLATFORM_OS_MOBILE
+        self.audioSession = [AVAudioSession sharedInstance];
         [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(audioSessionInterruptionHandler:) name:AVAudioSessionInterruptionNotification object:nil];
         [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(audioSessionRouteChangeHandler:) name:AVAudioSessionRouteChangeNotification object:nil];
+#endif
     }
     return self;
 }
@@ -82,6 +98,12 @@ static OSStatus renderCallback (void * inRefCon,
         self.routeChangeHandler = nil;
     }
 }
+
+#if SGPLATFORM_OS_MAC
+
+
+
+#elif SGPLATFORM_OS_MOBILE
 
 - (void)audioSessionInterruptionHandler:(NSNotification *)notification
 {
@@ -120,6 +142,8 @@ static OSStatus renderCallback (void * inRefCon,
     }
 }
 
+#endif
+
 - (BOOL)registerAudioSession
 {
     if (!self.registered) {
@@ -155,8 +179,13 @@ static OSStatus renderCallback (void * inRefCon,
     
     AudioComponentDescription description = {0};
     description.componentType = kAudioUnitType_Output;
-    description.componentSubType = kAudioUnitSubType_RemoteIO;
     description.componentManufacturer = kAudioUnitManufacturer_Apple;
+    
+#if SGPLATFORM_OS_MAC
+    description.componentSubType = kAudioUnitSubType_DefaultOutput;
+#elif SGPLATFORM_OS_MOBILE
+    description.componentSubType = kAudioUnitSubType_RemoteIO;
+#endif
     
     AudioComponent component = AudioComponentFindNext(NULL, &description);
     result = AudioComponentInstanceNew(component, &self->_audioUnit);
@@ -177,6 +206,7 @@ static OSStatus renderCallback (void * inRefCon,
         [self delegateWarningCallback];
     } else {
         if (self.audioSession.sampleRate != self->_audioOutputFormat.mSampleRate) {
+            self->_audioOutputFormat.mSampleRate = self.audioSession.sampleRate;
             result = AudioUnitSetProperty(self->_audioUnit,
                                           kAudioUnitProperty_StreamFormat,
                                           kAudioUnitScope_Input,
@@ -297,6 +327,10 @@ static OSStatus renderCallback (void * inRefCon,
 
 - (Float64)samplingRate
 {
+    Float64 number = self->_audioOutputFormat.mSampleRate;
+    if (number > 0) {
+        return number;
+    }
     return (Float64)self.audioSession.sampleRate;
 }
 
