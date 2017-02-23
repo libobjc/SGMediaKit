@@ -163,7 +163,6 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, frame_texture_id);
-//    glBindTexture(GL_TEXTURE_2D, [self testTexture]);
     
     glUniform1i(uTextureSampler_shader_location, 0);
     float _resolutionScale = 1;
@@ -339,37 +338,6 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
     {
         SGPlayerLog(@"glError: 0x%04X", err);
     }
-}
-
-- (GLuint)testTexture
-{
-    static GLuint texture_id = 0;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        
-        CGImageRef imageRef = [[UIImage alloc] initWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"2_2" ofType:@"png"]].CGImage;
-        size_t width =CGImageGetWidth(imageRef);
-        size_t height =CGImageGetHeight(imageRef);
-        
-        GLvoid * _imageData = (GLubyte *)malloc(width * height * 4);
-        memset(_imageData, 0, (width * height * 4));
-        CGContextRef imageContext = CGBitmapContextCreate(_imageData, width, height, 8, width * 4, CGImageGetColorSpace(imageRef), kCGImageAlphaPremultipliedLast);
-        CGContextTranslateCTM(imageContext, 0, height);
-        CGContextScaleCTM(imageContext, 1.0, -1.0);
-        CGContextDrawImage(imageContext, CGRectMake(0.0, 0.0, (CGFloat)width, (CGFloat)height), imageRef);
-        CGContextRelease(imageContext);
-        
-        glGenTextures(1, &texture_id);
-        glBindTexture(GL_TEXTURE_2D, texture_id);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, (GLsizei)width, (GLsizei)height, 0, GL_RGBA, GL_UNSIGNED_BYTE, _imageData);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        
-        glActiveTexture(GL_TEXTURE0);
-    });
-    return texture_id;
 }
 
 @end
