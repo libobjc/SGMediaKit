@@ -6,7 +6,7 @@
 //  Copyright © 2016 single. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "SGPLFGraphicMacro.h"
 #import "SGVideoConfiguration.h"
 
 FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameNone;
@@ -94,7 +94,7 @@ typedef NS_ENUM(NSUInteger, SGExposureMode) {
 @property (nonatomic, assign, readonly) BOOL running;
 @property (nonatomic, assign, readonly) BOOL recording;
 @property (nonatomic, weak) id <SGVideoCaptureDelegate> delegate;
-@property (nonatomic, strong, readonly) UIView * view;
+@property (nonatomic, strong, readonly) SGPLFView * view;
 @property (nonatomic, assign) BOOL mirror;
 @property (nonatomic, assign) BOOL autorotate;      // default is YES;
 

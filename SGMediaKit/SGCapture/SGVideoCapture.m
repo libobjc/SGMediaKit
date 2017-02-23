@@ -332,7 +332,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
     }
 }
 
-- (UIView *)view
+- (SGPLFView *)view
 {
     return self.preview;
 }
