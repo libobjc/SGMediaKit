@@ -29,6 +29,7 @@ typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
 }
 
 @property (nonatomic, assign) BOOL vtSessionToken;
+@property (nonatomic, assign) BOOL needConvertNALSize3To4;
 
 @end
 
@@ -68,10 +69,11 @@ typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
             error = [NSError errorWithDomain:@"extradata error" code:SGFFVideoToolBoxErrorCodeExtradataSize userInfo:nil];
             return error;
         }
+
         if (extradata[0] == 1) {
             if (extradata[4] == 0xFE) {
                 extradata[4] = 0xFF;
-                // todo
+                self.needConvertNALSize3To4 = YES;
             }
             self->_format_description = CreateFormatDescription(kCMVideoCodecType_H264, _codec_context->width, _codec_context->height, extradata, extradata_size);
             if (self->_format_description == NULL) {
@@ -121,6 +123,7 @@ typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
         CFRelease(self->_vt_session);
         self->_vt_session = NULL;
     }
+    self.needConvertNALSize3To4 = NO;
     self.vtSessionToken = NO;
 }
 
@@ -136,9 +139,31 @@ typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
     [self cleanDecodeInfo];
     
     BOOL result = NO;
-    
     CMBlockBufferRef blockBuffer = NULL;
-    OSStatus status = CMBlockBufferCreateWithMemoryBlock(NULL, packet.data, packet.size, kCFAllocatorNull, NULL, 0, packet.size, FALSE, &blockBuffer);
+    OSStatus status = noErr;
+    
+    if (self.needConvertNALSize3To4) {
+        AVIOContext * io_context = NULL;
+        if (avio_open_dyn_buf(&io_context) < 0) {
+            status = -1900;
+        } else {
+            uint32_t nal_size;
+            uint8_t * end = packet.data + packet.size;
+            uint8_t * nal_start = packet.data;
+            while (nal_start < end) {
+                nal_size = (nal_start[0] << 16) | (nal_start[1] << 8) | nal_start[2];
+                avio_wb32(io_context, nal_size);
+                nal_start += 3;
+                avio_write(io_context, nal_start, nal_size);
+                nal_start += nal_size;
+            }
+            uint8_t * demux_buffer = NULL;
+            int demux_size = avio_close_dyn_buf(io_context, &demux_buffer);
+            status = CMBlockBufferCreateWithMemoryBlock(NULL, demux_buffer, demux_size, kCFAllocatorNull, NULL, 0, packet.size, FALSE, &blockBuffer);
+        }
+    } else {
+        status = CMBlockBufferCreateWithMemoryBlock(NULL, packet.data, packet.size, kCFAllocatorNull, NULL, 0, packet.size, FALSE, &blockBuffer);
+    }
     
     if (status == noErr) {
         CMSampleBufferRef sampleBuffer = NULL;
