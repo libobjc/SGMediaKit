@@ -6,7 +6,8 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import <CoreGraphics/CoreGraphics.h>
 #import "SGFFAudioFrame.h"
 #import "SGFFVideoFrame.h"
 
