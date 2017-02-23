@@ -241,7 +241,7 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
 
 - (SGFFVideoFrame *)videoFrameFromVideoToolBox:(AVPacket)packet
 {
-    CVImageBufferRef * imageBuffer = [self.videoToolBox imageBuffer];
+    CVImageBufferRef imageBuffer = [self.videoToolBox imageBuffer];
     if (imageBuffer == NULL) return nil;
     
     SGFFCVYUVVideoFrame * videoFrame = [[SGFFCVYUVVideoFrame alloc] initWithAVPixelBuffer:imageBuffer];
