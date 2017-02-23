@@ -9,7 +9,6 @@
 #import "SGMatrix.h"
 #import "SGPlayerMacro.h"
 #import "SGSensors.h"
-#import <CoreMotion/CoreMotion.h>
 
 @interface SGMatrix ()
 
