@@ -6,7 +6,6 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import "SGPlayer.h"
 #import "SGFFDecoder.h"
@@ -23,7 +22,7 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
     SGDisplayRendererTypeFFmpegPexelBufferVR,
 };
 
-@interface SGDisplayView : UIView <SGFFDecoderVideoOutput>
+@interface SGDisplayView : SGPLFView <SGFFDecoderVideoOutput>
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
@@ -42,6 +41,6 @@ typedef NS_ENUM(NSUInteger, SGDisplayRendererType) {
 - (void)reloadGravityMode;
 - (void)cleanEmptyBuffer;
 
-- (UIImage *)snapshot;
+- (SGPLFImage *)snapshot;
 
 @end

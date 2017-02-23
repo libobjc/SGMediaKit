@@ -191,7 +191,7 @@
     return _fingerRotation;
 }
 
-- (UIImage *)snapshot
+- (SGPLFImage *)snapshot
 {
     switch (self.rendererType) {
         case SGDisplayRendererTypeEmpty:
