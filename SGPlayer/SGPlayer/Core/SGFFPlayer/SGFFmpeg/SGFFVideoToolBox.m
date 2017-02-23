@@ -7,6 +7,7 @@
 //
 
 #import "SGFFVideoToolBox.h"
+#import "SGPLFMacro.h"
 
 typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
     SGFFVideoToolBoxErrorCodeExtradataSize,
@@ -90,6 +91,15 @@ typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
             cf_dict_set_int32(destinationPixelBufferAttributes, kCVPixelBufferHeightKey, _codec_context->height);
             cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLESCompatibilityKey, YES);
             cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLESTextureCacheCompatibilityKey, YES);
+            
+#if SGPLATFORM_OS_MAC
+            cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLCompatibilityKey, YES);
+            cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLTextureCacheCompatibilityKey, YES);
+#elif SGPLATFORM_OS_MOBILE
+            cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLESCompatibilityKey, YES);
+            cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLESTextureCacheCompatibilityKey, YES);
+#endif
+
             
             VTDecompressionOutputCallbackRecord outputCallbackRecord;
             outputCallbackRecord.decompressionOutputCallback = outputCallback;

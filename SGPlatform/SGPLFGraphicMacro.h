@@ -18,7 +18,7 @@
 #define SGPLFView NSView
 #define SGPLFImage NSImage
 
-#else
+#elif SGPLATFORM_OS_MOBILE
 
 #import <UIKit/UIKit.h>
 

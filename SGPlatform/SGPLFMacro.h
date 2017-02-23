@@ -9,7 +9,7 @@
 #ifndef SGPLFMacro_h
 #define SGPLFMacro_h
 
-#define SGPLATFORM_OS_IOS 1
 #define SGPLATFORM_OS_MAC 0
+#define SGPLATFORM_OS_MOBILE 1
 
 #endif /* SGPLFMacro_h */
