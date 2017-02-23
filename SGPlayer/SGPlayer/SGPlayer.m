@@ -254,7 +254,7 @@
     }
 }
 
-- (UIImage *)snapshot
+- (SGPLFImage *)snapshot
 {
     return self.displayView.snapshot;
 }
@@ -271,7 +271,7 @@
     }
 }
 
-- (UIView *)view
+- (SGPLFView *)view
 {
     return self.displayView;
 }
@@ -300,7 +300,7 @@
     return _ffPlayer;
 }
 
-- (void)setupPlayerView:(UIView *)playerView;
+- (void)setupPlayerView:(SGPLFView *)playerView;
 {
     [self cleanPlayerView];
     if (playerView) {
@@ -345,7 +345,7 @@
 
 - (void)cleanPlayerView
 {
-    [self.view.subviews enumerateObjectsUsingBlock:^(__kindof UIView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+    [self.view.subviews enumerateObjectsUsingBlock:^(__kindof SGPLFView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj removeFromSuperview];
     }];
 }

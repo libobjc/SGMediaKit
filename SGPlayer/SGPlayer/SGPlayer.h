@@ -73,11 +73,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 // preview
 @property (nonatomic, assign) SGDisplayMode displayMode;
-@property (nonatomic, strong, readonly) UIView * view;      // graphics view
+@property (nonatomic, strong, readonly) SGPLFView * view;      // graphics view
 @property (nonatomic, assign) BOOL viewAnimationHidden;     // default is NO;
 @property (nonatomic, assign) SGGravityMode viewGravityMode;       // default is SGGravityModeResizeAspect;
-@property (nonatomic, copy) void (^viewTapAction)(SGPlayer * player, UIView * view);
-- (UIImage *)snapshot;
+@property (nonatomic, copy) void (^viewTapAction)(SGPlayer * player, SGPLFView * view);
+- (SGPLFImage *)snapshot;
 
 // control
 @property (nonatomic, assign) SGPlayerBackgroundMode backgroundMode;    // background mode
