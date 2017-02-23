@@ -831,6 +831,10 @@
 		9CA476751DE53D3300B1B0D1 /* SGVideoCapture.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGVideoCapture.m; sourceTree = "<group>"; };
 		9CD262D91E30BCAD002AABBA /* SGFFTools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGFFTools.h; sourceTree = "<group>"; };
 		9CD262DA1E30BCAD002AABBA /* SGFFTools.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGFFTools.m; sourceTree = "<group>"; };
+		9CD8858E1E5EE88200A63669 /* SGMacAudioDevice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SGMacAudioDevice.h; sourceTree = "<group>"; };
+		9CD8858F1E5EE88200A63669 /* SGMacAudioDevice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SGMacAudioDevice.m; sourceTree = "<group>"; };
+		9CD885901E5EE88200A63669 /* SGMacAudioSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SGMacAudioSession.h; sourceTree = "<group>"; };
+		9CD885911E5EE88200A63669 /* SGMacAudioSession.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SGMacAudioSession.m; sourceTree = "<group>"; };
 		9CDEFB5E1E1DE506005510C9 /* VideoToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = VideoToolbox.framework; path = System/Library/Frameworks/VideoToolbox.framework; sourceTree = SDKROOT; };
 		9CDEFB601E1DE50E005510C9 /* libbz2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.tbd; path = usr/lib/libbz2.tbd; sourceTree = SDKROOT; };
 		9CDEFB621E1DE5F5005510C9 /* libbz2.1.0.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libbz2.1.0.tbd; path = usr/lib/libbz2.1.0.tbd; sourceTree = SDKROOT; };
@@ -1436,6 +1440,10 @@
 			children = (
 				9CEC9A861E233A6D00657B35 /* SGAudioManager.h */,
 				9CEC9A871E233A6D00657B35 /* SGAudioManager.m */,
+				9CD8858E1E5EE88200A63669 /* SGMacAudioDevice.h */,
+				9CD8858F1E5EE88200A63669 /* SGMacAudioDevice.m */,
+				9CD885901E5EE88200A63669 /* SGMacAudioSession.h */,
+				9CD885911E5EE88200A63669 /* SGMacAudioSession.m */,
 			);
 			path = SGAudio;
 			sourceTree = "<group>";
