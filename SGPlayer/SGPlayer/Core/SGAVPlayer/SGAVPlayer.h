@@ -6,9 +6,8 @@
 //  Copyright © 2016年 single. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import <AVFoundation/AVFoundation.h>
 #import "SGPlayer.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface SGAVPlayer : NSObject
 
