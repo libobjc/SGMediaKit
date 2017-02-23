@@ -118,6 +118,27 @@
     return quality;
 }
 
+#if SGPLATFORM_OS_MAC
+- (CGSize)pixelsSize
+{
+    CGSize size;
+    switch (self.size) {
+        case SGVideoSize640X480:
+            size = CGSizeMake(640, 480);
+            break;
+        case SGVideoSize960x540:
+            size = CGSizeMake(960, 540);
+            break;
+        case SGVideoSize1280x720:
+            size = CGSizeMake(1280, 720);
+            break;
+        case SGVideoSize1920x1080:
+            size = CGSizeMake(1920, 1080);
+            break;
+    }
+    return size;
+}
+#elif SGPLATFORM_OS_MOBILE
 - (CGSize)pixelsSize:(UIInterfaceOrientation)orientation
 {
     CGSize size;
@@ -145,6 +166,7 @@
     }
     return size;
 }
+#endif
 
 - (NSString *)sessionPreset
 {

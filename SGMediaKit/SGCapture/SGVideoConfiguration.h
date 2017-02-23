@@ -6,7 +6,7 @@
 //  Copyright © 2016 single. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "SGPLFMacro.h"
 
 typedef NS_ENUM(NSUInteger, SGVideoQuality) {
     SGVideoQualityLow,
@@ -31,7 +31,12 @@ typedef NS_ENUM(NSUInteger, SGVideoSize) {
 @property (nonatomic, assign, readonly) NSUInteger frameRate;
 @property (nonatomic, assign, readonly) NSUInteger bitRate;
 
+#if SGPLATFORM_OS_MAC
+- (CGSize)pixelsSize;
+#elif SGPLATFORM_OS_MOBILE
 - (CGSize)pixelsSize:(UIInterfaceOrientation)orientation;
+#endif
+
 - (NSString *)sessionPreset;
 
 @end
