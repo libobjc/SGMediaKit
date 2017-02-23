@@ -20,12 +20,18 @@
 #define SGPLFView NSView
 #define SGPLFImage NSImage
 
+// OpenGL
+#define SGPLFGLView NSView
+
 #elif SGPLATFORM_OS_MOBILE
 
 #import <UIKit/UIKit.h>
 
 #define SGPLFView UIView
 #define SGPLFImage UIImage
+
+// OpenGL ES
+#define SGPLFGLView GLKView
 
 #endif
 

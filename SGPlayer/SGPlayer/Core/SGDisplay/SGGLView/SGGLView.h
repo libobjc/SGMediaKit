@@ -7,10 +7,11 @@
 //
 
 #import <GLKit/GLKit.h>
+#import "SGPLFGraphicMacro.h"
 #import "SGGLProgram.h"
 #import "SGDisplayView.h"
 
-@interface SGGLView : GLKView
+@interface SGGLView : SGPLFGLView
 
 + (instancetype)new NS_UNAVAILABLE;
 - (instancetype)init NS_UNAVAILABLE;
