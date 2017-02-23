@@ -6,13 +6,19 @@
 //  Copyright © 2017年 single. All rights reserved.
 //
 
-#import "SGPLFMacro.h"
 #import <GLKit/GLKit.h>
+#import "SGPLFMacro.h"
+#import "SGPLFGLContext.h"
 
 #if SGPLATFORM_OS_MOBILE
 
+#ifndef SGPLFGLView
 #define SGPLFGLView GLKView
+#endif
+
+#ifndef SGPLFGLViewDelegate
 #define SGPLFGLViewDelegate GLKViewDelegate
+#endif
 
 #elif SGPLATFORM_OS_MAC
 
@@ -23,6 +29,8 @@
 @end
 
 @interface SGPLFGLView : NSView
+
+@property (nonatomic, strong) SGPLFGLContext * context;
 
 @end
 

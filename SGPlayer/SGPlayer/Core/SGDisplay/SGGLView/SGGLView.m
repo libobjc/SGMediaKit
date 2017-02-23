@@ -74,8 +74,8 @@
     self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     self.contentScaleFactor = [UIScreen mainScreen].scale;
     self.delegate = self;
-    self.context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    [EAGLContext setCurrentContext:self.context];
+    self.context = SGPLFGLContext_Alloc_Init;
+    [SGPLFGLContext setCurrentContext:self.context];
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
@@ -111,7 +111,7 @@
 
 - (void)render
 {
-    [EAGLContext setCurrentContext:self.context];
+    [SGPLFGLContext setCurrentContext:self.context];
     
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -229,7 +229,7 @@
 - (void)dealloc
 {
     [self willDealloc];
-    [EAGLContext setCurrentContext:nil];
+    [SGPLFGLContext setCurrentContext:nil];
     SGPlayerLog(@"%@ release", self.class);
 }
 
