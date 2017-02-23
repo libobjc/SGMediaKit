@@ -189,7 +189,9 @@ static void outputCallback(void * decompressionOutputRefCon, void * sourceFrameR
         SGFFVideoToolBox * videoToolBox = (__bridge SGFFVideoToolBox *)decompressionOutputRefCon;
         videoToolBox->_decode_status = status;
         videoToolBox->_decode_output = imageBuffer;
-        CVPixelBufferRetain(imageBuffer);
+        if (imageBuffer != NULL) {
+            CVPixelBufferRetain(imageBuffer);
+        }
     }
 }
 
