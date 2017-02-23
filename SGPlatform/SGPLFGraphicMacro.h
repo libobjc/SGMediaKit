@@ -11,6 +11,8 @@
 
 #import "SGPLFMacro.h"
 
+// type define
+
 #if SGPLATFORM_OS_MAC
 
 #import <Cocoa/Cocoa.h>
@@ -24,6 +26,19 @@
 
 #define SGPLFView UIView
 #define SGPLFImage UIImage
+
+#endif
+
+
+// tools
+
+#if SGPLATFORM_OS_MAC
+
+#define SGPLFImageWithCGImage(image) [[NSImage alloc] initWithCGImage:image size:CGSizeMake(CGImageGetWidth(image), CGImageGetHeight(image))]
+
+#elif SGPLATFORM_OS_MOBILE
+
+#define SGPLFImageWithCGImage(CGImage) [UIImage imageWithCGImage:CGImage]
 
 #endif
 

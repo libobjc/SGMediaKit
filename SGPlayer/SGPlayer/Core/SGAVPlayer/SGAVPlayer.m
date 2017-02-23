@@ -251,7 +251,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     return CGSizeZero;
 }
 
-- (UIImage *)snapshotAtCurrentTime
+- (SGPLFImage *)snapshotAtCurrentTime
 {
     switch (self.abstractPlayer.videoType) {
         case SGVideoTypeNormal:
@@ -265,7 +265,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
             CMTime time = self.avPlayerItem.currentTime;
             CMTime actualTime;
             CGImageRef cgImage = [imageGenerator copyCGImageAtTime:time actualTime:&actualTime error:&error];
-            UIImage * image = [UIImage imageWithCGImage:cgImage];
+            SGPLFImage * image = SGPLFImageWithCGImage(cgImage);
             return image;
         }
             break;

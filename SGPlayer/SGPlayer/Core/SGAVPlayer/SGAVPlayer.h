@@ -36,7 +36,7 @@
 - (void)seekToTime:(NSTimeInterval)time;
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void(^)(BOOL finished))completeHandler;
 
-- (UIImage *)snapshotAtCurrentTime;
+- (SGPLFImage *)snapshotAtCurrentTime;
 - (CVPixelBufferRef)pixelBufferAtCurrentTime;
 
 @end
