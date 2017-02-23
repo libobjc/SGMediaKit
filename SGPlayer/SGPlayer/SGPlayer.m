@@ -12,7 +12,10 @@
 #import "SGDisplayView.h"
 #import "SGAVPlayer.h"
 #import "SGFFPlayer.h"
+
+#if SGPLATFORM_OS_MOBILE
 #import "SGAudioManager.h"
+#endif
 
 @interface SGPlayer ()
 
@@ -35,7 +38,9 @@
 - (instancetype)init
 {
     if (self = [super init]) {
+#if SGPLATFORM_OS_MOBILE
         [self setupNotification];
+#endif
         self.decoder = [SGPlayerDecoder defaultDecoder];
         self.contentURL = nil;
         self.videoType = SGVideoTypeNormal;
@@ -354,12 +359,16 @@
 {
     SGPlayerLog(@"SGPlayer release");
     [self cleanPlayer];
+
+#if SGPLATFORM_OS_MOBILE
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[SGAudioManager manager] removeHandlerTarget:self];
+#endif
 }
 
 #pragma mark - background mode
 
+#if SGPLATFORM_OS_MOBILE
 - (void)setupNotification
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
@@ -446,5 +455,6 @@
             break;
     }
 }
+#endif
 
 @end
