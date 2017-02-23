@@ -6,8 +6,7 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
-#import <GLKit/GLKit.h>
-#import "SGPLFGraphicMacro.h"
+#import "SGPLFGLView.h"
 #import "SGGLProgram.h"
 #import "SGDisplayView.h"
 

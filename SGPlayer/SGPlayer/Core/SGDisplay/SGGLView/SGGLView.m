@@ -14,7 +14,7 @@
 #import "SGMatrix.h"
 #import "SGDistortionRenderer.h"
 
-@interface SGGLView () <GLKViewDelegate>
+@interface SGGLView () <SGPLFGLViewDelegate>
 
 @property (nonatomic, assign) BOOL setupToken;
 @property (nonatomic, weak) SGDisplayView * displayView;
@@ -104,7 +104,7 @@
     [self displayAsyncOnMainThread];
 }
 
-- (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
+- (void)glkView:(SGPLFGLView *)view drawInRect:(CGRect)rect
 {
     [self render];
 }
