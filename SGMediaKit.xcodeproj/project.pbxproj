@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9C06D2EC1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EB1E5EBEF2000EA7AC /* SGPLFMacro.h */; };
+		9C06D2ED1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EB1E5EBEF2000EA7AC /* SGPLFMacro.h */; };
+		9C06D2EF1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EE1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h */; };
+		9C06D2F01E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EE1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h */; };
 		9C0AF8641E5BEDC200147998 /* SGFFVideoToolBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0AF8621E5BEDC200147998 /* SGFFVideoToolBox.h */; };
 		9C0AF8651E5BEDC200147998 /* SGFFVideoToolBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0AF8621E5BEDC200147998 /* SGFFVideoToolBox.h */; };
 		9C0AF8661E5BEDC200147998 /* SGFFVideoToolBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C0AF8631E5BEDC200147998 /* SGFFVideoToolBox.m */; };
@@ -547,6 +551,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9C06D2EB1E5EBEF2000EA7AC /* SGPLFMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFMacro.h; sourceTree = "<group>"; };
+		9C06D2EE1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFGraphicMacro.h; sourceTree = "<group>"; };
 		9C0AF8621E5BEDC200147998 /* SGFFVideoToolBox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGFFVideoToolBox.h; sourceTree = "<group>"; };
 		9C0AF8631E5BEDC200147998 /* SGFFVideoToolBox.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGFFVideoToolBox.m; sourceTree = "<group>"; };
 		9C13B1941DF661B200F67D62 /* SGFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGFormat.h; sourceTree = "<group>"; };
@@ -875,6 +881,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		9C06D2EA1E5EBECB000EA7AC /* SGPlatform */ = {
+			isa = PBXGroup;
+			children = (
+				9C06D2EB1E5EBEF2000EA7AC /* SGPLFMacro.h */,
+				9C06D2EE1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h */,
+			);
+			path = SGPlatform;
+			sourceTree = "<group>";
+		};
 		9C13B1931DF6619D00F67D62 /* SGFormat */ = {
 			isa = PBXGroup;
 			children = (
@@ -1320,6 +1335,7 @@
 		9CA4761B1DE531FE00B1B0D1 = {
 			isa = PBXGroup;
 			children = (
+				9C06D2EA1E5EBECB000EA7AC /* SGPlatform */,
 				9CA476271DE531FE00B1B0D1 /* SGMediaKit */,
 				9C7C70F01DF9020A0098E2E7 /* SGPlayer */,
 				9CA476261DE531FE00B1B0D1 /* Products */,
@@ -1445,6 +1461,7 @@
 				9C56BCE01E4DB01800F5201F /* sha.h in Headers */,
 				9C56BC261E4DB01800F5201F /* log.h in Headers */,
 				9C56BC421E4DB01800F5201F /* random_seed.h in Headers */,
+				9C06D2F01E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */,
 				9C56BBB61E4DB01800F5201F /* version.h in Headers */,
 				9C56BBB81E4DB01800F5201F /* videotoolbox.h in Headers */,
 				9C8820CB1E2735B000EBEA93 /* SGDisplayView.h in Headers */,
@@ -1639,6 +1656,7 @@
 				9C56BBD21E4DB01800F5201F /* adler32.h in Headers */,
 				9C56BBF01E4DB01800F5201F /* cast5.h in Headers */,
 				9C56BCCE1E4DB01800F5201F /* pkcs7.h in Headers */,
+				9C06D2ED1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */,
 				9C2161C91E2CD99C005FAF08 /* SGGLAVTexture.h in Headers */,
 				9C2161C51E2CD99C005FAF08 /* SGGLModel.h in Headers */,
 				9C56BC401E4DB01800F5201F /* pixfmt.h in Headers */,
@@ -1708,6 +1726,7 @@
 				9C0AF8641E5BEDC200147998 /* SGFFVideoToolBox.h in Headers */,
 				9C65E8C21E2DC9C3007D81A9 /* SGFingerRotation.h in Headers */,
 				9C56BC731E4DB01800F5201F /* asn1t.h in Headers */,
+				9C06D2EF1E5EBF1C000EA7AC /* SGPLFGraphicMacro.h in Headers */,
 				9C56BC4F1E4DB01800F5201F /* sha512.h in Headers */,
 				9C56BC891E4DB01800F5201F /* conf_api.h in Headers */,
 				9C56BBBD1E4DB01800F5201F /* avdevice.h in Headers */,
@@ -1800,6 +1819,7 @@
 				9C56BCD71E4DB01800F5201F /* ripemd.h in Headers */,
 				9C56BBC31E4DB01800F5201F /* avfiltergraph.h in Headers */,
 				9C56BC9D1E4DB01800F5201F /* ec.h in Headers */,
+				9C06D2EC1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */,
 				9C56BB9F1E4DB01800F5201F /* avfft.h in Headers */,
 				9C56BC611E4DB01800F5201F /* version.h in Headers */,
 				9CEC9A881E233A6D00657B35 /* SGAudioManager.h in Headers */,
