@@ -17,6 +17,7 @@
 - (BOOL)sendPacket:(AVPacket)packet;
 - (CVImageBufferRef)imageBuffer;
 
+- (BOOL)trySetupVTSession;
 - (void)flush;
 
 @end

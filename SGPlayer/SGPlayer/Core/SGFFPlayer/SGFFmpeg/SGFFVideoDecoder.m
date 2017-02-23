@@ -179,7 +179,11 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
         if (packet.stream_index < 0 || packet.data == NULL) continue;
         
         SGFFVideoFrame * videoFrame = nil;
-        if (self.videoToolBoxEnable) {
+        BOOL vtbEnable = NO;
+        if (self.videoToolBoxEnable && _codec_context->codec_id == AV_CODEC_ID_H264) {
+            vtbEnable = [self.videoToolBox trySetupVTSession];
+        }
+        if (vtbEnable) {
             BOOL result = [self.videoToolBox sendPacket:packet];
             if (result) {
                 videoFrame = [self videoFrameFromVideoToolBox:packet];

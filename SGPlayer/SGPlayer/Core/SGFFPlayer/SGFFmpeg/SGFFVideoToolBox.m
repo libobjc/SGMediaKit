@@ -48,12 +48,15 @@ typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
     return self;
 }
 
-- (void)trySetupVTSession
+- (BOOL)trySetupVTSession
 {
     if (!self.vtSessionToken) {
-        [self setupVTSession];
-        self.vtSessionToken = YES;
+        NSError * error = [self setupVTSession];
+        if (!error) {
+            self.vtSessionToken = YES;
+        }
     }
+    return self.vtSessionToken;
 }
 
 - (NSError *)setupVTSession
@@ -135,7 +138,8 @@ typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
 
 - (BOOL)sendPacket:(AVPacket)packet
 {
-    [self trySetupVTSession];
+    BOOL setupResult = [self trySetupVTSession];
+    if (!setupResult) return NO;
     [self cleanDecodeInfo];
     
     BOOL result = NO;
