@@ -13,7 +13,7 @@
 
 @interface SGGLAVTexture ()
 
-@property (nonatomic, strong) EAGLContext * context;
+@property (nonatomic, strong) SGPLFGLContext * context;
 @property (nonatomic, assign) CVOpenGLESTextureRef lumaTexture;
 @property (nonatomic, assign) CVOpenGLESTextureRef chromaTexture;
 @property (nonatomic, assign) CVOpenGLESTextureCacheRef videoTextureCache;
