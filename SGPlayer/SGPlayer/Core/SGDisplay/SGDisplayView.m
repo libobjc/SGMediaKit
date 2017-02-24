@@ -21,7 +21,6 @@
 @property (nonatomic, strong) AVPlayerLayer * avplayerLayer;
 @property (nonatomic, strong) SGGLAVView * avplayerView;
 @property (nonatomic, strong) SGGLFFView * ffplayerView;
-@property (nonatomic, strong) UITapGestureRecognizer * tapGestureRecigbuzer;
 
 @end
 
