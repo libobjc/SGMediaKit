@@ -12,13 +12,11 @@
 
 #if SGPLATFORM_OS_MOBILE
 
-#ifndef SGPLFGLView
-#define SGPLFGLView GLKView
-#endif
+typedef GLKView SGPLFGLView;
 
-#ifndef SGPLFGLViewDelegate
-#define SGPLFGLViewDelegate GLKViewDelegate
-#endif
+@protocol SGPLFGLViewDelegate <GLKViewDelegate>
+
+@end
 
 #elif SGPLATFORM_OS_MAC
 

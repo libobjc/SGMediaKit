@@ -74,7 +74,7 @@
     self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     self.contentScaleFactor = [UIScreen mainScreen].scale;
     self.delegate = self;
-    self.context = SGPLFGLContext_Alloc_Init;
+    self.context = SGPLFGLContext_Alloc_Init();
     [SGPLFGLContext setCurrentContext:self.context];
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }

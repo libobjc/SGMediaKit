@@ -11,19 +11,9 @@
 
 #if SGPLATFORM_OS_MOBILE
 
-#ifndef SGPLFGLContext
-#define SGPLFGLContext EAGLContext
-#endif
-
-#ifndef SGPLFGLContext_Alloc_Init
-#define SGPLFGLContext_Alloc_Init [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2]
-#endif
+typedef EAGLContext SGPLFGLContext;
 
 #elif SGPLATFORM_OS_MAC
-
-#ifndef SGPLFGLContext_Alloc_Init
-#define SGPLFGLContext_Alloc_Init [[SGPLFGLContext alloc] init]
-#endif
 
 @interface SGPLFGLContext : NSObject
 
@@ -32,3 +22,5 @@
 @end
 
 #endif
+
+SGPLFGLContext * SGPLFGLContext_Alloc_Init();
