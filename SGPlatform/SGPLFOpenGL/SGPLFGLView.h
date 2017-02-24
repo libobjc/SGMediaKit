@@ -6,8 +6,9 @@
 //  Copyright © 2017年 single. All rights reserved.
 //
 
-#import <GLKit/GLKit.h>
 #import "SGPLFMacro.h"
+
+#import <GLKit/GLKit.h>
 #import "SGPLFGLContext.h"
 
 #if SGPLATFORM_TARGET_OS_IPHONE

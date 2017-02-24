@@ -6,7 +6,7 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
-#import "SGPLFGLView.h"
+#import "SGPLFOpenGL.h"
 #import "SGGLProgram.h"
 #import "SGDisplayView.h"
 
