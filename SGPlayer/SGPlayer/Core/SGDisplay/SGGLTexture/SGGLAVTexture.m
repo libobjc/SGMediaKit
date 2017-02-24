@@ -45,17 +45,17 @@
 
 - (void)setupVideoCache
 {
-    if (!self.videoTextureCache) {
 #if SGPLATFORM_TARGET_OS_MAC
-        
+    
 #elif SGPLATFORM_TARGET_OS_IPHONE
+    if (!self.videoTextureCache) {
         CVReturn result = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, self.context, NULL, &_videoTextureCache);
-#endif
         if (result != noErr) {
             SGPlayerLog(@"create CVOpenGLESTextureCacheCreate failure %d", result);
             return;
         }
     }
+#endif
 }
 
 - (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer aspect:(CGFloat *)aspect needRelease:(BOOL)needRelease
