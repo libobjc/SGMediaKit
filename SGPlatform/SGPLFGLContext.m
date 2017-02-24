@@ -8,14 +8,14 @@
 
 #import "SGPLFGLContext.h"
 
-#if SGPLATFORM_OS_MOBILE
+#if SGPLATFORM_TARGET_OS_IPHONE
 
 SGPLFGLContext * SGPLFGLContext_Alloc_Init()
 {
     return [[SGPLFGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 }
 
-#elif SGPLATFORM_OS_MAC
+#elif SGPLATFORM_TARGET_OS_MAC
 
 @implementation SGPLFGLContext
 

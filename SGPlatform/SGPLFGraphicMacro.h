@@ -13,14 +13,14 @@
 
 // type define
 
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
 
 #import <Cocoa/Cocoa.h>
 
 #define SGPLFView NSView
 #define SGPLFImage NSImage
 
-#elif SGPLATFORM_OS_MOBILE
+#elif SGPLATFORM_TARGET_OS_IPHONE
 
 #import <UIKit/UIKit.h>
 
@@ -32,11 +32,11 @@
 
 // tools
 
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
 
 #define SGPLFImageWithCGImage(image) [[NSImage alloc] initWithCGImage:image size:CGSizeMake(CGImageGetWidth(image), CGImageGetHeight(image))]
 
-#elif SGPLATFORM_OS_MOBILE
+#elif SGPLATFORM_TARGET_OS_IPHONE
 
 #define SGPLFImageWithCGImage(CGImage) [UIImage imageWithCGImage:CGImage]
 

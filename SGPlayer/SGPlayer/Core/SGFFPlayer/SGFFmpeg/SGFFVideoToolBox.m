@@ -90,10 +90,10 @@ typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
             cf_dict_set_int32(destinationPixelBufferAttributes, kCVPixelBufferWidthKey, _codec_context->width);
             cf_dict_set_int32(destinationPixelBufferAttributes, kCVPixelBufferHeightKey, _codec_context->height);
 
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
             cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLCompatibilityKey, YES);
             cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLTextureCacheCompatibilityKey, YES);
-#elif SGPLATFORM_OS_MOBILE
+#elif SGPLATFORM_TARGET_OS_IPHONE
             cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLESCompatibilityKey, YES);
             cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLESTextureCacheCompatibilityKey, YES);
 #endif

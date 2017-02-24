@@ -6,7 +6,7 @@
 //  Copyright © 2017年 single. All rights reserved.
 //
 
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
 
 #import "SGPLFGLView.h"
 

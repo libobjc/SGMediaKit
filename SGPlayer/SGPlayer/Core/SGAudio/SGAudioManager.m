@@ -13,7 +13,7 @@
 #import "SGPlayerMacro.h"
 #import "SGPLFMacro.h"
 
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
 #import "SGMacAudioSession.h"
 #endif
 
@@ -42,9 +42,9 @@ static OSStatus renderCallback (void * inRefCon,
 
 @property (nonatomic, assign) BOOL registered;
 
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
 @property (nonatomic, strong) SGMacAudioSession * audioSession;
-#elif SGPLATFORM_OS_MOBILE
+#elif SGPLATFORM_TARGET_OS_IPHONE
 @property (nonatomic, strong) AVAudioSession * audioSession;
 #endif
 
@@ -70,9 +70,9 @@ static OSStatus renderCallback (void * inRefCon,
     if (self = [super init]) {
         self->_outData = (float *)calloc(max_frame_size * max_chan, sizeof(float));
         
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
         self.audioSession = [SGMacAudioSession sharedInstance];
-#elif SGPLATFORM_OS_MOBILE
+#elif SGPLATFORM_TARGET_OS_IPHONE
         self.audioSession = [AVAudioSession sharedInstance];
         [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(audioSessionInterruptionHandler:) name:AVAudioSessionInterruptionNotification object:nil];
         [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(audioSessionRouteChangeHandler:) name:AVAudioSessionRouteChangeNotification object:nil];
@@ -99,11 +99,11 @@ static OSStatus renderCallback (void * inRefCon,
     }
 }
 
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
 
 
 
-#elif SGPLATFORM_OS_MOBILE
+#elif SGPLATFORM_TARGET_OS_IPHONE
 
 - (void)audioSessionInterruptionHandler:(NSNotification *)notification
 {
@@ -181,9 +181,9 @@ static OSStatus renderCallback (void * inRefCon,
     description.componentType = kAudioUnitType_Output;
     description.componentManufacturer = kAudioUnitManufacturer_Apple;
     
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
     description.componentSubType = kAudioUnitSubType_DefaultOutput;
-#elif SGPLATFORM_OS_MOBILE
+#elif SGPLATFORM_TARGET_OS_IPHONE
     description.componentSubType = kAudioUnitSubType_RemoteIO;
 #endif
     

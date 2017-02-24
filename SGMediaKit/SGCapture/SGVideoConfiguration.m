@@ -118,7 +118,7 @@
     return quality;
 }
 
-#if SGPLATFORM_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
 - (CGSize)pixelsSize
 {
     CGSize size;
@@ -138,7 +138,7 @@
     }
     return size;
 }
-#elif SGPLATFORM_OS_MOBILE
+#elif SGPLATFORM_TARGET_OS_IPHONE
 - (CGSize)pixelsSize:(UIInterfaceOrientation)orientation
 {
     CGSize size;

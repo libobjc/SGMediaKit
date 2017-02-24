@@ -10,7 +10,7 @@
 #import "SGPLFMacro.h"
 #import "SGPLFGLContext.h"
 
-#if SGPLATFORM_OS_MOBILE
+#if SGPLATFORM_TARGET_OS_IPHONE
 
 typedef GLKView SGPLFGLView;
 
@@ -18,7 +18,7 @@ typedef GLKView SGPLFGLView;
 
 @end
 
-#elif SGPLATFORM_OS_MAC
+#elif SGPLATFORM_TARGET_OS_MAC
 
 @protocol SGPLFGLViewDelegate <NSObject>
 

@@ -9,11 +9,11 @@
 #import <GLKit/GLKit.h>
 #import "SGPLFMacro.h"
 
-#if SGPLATFORM_OS_MOBILE
+#if SGPLATFORM_TARGET_OS_IPHONE
 
 typedef EAGLContext SGPLFGLContext;
 
-#elif SGPLATFORM_OS_MAC
+#elif SGPLATFORM_TARGET_OS_MAC
 
 @interface SGPLFGLContext : NSObject
 
