@@ -36,6 +36,7 @@
 {
     if (self = [super initWithFrame:CGRectZero]) {
         self.abstractPlayer = abstractPlayer;
+        SGPLFViewSetBackgroundColor(self, [SGPLFColor blackColor]);
         [self setupEventHandler];
     }
     return self;
@@ -194,14 +195,9 @@
 {
 #if SGPLATFORM_TARGET_OS_MAC
     
-    self.wantsLayer = YES;
-    self.layer.backgroundColor = [NSColor blackColor].CGColor;
-    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(macOS_updateFrameAction:) name:NSViewFrameDidChangeNotification object:self];
     
 #elif SGPLATFORM_TARGET_OS_IPHONE
-    
-    self.backgroundColor = [UIColor blackColor];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iOS_applicationDidEnterBackgroundAction:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iOS_applicationWillEnterForegroundAction:) name:UIApplicationWillEnterForegroundNotification object:nil];
