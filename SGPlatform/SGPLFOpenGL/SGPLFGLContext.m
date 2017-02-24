@@ -17,11 +17,16 @@ SGPLFGLContext * SGPLFGLContext_Alloc_Init()
 
 #elif SGPLATFORM_TARGET_OS_MAC
 
-@implementation SGPLFGLContext
-
 SGPLFGLContext * SGPLFGLContext_Alloc_Init()
 {
     return [[SGPLFGLContext alloc] init];
+}
+
+@implementation SGPLFGLContext
+
++ (void)setCurrentContext:(SGPLFGLContext *)context
+{
+    
 }
 
 @end
