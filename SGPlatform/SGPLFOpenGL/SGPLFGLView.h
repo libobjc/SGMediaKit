@@ -21,6 +21,8 @@ typedef GLKView SGPLFGLView;
 
 #elif SGPLATFORM_TARGET_OS_MAC
 
+#import <Cocoa/Cocoa.h>
+
 @class SGPLFGLView;
 
 @protocol SGPLFGLViewDelegate <NSObject>
