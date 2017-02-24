@@ -228,7 +228,6 @@
 
 - (void)dealloc
 {
-    [self willDealloc];
     [SGPLFGLContext setCurrentContext:nil];
     SGPlayerLog(@"%@ release", self.class);
 }
@@ -238,6 +237,5 @@
 - (BOOL)updateTextureAspect:(CGFloat *)aspect {return NO;}
 - (void)cleanTexture {}
 - (SGGLProgram *)program {return nil;}
-- (void)willDealloc {}
 
 @end

@@ -33,6 +33,4 @@
 - (BOOL)updateTextureAspect:(CGFloat *)aspect;
 - (void)cleanTexture;
 
-- (void)willDealloc;
-
 @end

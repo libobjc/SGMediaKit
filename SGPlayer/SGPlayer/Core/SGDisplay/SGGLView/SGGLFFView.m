@@ -134,7 +134,7 @@
     self.videoFrame = nil;
 }
 
-- (void)willDealloc
+- (void)dealloc
 {
     if (self.avSetupToken) {
         glDeleteTextures(3, self->_avTexture);

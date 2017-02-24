@@ -307,6 +307,7 @@
 
 -(void)dealloc
 {
+    [self cleanView];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     SGPlayerLog(@"SGDisplayView release");
 }
