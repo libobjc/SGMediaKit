@@ -83,6 +83,7 @@
             }
             break;
     }
+    [self updateDisplayViewLayout:self.bounds];
 }
 
 - (void)reloadGravityMode
@@ -192,6 +193,23 @@
     }
 }
 
+- (void)updateDisplayViewLayout:(CGRect)frame
+{
+    if (self.avplayerLayer) {
+        self.avplayerLayer.frame = frame;
+        if (self.abstractPlayer.viewAnimationHidden || !self.avplayerLayerToken) {
+            [self.avplayerLayer removeAllAnimations];
+            self.avplayerLayerToken = YES;
+        }
+    }
+    if (self.avplayerView) {
+        self.avplayerView.frame = frame;
+    }
+    if (self.ffplayerView) {
+        self.ffplayerView.frame = frame;
+    }
+}
+
 #pragma mark - Event Handler
 
 - (void)setupEventHandler
@@ -231,6 +249,7 @@
 - (void)macOS_updateFrameAction:(NSNotification *)notification
 {
     NSLog(@"%s", __func__);
+    [self updateDisplayViewLayout:self.bounds];
 }
 
 #elif SGPLATFORM_TARGET_OS_IPHONE
@@ -286,20 +305,7 @@
 - (void)layoutSublayersOfLayer:(CALayer *)layer
 {
     [super layoutSublayersOfLayer:layer];
-    
-    if (self.avplayerLayer) {
-        self.avplayerLayer.frame = layer.bounds;
-        if (self.abstractPlayer.viewAnimationHidden || !self.avplayerLayerToken) {
-            [self.avplayerLayer removeAllAnimations];
-            self.avplayerLayerToken = YES;
-        }
-    }
-    if (self.avplayerView) {
-        self.avplayerView.frame = layer.bounds;
-    }
-    if (self.ffplayerView) {
-        self.ffplayerView.frame = layer.bounds;
-    }
+    [self updateDisplayViewLayout:layer.bounds];
 }
 
 #endif
