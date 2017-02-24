@@ -88,8 +88,10 @@
 
 - (void)setupGLKView
 {
+#if SGPLATFORM_TARGET_OS_IPHONE
     self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     self.contentScaleFactor = [UIScreen mainScreen].scale;
+#endif
     self.delegate = self;
     self.context = SGPLFGLContext_Alloc_Init();
     [SGPLFGLContext setCurrentContext:self.context];
