@@ -72,7 +72,6 @@
         case SGDisplayRendererTypeAVPlayerPixelBufferVR:
             if (!self.avplayerView) {
                 self.avplayerView = [SGGLAVView viewWithDisplayView:self];
-                [self insertSubview:self.avplayerView atIndex:0];
                 SGPLFViewInsertSubview(self, self.avplayerView, 0);
             }
             break;
