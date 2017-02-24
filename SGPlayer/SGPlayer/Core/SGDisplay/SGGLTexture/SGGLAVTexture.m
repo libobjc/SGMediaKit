@@ -8,15 +8,25 @@
 
 #import "SGGLAVTexture.h"
 #import "SGPlayerMacro.h"
+
+#if SGPLATFORM_TARGET_OS_MAC
+
+#elif SGPLATFORM_TARGET_OS_IPHONE
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
+#endif
 
 @interface SGGLAVTexture ()
 
 @property (nonatomic, strong) SGPLFGLContext * context;
+
+#if SGPLATFORM_TARGET_OS_MAC
+
+#elif SGPLATFORM_TARGET_OS_IPHONE
 @property (nonatomic, assign) CVOpenGLESTextureRef lumaTexture;
 @property (nonatomic, assign) CVOpenGLESTextureRef chromaTexture;
 @property (nonatomic, assign) CVOpenGLESTextureCacheRef videoTextureCache;
+#endif
 
 @property (nonatomic, assign) CGFloat textureAspect;
 
@@ -36,7 +46,11 @@
 - (void)setupVideoCache
 {
     if (!self.videoTextureCache) {
+#if SGPLATFORM_TARGET_OS_MAC
+        
+#elif SGPLATFORM_TARGET_OS_IPHONE
         CVReturn result = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, self.context, NULL, &_videoTextureCache);
+#endif
         if (result != noErr) {
             SGPlayerLog(@"create CVOpenGLESTextureCacheCreate failure %d", result);
             return;
@@ -46,6 +60,9 @@
 
 - (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer aspect:(CGFloat *)aspect needRelease:(BOOL)needRelease
 {
+#if SGPLATFORM_TARGET_OS_MAC
+    
+#elif SGPLATFORM_TARGET_OS_IPHONE
     if (pixelBuffer == nil) {
         if (self.lumaTexture) {
             glActiveTexture(GL_TEXTURE0);
@@ -127,6 +144,7 @@
     }
     
     _hasTexture = YES;
+#endif
 }
 
 - (void)dealloc
@@ -139,12 +157,19 @@
 
 - (void)clearVideoCache
 {
+#if SGPLATFORM_TARGET_OS_MAC
+    
+#elif SGPLATFORM_TARGET_OS_IPHONE
     CFRelease(_videoTextureCache);
     self.videoTextureCache = nil;
+#endif
 }
 
 - (void)cleanTextures
 {
+#if SGPLATFORM_TARGET_OS_MAC
+    
+#elif SGPLATFORM_TARGET_OS_IPHONE
     if (self.lumaTexture) {
         CFRelease(_lumaTexture);
         self.lumaTexture = NULL;
@@ -157,6 +182,7 @@
     
     self.textureAspect = 16.0 / 9.0;
     CVOpenGLESTextureCacheFlush(_videoTextureCache, 0);
+#endif
 }
 
 @end
