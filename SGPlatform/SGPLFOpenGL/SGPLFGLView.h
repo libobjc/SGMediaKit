@@ -21,6 +21,8 @@ typedef GLKView SGPLFGLView;
 
 #elif SGPLATFORM_TARGET_OS_MAC
 
+@class SGPLFGLView;
+
 @protocol SGPLFGLViewDelegate <NSObject>
 
 - (void)glkView:(SGPLFGLView *)view drawInRect:(CGRect)rect;
