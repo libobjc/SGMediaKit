@@ -104,11 +104,15 @@
 
 - (void)reloadSGAVPlayer
 {
+#if SGPLATFORM_TARGET_OS_MAC
+    self.avplayerLayer.player = self.sgavplayer.avPlayer;
+#elif SGPLATFORM_TARGET_OS_IPHONE
     if (self.sgavplayer.avPlayer && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
         self.avplayerLayer.player = self.sgavplayer.avPlayer;
     } else {
         self.avplayerLayer.player = nil;
     }
+#endif
 }
 
 - (void)cleanView
