@@ -1,5 +1,5 @@
 //
-//  SGPLFView.h
+//  SGPLFColor.h
 //  SGMediaKit
 //
 //  Created by Single on 2017/2/24.
@@ -7,20 +7,17 @@
 //
 
 #import "SGPLFMacro.h"
-#import "SGPLFColor.h"
 
 #if SGPLATFORM_TARGET_OS_MAC
 
 #import <Cocoa/Cocoa.h>
 
-typedef NSView SGPLFView;
+typedef NSColor SGPLFColor;
 
 #elif SGPLATFORM_TARGET_OS_IPHONE
 
 #import <UIKit/UIKit.h>
 
-typedef UIView SGPLFView;
+typedef UIColor SGPLFColor;
 
 #endif
-
-void SGPLFViewSetBackgroundColor(SGPLFView * view, SGPLFColor * color);
