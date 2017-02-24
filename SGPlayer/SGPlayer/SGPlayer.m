@@ -48,7 +48,7 @@
         self.displayMode = SGDisplayModeNormal;
         self.viewGravityMode = SGGravityModeResizeAspect;
         self.playableBufferInterval = 2.f;
-        self.viewAnimationHidden = NO;
+        self.viewAnimationHidden = YES;
         self.volume = 1;
     }
     return self;
