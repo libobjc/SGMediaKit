@@ -6,7 +6,7 @@
 //  Copyright © 2016 single. All rights reserved.
 //
 
-#import "SGPLFGraphicMacro.h"
+#import "SGPLFObject.h"
 #import "SGVideoConfiguration.h"
 
 FOUNDATION_EXTERN NSString * const SGVideoCaptureErrorNameNone;

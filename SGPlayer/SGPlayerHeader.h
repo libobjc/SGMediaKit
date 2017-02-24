@@ -12,8 +12,7 @@ FOUNDATION_EXPORT double SGPlayerVersionNumber;     // version number
 FOUNDATION_EXPORT const unsigned char SGPlayerVersionString[];      // version string
 
 // SGPlatform
-#import <SGPlayer/SGPLFMacro.h>
-#import <SGPlayer/SGPLFGraphicMacro.h>
+#import <SGPlayer/SGPLFObject.h>
 
 // SGPlayer
 #import <SGPlayer/SGPlayer.h>
