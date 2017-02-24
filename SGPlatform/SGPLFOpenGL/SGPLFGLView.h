@@ -37,6 +37,7 @@ typedef GLKView SGPLFGLView;
 @property (nonatomic, strong) SGPLFGLContext * context;
 
 - (SGPLFImage *)snapshot;
+- (void)bindDrawable;
 
 @end
 

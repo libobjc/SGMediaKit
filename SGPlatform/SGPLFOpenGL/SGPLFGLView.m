@@ -17,6 +17,11 @@
     return nil;
 }
 
+- (void)bindDrawable
+{
+    
+}
+
 @end
 
 #endif
