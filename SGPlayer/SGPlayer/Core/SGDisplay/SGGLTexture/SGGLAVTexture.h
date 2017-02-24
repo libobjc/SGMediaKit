@@ -6,13 +6,13 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
-#import <GLKit/GLKit.h>
+#import "SGPLFOpenGL.h"
 
 @interface SGGLAVTexture : NSObject
 
 @property (nonatomic, assign, readonly) BOOL hasTexture;
 
-- (instancetype)initWithContext:(EAGLContext *)context;
+- (instancetype)initWithContext:(SGPLFGLContext *)context;
 - (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer aspect:(CGFloat *)aspect needRelease:(BOOL)needRelease;
 
 @end

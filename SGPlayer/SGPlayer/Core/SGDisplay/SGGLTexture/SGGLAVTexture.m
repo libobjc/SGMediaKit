@@ -24,7 +24,7 @@
 
 @implementation SGGLAVTexture
 
-- (instancetype)initWithContext:(EAGLContext *)context
+- (instancetype)initWithContext:(SGPLFGLContext *)context
 {
     if (self = [super init]) {
         self.context = context;
