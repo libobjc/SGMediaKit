@@ -35,37 +35,10 @@
 - (instancetype)initWithAbstractPlayer:(SGPlayer *)abstractPlayer
 {
     if (self = [super initWithFrame:CGRectZero]) {
-        [self setupNotification];
         self.abstractPlayer = abstractPlayer;
-        [self UILayout];
+        [self setupEventHandler];
     }
     return self;
-}
-
-- (void)UILayout
-{
-    self.backgroundColor = [UIColor blackColor];
-    self.tapGestureRecigbuzer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGestureRecigbuzerAction:)];
-    [self addGestureRecognizer:self.tapGestureRecigbuzer];
-}
-
-- (void)layoutSublayersOfLayer:(CALayer *)layer
-{
-    [super layoutSublayersOfLayer:layer];
-    
-    if (self.avplayerLayer) {
-        self.avplayerLayer.frame = layer.bounds;
-        if (self.abstractPlayer.viewAnimationHidden || !self.avplayerLayerToken) {
-            [self.avplayerLayer removeAllAnimations];
-            self.avplayerLayerToken = YES;
-        }
-    }
-    if (self.avplayerView) {
-        self.avplayerView.frame = layer.bounds;
-    }
-    if (self.ffplayerView) {
-        self.ffplayerView.frame = layer.bounds;
-    }
 }
 
 - (void)decoder:(SGFFDecoder *)decoder renderVideoFrame:(SGFFVideoFrame *)videoFrame
@@ -112,6 +85,32 @@
     }
 }
 
+- (void)reloadGravityMode
+{
+    if (self.avplayerLayer) {
+        switch (self.abstractPlayer.viewGravityMode) {
+            case SGGravityModeResize:
+                self.avplayerLayer.videoGravity = AVLayerVideoGravityResize;
+                break;
+            case SGGravityModeResizeAspect:
+                self.avplayerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+                break;
+            case SGGravityModeResizeAspectFill:
+                self.avplayerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+                break;
+        }
+    }
+}
+
+- (void)reloadSGAVPlayer
+{
+    if (self.sgavplayer.avPlayer && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
+        self.avplayerLayer.player = self.sgavplayer.avPlayer;
+    } else {
+        self.avplayerLayer.player = nil;
+    }
+}
+
 - (void)cleanView
 {
     [self cleanViewCleanAVPlayerLayer:YES cleanAVPlayerView:YES cleanFFPlayerView:YES];
@@ -155,23 +154,6 @@
     self.avplayerLayerToken = NO;
 }
 
-- (void)reloadGravityMode
-{
-    if (self.avplayerLayer) {
-        switch (self.abstractPlayer.viewGravityMode) {
-            case SGGravityModeResize:
-                self.avplayerLayer.videoGravity = AVLayerVideoGravityResize;
-                break;
-            case SGGravityModeResizeAspect:
-                self.avplayerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
-                break;
-            case SGGravityModeResizeAspectFill:
-                self.avplayerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-                break;
-        }
-    }
-}
-
 - (void)cleanEmptyBuffer
 {
     [self.fingerRotation clean];
@@ -206,6 +188,81 @@
     }
 }
 
+#pragma mark - Event Handler
+
+- (void)setupEventHandler
+{
+#if SGPLATFORM_TARGET_OS_MAC
+    
+    self.wantsLayer = YES;
+    self.layer.backgroundColor = [NSColor blackColor].CGColor;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(macOS_updateFrameAction:) name:NSViewFrameDidChangeNotification object:self];
+    
+#elif SGPLATFORM_TARGET_OS_IPHONE
+    
+    self.backgroundColor = [UIColor blackColor];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iOS_applicationDidEnterBackgroundAction:) name:UIApplicationDidEnterBackgroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iOS_applicationWillEnterForegroundAction:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    UITapGestureRecognizer * tapGestureRecigbuzer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(iOS_tapGestureRecigbuzerAction:)];
+    [self addGestureRecognizer:tapGestureRecigbuzer];
+    
+#endif
+}
+
+#if SGPLATFORM_TARGET_OS_MAC
+
+- (void)mouseDragged:(NSEvent *)event
+{
+    NSLog(@"%s", __func__);
+}
+
+- (void)mouseUp:(NSEvent *)event
+{
+    NSLog(@"%s", __func__);
+}
+
+- (void)mouseDown:(NSEvent *)event
+{
+    NSLog(@"%s", __func__);
+}
+
+- (void)macOS_updateFrameAction:(NSNotification *)notification
+{
+    NSLog(@"%s", __func__);
+}
+
+#elif SGPLATFORM_TARGET_OS_IPHONE
+
+- (void)iOS_applicationDidEnterBackgroundAction:(NSNotification *)notification
+{
+    if (_avplayerLayer) {
+        _avplayerLayer.player = nil;
+    }
+}
+
+- (void)iOS_applicationWillEnterForegroundAction:(NSNotification *)notification
+{
+    if (_avplayerLayer) {
+        _avplayerLayer.player = self.sgavplayer.avPlayer;
+    }
+    if (self.avplayerView) {
+        [self.avplayerView displayAsyncOnMainThread];
+    }
+    if (self.ffplayerView) {
+        [self.ffplayerView displayAsyncOnMainThread];
+    }
+}
+
+- (void)iOS_tapGestureRecigbuzerAction:(UITapGestureRecognizer *)tapGestureRecognizer
+{
+    if (self.abstractPlayer.viewTapAction) {
+        self.abstractPlayer.viewTapAction(self.abstractPlayer, self.abstractPlayer.view);
+    }
+}
+
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
     if (self.abstractPlayer.displayMode == SGDisplayModeBox) return;
@@ -227,49 +284,26 @@
     }
 }
 
-- (void)tapGestureRecigbuzerAction:(UITapGestureRecognizer *)tapGestureRecognizer
+- (void)layoutSublayersOfLayer:(CALayer *)layer
 {
-    if (self.abstractPlayer.viewTapAction) {
-        self.abstractPlayer.viewTapAction(self.abstractPlayer, self.abstractPlayer.view);
-    }
-}
-
-#pragma mark - background mode
-
-- (void)setupNotification
-{
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
-}
-
-- (void)applicationDidEnterBackground:(NSNotification *)notification
-{
-    if (_avplayerLayer) {
-        _avplayerLayer.player = nil;
-    }
-}
-
-- (void)applicationWillEnterForeground:(NSNotification *)notification
-{
-    if (_avplayerLayer) {
-        _avplayerLayer.player = self.sgavplayer.avPlayer;
+    [super layoutSublayersOfLayer:layer];
+    
+    if (self.avplayerLayer) {
+        self.avplayerLayer.frame = layer.bounds;
+        if (self.abstractPlayer.viewAnimationHidden || !self.avplayerLayerToken) {
+            [self.avplayerLayer removeAllAnimations];
+            self.avplayerLayerToken = YES;
+        }
     }
     if (self.avplayerView) {
-        [self.avplayerView displayAsyncOnMainThread];
+        self.avplayerView.frame = layer.bounds;
     }
     if (self.ffplayerView) {
-        [self.ffplayerView displayAsyncOnMainThread];
+        self.ffplayerView.frame = layer.bounds;
     }
 }
 
-- (void)reloadSGAVPlayer
-{
-    if (self.sgavplayer.avPlayer && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
-        self.avplayerLayer.player = self.sgavplayer.avPlayer;
-    } else {
-        self.avplayerLayer.player = nil;
-    }
-}
+#endif
 
 -(void)dealloc
 {
