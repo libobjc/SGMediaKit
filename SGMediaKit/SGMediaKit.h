@@ -6,7 +6,7 @@
 //  Copyright © 2016 single. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 FOUNDATION_EXPORT double SGMediaKitVersionNumber;       // version number
 FOUNDATION_EXPORT const unsigned char SGMediaKitVersionString[];        // version string
