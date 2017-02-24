@@ -462,18 +462,18 @@
 		9C64D8591E5FC92100292757 /* SGPLFGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D8511E5FC92100292757 /* SGPLFGLView.m */; };
 		9C64D85B1E5FC94B00292757 /* SGPLFOpenGL.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D85A1E5FC94B00292757 /* SGPLFOpenGL.h */; };
 		9C64D85C1E5FC94B00292757 /* SGPLFOpenGL.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D85A1E5FC94B00292757 /* SGPLFOpenGL.h */; };
-		9C64D8871E5FD84800292757 /* SGPLFView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8851E5FD84800292757 /* SGPLFView.h */; };
-		9C64D8881E5FD84800292757 /* SGPLFView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8851E5FD84800292757 /* SGPLFView.h */; };
+		9C64D8871E5FD84800292757 /* SGPLFView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8851E5FD84800292757 /* SGPLFView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C64D8881E5FD84800292757 /* SGPLFView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8851E5FD84800292757 /* SGPLFView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C64D8891E5FD84800292757 /* SGPLFView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D8861E5FD84800292757 /* SGPLFView.m */; };
 		9C64D88A1E5FD84800292757 /* SGPLFView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D8861E5FD84800292757 /* SGPLFView.m */; };
 		9C64D8921E5FD8C700292757 /* SGPLFObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8911E5FD8C700292757 /* SGPLFObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C64D8931E5FD8C700292757 /* SGPLFObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8911E5FD8C700292757 /* SGPLFObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		9C64D8961E5FD9C800292757 /* SGPLFImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8941E5FD9C800292757 /* SGPLFImage.h */; };
-		9C64D8971E5FD9C800292757 /* SGPLFImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8941E5FD9C800292757 /* SGPLFImage.h */; };
+		9C64D8961E5FD9C800292757 /* SGPLFImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8941E5FD9C800292757 /* SGPLFImage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C64D8971E5FD9C800292757 /* SGPLFImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8941E5FD9C800292757 /* SGPLFImage.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C64D8981E5FD9C800292757 /* SGPLFImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D8951E5FD9C800292757 /* SGPLFImage.m */; };
 		9C64D8991E5FD9C800292757 /* SGPLFImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D8951E5FD9C800292757 /* SGPLFImage.m */; };
-		9C64D89C1E5FDCB900292757 /* SGPLFColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D89A1E5FDCB900292757 /* SGPLFColor.h */; };
-		9C64D89D1E5FDCB900292757 /* SGPLFColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D89A1E5FDCB900292757 /* SGPLFColor.h */; };
+		9C64D89C1E5FDCB900292757 /* SGPLFColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D89A1E5FDCB900292757 /* SGPLFColor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C64D89D1E5FDCB900292757 /* SGPLFColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D89A1E5FDCB900292757 /* SGPLFColor.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C64D89E1E5FDCB900292757 /* SGPLFColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D89B1E5FDCB900292757 /* SGPLFColor.m */; };
 		9C64D89F1E5FDCB900292757 /* SGPLFColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D89B1E5FDCB900292757 /* SGPLFColor.m */; };
 		9C65E8C21E2DC9C3007D81A9 /* SGFingerRotation.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C65E8C01E2DC9C3007D81A9 /* SGFingerRotation.h */; };
@@ -1515,6 +1515,9 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C64D89D1E5FDCB900292757 /* SGPLFColor.h in Headers */,
+				9C64D8971E5FD9C800292757 /* SGPLFImage.h in Headers */,
+				9C64D8881E5FD84800292757 /* SGPLFView.h in Headers */,
 				9C64D8931E5FD8C700292757 /* SGPLFObject.h in Headers */,
 				9C06D2ED1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */,
 				9C7C71431DF904180098E2E7 /* SGPlayer.h in Headers */,
@@ -1656,7 +1659,6 @@
 				9C56BBDE1E4DB01800F5201F /* avconfig.h in Headers */,
 				9C56BCEC1E4DB01800F5201F /* ssl3.h in Headers */,
 				9C56BBC81E4DB01800F5201F /* buffersrc.h in Headers */,
-				9C64D8881E5FD84800292757 /* SGPLFView.h in Headers */,
 				9C56BBE81E4DB01800F5201F /* bprint.h in Headers */,
 				9C56BC001E4DB01800F5201F /* downmix_info.h in Headers */,
 				9C56BC781E4DB01800F5201F /* blowfish.h in Headers */,
@@ -1677,7 +1679,6 @@
 				9C2161AC1E2CD929005FAF08 /* SGGLAVView.h in Headers */,
 				9C56BC0E1E4DB01800F5201F /* hash.h in Headers */,
 				9C56BBF21E4DB01800F5201F /* channel_layout.h in Headers */,
-				9C64D8971E5FD9C800292757 /* SGPLFImage.h in Headers */,
 				9C56BBA21E4DB01800F5201F /* d3d11va.h in Headers */,
 				9C56BCE41E4DB01800F5201F /* srtp.h in Headers */,
 				9C56BCBA1E4DB01800F5201F /* modes.h in Headers */,
@@ -1704,7 +1705,6 @@
 				9C56BCD81E4DB01800F5201F /* ripemd.h in Headers */,
 				9C56BCE21E4DB01800F5201F /* srp.h in Headers */,
 				9C56BC3E1E4DB01800F5201F /* pixelutils.h in Headers */,
-				9C64D89D1E5FDCB900292757 /* SGPLFColor.h in Headers */,
 				9C56BC841E4DB01800F5201F /* cms.h in Headers */,
 				9C56BCF61E4DB01800F5201F /* txt_db.h in Headers */,
 				9C56BC5E1E4DB01800F5201F /* tree.h in Headers */,
@@ -1747,11 +1747,13 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C64D89C1E5FDCB900292757 /* SGPLFColor.h in Headers */,
+				9C64D8961E5FD9C800292757 /* SGPLFImage.h in Headers */,
+				9C64D8871E5FD84800292757 /* SGPLFView.h in Headers */,
 				9C64D8921E5FD8C700292757 /* SGPLFObject.h in Headers */,
 				9C06D2EC1E5EBEF2000EA7AC /* SGPLFMacro.h in Headers */,
 				9C56BBB31E4DB01800F5201F /* vdpau.h in Headers */,
 				9C5056501E56FA83007B18FA /* SGFFFormatContext.h in Headers */,
-				9C64D8871E5FD84800292757 /* SGPLFView.h in Headers */,
 				9C56BC671E4DB01800F5201F /* version.h in Headers */,
 				9C97CBEE1E5167E9000EB943 /* SGPlayerAction.h in Headers */,
 				9C56BCEF1E4DB01800F5201F /* symhacks.h in Headers */,
@@ -1904,7 +1906,6 @@
 				9C56BC591E4DB01800F5201F /* timecode.h in Headers */,
 				9C56BC771E4DB01800F5201F /* blowfish.h in Headers */,
 				9C56BC311E4DB01800F5201F /* mem.h in Headers */,
-				9C64D8961E5FD9C800292757 /* SGPLFImage.h in Headers */,
 				9C13B1FB1DF6C2AD00F67D62 /* SGFormatFactory.h in Headers */,
 				9CE4184C1E2DB390009BCFB6 /* SGGLVRModel.h in Headers */,
 				9C56BCCF1E4DB01800F5201F /* pqueue.h in Headers */,
@@ -1926,7 +1927,6 @@
 				9C3A3A5B1E2F5652008CD0DB /* SGFFPacketQueue.h in Headers */,
 				9C8820CA1E2735B000EBEA93 /* SGDisplayView.h in Headers */,
 				9C56BC951E4DB01800F5201F /* dso.h in Headers */,
-				9C64D89C1E5FDCB900292757 /* SGPLFColor.h in Headers */,
 				9C56BC0F1E4DB01800F5201F /* hmac.h in Headers */,
 				9C56BBF91E4DB01800F5201F /* des.h in Headers */,
 				9C56BC651E4DB01800F5201F /* swresample.h in Headers */,
