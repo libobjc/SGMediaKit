@@ -41,9 +41,26 @@
     return self;
 }
 
+#if SGPLATFORM_TARGET_OS_MAC
+
+- (void)drawRect:(NSRect)dirtyRect
+{
+    [super drawRect:dirtyRect];
+    [self trySetupAndResize];
+}
+
+#elif SGPLATFORM_TARGET_OS_IPHONE
+
 - (void)layoutSubviews
 {
     [super layoutSubviews];
+    [self trySetupAndResize];
+}
+
+#endif
+
+- (void)trySetupAndResize
+{
     if (!self.setupToken) {
         [self setup];
         self.setupToken = YES;
@@ -53,7 +70,7 @@
 
 - (CGSize)pixelSize
 {
-    NSInteger scale = [UIScreen mainScreen].scale;
+    CGFloat scale = SGPLFScreenGetScale();
     CGSize size = CGSizeMake(CGRectGetWidth(self.bounds) * scale, CGRectGetHeight(self.bounds) * scale);
     return size;
 }
@@ -62,7 +79,7 @@
 
 - (void)setup
 {
-    self.backgroundColor = [UIColor blackColor];
+    SGPLFViewSetBackgroundColor(self, [SGPLFColor blackColor]);
     [self setupGLKView];
     [self setupProgram];
     [self setupModel];
@@ -94,7 +111,9 @@
 
 - (void)displayIfApplicationActive
 {
+#if SGPLATFORM_TARGET_OS_IPHONE
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) return;
+#endif
     [self display];
 }
 
@@ -131,7 +150,7 @@
     [self.program use];
     [self.program bindVariable];
     
-    NSInteger scale = [UIScreen mainScreen].scale;
+    CGFloat scale = SGPLFScreenGetScale();
     CGRect rect = self.bounds;
     CGFloat rectAspect = rect.size.width / rect.size.height;
     if (videoType == SGVideoTypeVR) aspect = 16.0/9.0;
