@@ -799,6 +799,7 @@
 		9C56BB981E4DB01800F5201F /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libssl.a; sourceTree = "<group>"; };
 		9C56BB991E4DB01800F5201F /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswresample.a; sourceTree = "<group>"; };
 		9C56BB9A1E4DB01800F5201F /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswscale.a; sourceTree = "<group>"; };
+		9C590D521E60300A00DE7172 /* SGPlayerHeader_macOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPlayerHeader_macOS.h; sourceTree = "<group>"; };
 		9C64D84E1E5FC92100292757 /* SGPLFGLContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFGLContext.h; sourceTree = "<group>"; };
 		9C64D84F1E5FC92100292757 /* SGPLFGLContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPLFGLContext.m; sourceTree = "<group>"; };
 		9C64D8501E5FC92100292757 /* SGPLFGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFGLView.h; sourceTree = "<group>"; };
@@ -1308,6 +1309,7 @@
 			isa = PBXGroup;
 			children = (
 				9C7C70F11DF9020A0098E2E7 /* SGPlayerHeader.h */,
+				9C590D521E60300A00DE7172 /* SGPlayerHeader_macOS.h */,
 				9C7C70F21DF9020A0098E2E7 /* Info.plist */,
 				9C7C70F81DF904180098E2E7 /* SGPlayer */,
 			);

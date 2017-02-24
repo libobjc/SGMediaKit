@@ -1,0 +1,5 @@
+framework module SGPlayer_macOS {
+    umbrella header "SGPlayerHeader_macOS.h"
+    export *
+    module * { export * }
+}

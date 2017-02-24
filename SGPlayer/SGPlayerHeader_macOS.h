@@ -1,6 +1,6 @@
 //
-//  SGPlayerHeader.h
-//  SGPlayer
+//  SGPlayerHeader_macOS.h
+//  SGPlayer_macOS
 //
 //  Created by Single on 08/12/2016.
 //  Copyright © 2016 single. All rights reserved.
@@ -12,9 +12,9 @@ FOUNDATION_EXPORT double SGPlayerVersionNumber;     // version number
 FOUNDATION_EXPORT const unsigned char SGPlayerVersionString[];      // version string
 
 // SGPlatform
-#import <SGPlayer/SGPLFObject.h>
+#import <SGPlayer_macOS/SGPLFObject.h>
 
 // SGPlayer
-#import <SGPlayer/SGPlayer.h>
-#import <SGPlayer/SGPlayerAction.h>
-#import <SGPlayer/SGPlayerDecoder.h>
+#import <SGPlayer_macOS/SGPlayer.h>
+#import <SGPlayer_macOS/SGPlayerAction.h>
+#import <SGPlayer_macOS/SGPlayerDecoder.h>
