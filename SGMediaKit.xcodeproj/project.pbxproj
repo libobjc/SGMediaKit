@@ -460,6 +460,287 @@
 		9C590D601E60411C00DE7172 /* SGPLFDisplayLink.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C590D5D1E60411C00DE7172 /* SGPLFDisplayLink.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9C590D611E60411C00DE7172 /* SGPLFDisplayLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C590D5E1E60411C00DE7172 /* SGPLFDisplayLink.m */; };
 		9C590D621E60411C00DE7172 /* SGPLFDisplayLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C590D5E1E60411C00DE7172 /* SGPLFDisplayLink.m */; };
+		9C590D651E60449000DE7172 /* SGPlayerNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710E1DF904180098E2E7 /* SGPlayerNotification.m */; };
+		9C590D661E60449000DE7172 /* SGFFDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C31006B1E1E50A2003C6611 /* SGFFDecoder.m */; };
+		9C590D671E60449000DE7172 /* SGFFFrameQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3A3A601E2F775A008CD0DB /* SGFFFrameQueue.m */; };
+		9C590D681E60449000DE7172 /* SGPLFGLContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D84F1E5FC92100292757 /* SGPLFGLContext.m */; };
+		9C590D691E60449000DE7172 /* SGPlayer+DisplayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8820DC1E274B0E00EBEA93 /* SGPlayer+DisplayView.m */; };
+		9C590D6A1E60449000DE7172 /* SGGLFFProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2161CD1E2CDCA9005FAF08 /* SGGLFFProgram.m */; };
+		9C590D6B1E60449000DE7172 /* SGPLFGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D8511E5FC92100292757 /* SGPLFGLView.m */; };
+		9C590D6C1E60449000DE7172 /* SGFFPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3335521E1B51CD00E4DDCC /* SGFFPlayer.m */; };
+		9C590D6D1E60449000DE7172 /* SGGLAVView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2161A61E2CD929005FAF08 /* SGGLAVView.m */; };
+		9C590D6E1E60449000DE7172 /* SGGLProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2161B91E2CD964005FAF08 /* SGGLProgram.m */; };
+		9C590D6F1E60449000DE7172 /* SGFFVideoFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C779AAC1E56D3640069FD57 /* SGFFVideoFrame.m */; };
+		9C590D701E60449000DE7172 /* SGDistortionRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA377F41E13AAD9001C923C /* SGDistortionRenderer.m */; };
+		9C590D711E60449000DE7172 /* SGPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C71131DF904180098E2E7 /* SGPlayer.m */; };
+		9C590D721E60449000DE7172 /* SGFFAudioDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C779A901E56A7B30069FD57 /* SGFFAudioDecoder.m */; };
+		9C590D731E60449000DE7172 /* SGFFFormatContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C50564F1E56FA83007B18FA /* SGFFFormatContext.m */; };
+		9C590D741E60449000DE7172 /* SGFFVideoToolBox.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C0AF8631E5BEDC200147998 /* SGFFVideoToolBox.m */; };
+		9C590D751E60449000DE7172 /* SGGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2161AA1E2CD929005FAF08 /* SGGLView.m */; };
+		9C590D761E60449000DE7172 /* SGFingerRotation.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C65E8C11E2DC9C3007D81A9 /* SGFingerRotation.m */; };
+		9C590D771E60449000DE7172 /* SGFFAudioFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C779AA61E56D3580069FD57 /* SGFFAudioFrame.m */; };
+		9C590D781E60449000DE7172 /* SGGLNormalModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CE418451E2DB383009BCFB6 /* SGGLNormalModel.m */; };
+		9C590D791E60449000DE7172 /* SGPlayerDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3335641E1B633800E4DDCC /* SGPlayerDecoder.m */; };
+		9C590D7A1E60449000DE7172 /* SGPLFImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D8951E5FD9C800292757 /* SGPLFImage.m */; };
+		9C590D7B1E60449000DE7172 /* SGMatrix.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C6E6D7C1E2CC8D7003D62D5 /* SGMatrix.m */; };
+		9C590D7C1E60449000DE7172 /* SGAVPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C7C710A1DF904180098E2E7 /* SGAVPlayer.m */; };
+		9C590D7D1E60449000DE7172 /* SGGLAVProgram.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2161D31E2CDCBC005FAF08 /* SGGLAVProgram.m */; };
+		9C590D7E1E60449000DE7172 /* SGPLFScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C590D581E603D6000DE7172 /* SGPLFScreen.m */; };
+		9C590D7F1E60449000DE7172 /* SGGLModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2161C01E2CD99C005FAF08 /* SGGLModel.m */; };
+		9C590D801E60449000DE7172 /* SGGLFFView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2161A81E2CD929005FAF08 /* SGGLFFView.m */; };
+		9C590D811E60449000DE7172 /* SGGLVRModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CE4184B1E2DB390009BCFB6 /* SGGLVRModel.m */; };
+		9C590D821E60449000DE7172 /* SGPLFView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D8861E5FD84800292757 /* SGPLFView.m */; };
+		9C590D831E60449000DE7172 /* SGPlayerAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C97CBED1E5167E9000EB943 /* SGPlayerAction.m */; };
+		9C590D841E60449000DE7172 /* SGDisplayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C8820C91E2735B000EBEA93 /* SGDisplayView.m */; };
+		9C590D861E60449000DE7172 /* SGFFVideoDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C779A8A1E56A7A60069FD57 /* SGFFVideoDecoder.m */; };
+		9C590D871E60449000DE7172 /* SGAudioManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CEC9A871E233A6D00657B35 /* SGAudioManager.m */; };
+		9C590D881E60449000DE7172 /* SGPLFColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D89B1E5FDCB900292757 /* SGPLFColor.m */; };
+		9C590D891E60449000DE7172 /* SGFFPacketQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C3A3A5A1E2F5652008CD0DB /* SGFFPacketQueue.m */; };
+		9C590D8A1E60449000DE7172 /* SGFFFrame.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C779AB11E56D5DD0069FD57 /* SGFFFrame.m */; };
+		9C590D8B1E60449000DE7172 /* SGFFTools.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CD262DA1E30BCAD002AABBA /* SGFFTools.m */; };
+		9C590D8C1E60449000DE7172 /* SGDistortionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CA377F21E13AAD9001C923C /* SGDistortionModel.m */; };
+		9C590D8D1E60449000DE7172 /* SGGLAVTexture.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C2161C31E2CD99C005FAF08 /* SGGLAVTexture.m */; };
+		9C590D8E1E60449000DE7172 /* SGPLFDisplayLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C590D5E1E60411C00DE7172 /* SGPLFDisplayLink.m */; };
+		9C590D901E60449000DE7172 /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB981E4DB01800F5201F /* libssl.a */; };
+		9C590D911E60449000DE7172 /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB991E4DB01800F5201F /* libswresample.a */; };
+		9C590D921E60449000DE7172 /* libavutil.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB961E4DB01800F5201F /* libavutil.a */; };
+		9C590D931E60449000DE7172 /* libavfilter.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB941E4DB01800F5201F /* libavfilter.a */; };
+		9C590D941E60449000DE7172 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C390EF91DFFDF430053DE4A /* AVFoundation.framework */; };
+		9C590D951E60449000DE7172 /* libavdevice.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB931E4DB01800F5201F /* libavdevice.a */; };
+		9C590D961E60449000DE7172 /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB9A1E4DB01800F5201F /* libswscale.a */; };
+		9C590D971E60449000DE7172 /* libavformat.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB951E4DB01800F5201F /* libavformat.a */; };
+		9C590D981E60449000DE7172 /* libavcodec.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB921E4DB01800F5201F /* libavcodec.a */; };
+		9C590D991E60449000DE7172 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB971E4DB01800F5201F /* libcrypto.a */; };
+		9C590D9B1E60449000DE7172 /* SGPLFDisplayLink.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C590D5D1E60411C00DE7172 /* SGPLFDisplayLink.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590D9C1E60449000DE7172 /* SGPLFScreen.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C590D571E603D6000DE7172 /* SGPLFScreen.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590D9E1E60449000DE7172 /* SGPLFColor.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D89A1E5FDCB900292757 /* SGPLFColor.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590D9F1E60449000DE7172 /* SGPLFImage.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8941E5FD9C800292757 /* SGPLFImage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590DA01E60449000DE7172 /* SGPLFView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8851E5FD84800292757 /* SGPLFView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590DA11E60449000DE7172 /* SGPLFObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8911E5FD8C700292757 /* SGPLFObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590DA21E60449000DE7172 /* SGPLFMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C06D2EB1E5EBEF2000EA7AC /* SGPLFMacro.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590DA31E60449000DE7172 /* SGPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71121DF904180098E2E7 /* SGPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590DA41E60449000DE7172 /* ssl2.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB831E4DB01800F5201F /* ssl2.h */; };
+		9C590DA51E60449000DE7172 /* frame.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB121E4DB01800F5201F /* frame.h */; };
+		9C590DA61E60449000DE7172 /* SGPlayerAction.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C97CBEC1E5167E9000EB943 /* SGPlayerAction.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590DA71E60449000DE7172 /* avfft.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAD81E4DB01800F5201F /* avfft.h */; };
+		9C590DA81E60449000DE7172 /* hwcontext_qsv.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB181E4DB01800F5201F /* hwcontext_qsv.h */; };
+		9C590DA91E60449000DE7172 /* timecode.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB391E4DB01800F5201F /* timecode.h */; };
+		9C590DAA1E60449000DE7172 /* tls1.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB881E4DB01800F5201F /* tls1.h */; };
+		9C590DAB1E60449000DE7172 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAE91E4DB01800F5201F /* version.h */; };
+		9C590DAC1E60449000DE7172 /* buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB021E4DB01800F5201F /* buffer.h */; };
+		9C590DAD1E60449000DE7172 /* evp.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB631E4DB01800F5201F /* evp.h */; };
+		9C590DAE1E60449000DE7172 /* sha.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB7F1E4DB01800F5201F /* sha.h */; };
+		9C590DAF1E60449000DE7172 /* log.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB1F1E4DB01800F5201F /* log.h */; };
+		9C590DB01E60449000DE7172 /* random_seed.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB2D1E4DB01800F5201F /* random_seed.h */; };
+		9C590DB11E60449000DE7172 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAE31E4DB01800F5201F /* version.h */; };
+		9C590DB21E60449000DE7172 /* videotoolbox.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAE41E4DB01800F5201F /* videotoolbox.h */; };
+		9C590DB31E60449000DE7172 /* SGDisplayView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C8820C81E2735B000EBEA93 /* SGDisplayView.h */; };
+		9C590DB41E60449000DE7172 /* dsa.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB591E4DB01800F5201F /* dsa.h */; };
+		9C590DB51E60449000DE7172 /* bio.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB4A1E4DB01800F5201F /* bio.h */; };
+		9C590DB61E60449000DE7172 /* twofish.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB3C1E4DB01800F5201F /* twofish.h */; };
+		9C590DB71E60449000DE7172 /* engine.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB611E4DB01800F5201F /* engine.h */; };
+		9C590DB81E60449000DE7172 /* SGFFAudioFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C779AA51E56D3580069FD57 /* SGFFAudioFrame.h */; };
+		9C590DB91E60449000DE7172 /* crypto.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB551E4DB01800F5201F /* crypto.h */; };
+		9C590DBA1E60449000DE7172 /* mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB251E4DB01800F5201F /* mem.h */; };
+		9C590DBB1E60449000DE7172 /* mdc2.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB6B1E4DB01800F5201F /* mdc2.h */; };
+		9C590DBC1E60449000DE7172 /* time.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB381E4DB01800F5201F /* time.h */; };
+		9C590DBD1E60449000DE7172 /* md5.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB241E4DB01800F5201F /* md5.h */; };
+		9C590DBE1E60449000DE7172 /* asn1.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB471E4DB01800F5201F /* asn1.h */; };
+		9C590DBF1E60449000DE7172 /* ssl23.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB841E4DB01800F5201F /* ssl23.h */; };
+		9C590DC01E60449000DE7172 /* vorbis_parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAE51E4DB01800F5201F /* vorbis_parser.h */; };
+		9C590DC11E60449000DE7172 /* err.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB621E4DB01800F5201F /* err.h */; };
+		9C590DC21E60449000DE7172 /* ecdh.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB5F1E4DB01800F5201F /* ecdh.h */; };
+		9C590DC31E60449000DE7172 /* dirac.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BADA1E4DB01800F5201F /* dirac.h */; };
+		9C590DC41E60449000DE7172 /* motion_vector.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB261E4DB01800F5201F /* motion_vector.h */; };
+		9C590DC51E60449000DE7172 /* macros.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB211E4DB01800F5201F /* macros.h */; };
+		9C590DC61E60449000DE7172 /* fifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB101E4DB01800F5201F /* fifo.h */; };
+		9C590DC71E60449000DE7172 /* file.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB111E4DB01800F5201F /* file.h */; };
+		9C590DC81E60449000DE7172 /* x509v3.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB901E4DB01800F5201F /* x509v3.h */; };
+		9C590DC91E60449000DE7172 /* stack.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB861E4DB01800F5201F /* stack.h */; };
+		9C590DCA1E60449000DE7172 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB411E4DB01800F5201F /* version.h */; };
+		9C590DCB1E60449000DE7172 /* symhacks.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB871E4DB01800F5201F /* symhacks.h */; };
+		9C590DCC1E60449000DE7172 /* aes.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAF61E4DB01800F5201F /* aes.h */; };
+		9C590DCD1E60449000DE7172 /* avutil.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAFD1E4DB01800F5201F /* avutil.h */; };
+		9C590DCE1E60449000DE7172 /* conf_api.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB541E4DB01800F5201F /* conf_api.h */; };
+		9C590DCF1E60449000DE7172 /* SGPLFGLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D84E1E5FC92100292757 /* SGPLFGLContext.h */; };
+		9C590DD01E60449000DE7172 /* qsv.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BADF1E4DB01800F5201F /* qsv.h */; };
+		9C590DD11E60449000DE7172 /* sha512.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB341E4DB01800F5201F /* sha512.h */; };
+		9C590DD21E60449000DE7172 /* replaygain.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB301E4DB01800F5201F /* replaygain.h */; };
+		9C590DD31E60449000DE7172 /* krb5_asn.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB661E4DB01800F5201F /* krb5_asn.h */; };
+		9C590DD41E60449000DE7172 /* cpu.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB071E4DB01800F5201F /* cpu.h */; };
+		9C590DD51E60449000DE7172 /* asn1t.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB491E4DB01800F5201F /* asn1t.h */; };
+		9C590DD61E60449000DE7172 /* SGFFFrameQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C3A3A5F1E2F775A008CD0DB /* SGFFFrameQueue.h */; };
+		9C590DD71E60449000DE7172 /* e_os2.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB5C1E4DB01800F5201F /* e_os2.h */; };
+		9C590DD81E60449000DE7172 /* bswap.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB011E4DB01800F5201F /* bswap.h */; };
+		9C590DD91E60449000DE7172 /* ffversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB0F1E4DB01800F5201F /* ffversion.h */; };
+		9C590DDA1E60449000DE7172 /* sha.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB331E4DB01800F5201F /* sha.h */; };
+		9C590DDB1E60449000DE7172 /* camellia.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB031E4DB01800F5201F /* camellia.h */; };
+		9C590DDC1E60449000DE7172 /* ec.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB5E1E4DB01800F5201F /* ec.h */; };
+		9C590DDD1E60449000DE7172 /* hwcontext.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB151E4DB01800F5201F /* hwcontext.h */; };
+		9C590DDE1E60449000DE7172 /* SGFFTools.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CD262D91E30BCAD002AABBA /* SGFFTools.h */; };
+		9C590DDF1E60449000DE7172 /* kssl.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB671E4DB01800F5201F /* kssl.h */; };
+		9C590DE01E60449000DE7172 /* pqueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB771E4DB01800F5201F /* pqueue.h */; };
+		9C590DE11E60449000DE7172 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB3D1E4DB01800F5201F /* version.h */; };
+		9C590DE21E60449000DE7172 /* buffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB4D1E4DB01800F5201F /* buffer.h */; };
+		9C590DE31E60449000DE7172 /* lzo.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB201E4DB01800F5201F /* lzo.h */; };
+		9C590DE41E60449000DE7172 /* avdct.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAD71E4DB01800F5201F /* avdct.h */; };
+		9C590DE51E60449000DE7172 /* avfiltergraph.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAEC1E4DB01800F5201F /* avfiltergraph.h */; };
+		9C590DE61E60449000DE7172 /* SGFFVideoToolBox.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C0AF8621E5BEDC200147998 /* SGFFVideoToolBox.h */; };
+		9C590DE71E60449000DE7172 /* crc.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB081E4DB01800F5201F /* crc.h */; };
+		9C590DE81E60449000DE7172 /* cmac.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB501E4DB01800F5201F /* cmac.h */; };
+		9C590DE91E60449000DE7172 /* avdevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAE81E4DB01800F5201F /* avdevice.h */; };
+		9C590DEA1E60449000DE7172 /* SGFFFormatContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C50564E1E56FA83007B18FA /* SGFFFormatContext.h */; };
+		9C590DEB1E60449000DE7172 /* avio.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAF21E4DB01800F5201F /* avio.h */; };
+		9C590DEC1E60449000DE7172 /* SGAudioManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CEC9A861E233A6D00657B35 /* SGAudioManager.h */; };
+		9C590DED1E60449000DE7172 /* tea.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB361E4DB01800F5201F /* tea.h */; };
+		9C590DEE1E60449000DE7172 /* ts.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB891E4DB01800F5201F /* ts.h */; };
+		9C590DEF1E60449000DE7172 /* obj_mac.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB6D1E4DB01800F5201F /* obj_mac.h */; };
+		9C590DF01E60449000DE7172 /* swresample.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB401E4DB01800F5201F /* swresample.h */; };
+		9C590DF11E60449000DE7172 /* seed.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB7E1E4DB01800F5201F /* seed.h */; };
+		9C590DF21E60449000DE7172 /* SGGLAVProgram.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2161D21E2CDCBC005FAF08 /* SGGLAVProgram.h */; };
+		9C590DF31E60449000DE7172 /* ocsp.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB6F1E4DB01800F5201F /* ocsp.h */; };
+		9C590DF41E60449000DE7172 /* lfg.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB1E1E4DB01800F5201F /* lfg.h */; };
+		9C590DF51E60449000DE7172 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAEF1E4DB01800F5201F /* version.h */; };
+		9C590DF61E60449000DE7172 /* SGPlayer+DisplayView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C8820DB1E274B0E00EBEA93 /* SGPlayer+DisplayView.h */; };
+		9C590DF71E60449000DE7172 /* dxva2.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BADC1E4DB01800F5201F /* dxva2.h */; };
+		9C590DF81E60449000DE7172 /* avfilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAEB1E4DB01800F5201F /* avfilter.h */; };
+		9C590DF91E60449000DE7172 /* bn.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB4C1E4DB01800F5201F /* bn.h */; };
+		9C590DFA1E60449000DE7172 /* avstring.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAFC1E4DB01800F5201F /* avstring.h */; };
+		9C590DFB1E60449000DE7172 /* hwcontext_cuda.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB161E4DB01800F5201F /* hwcontext_cuda.h */; };
+		9C590DFC1E60449000DE7172 /* whrlpool.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB8D1E4DB01800F5201F /* whrlpool.h */; };
+		9C590DFD1E60449000DE7172 /* SGGLProgram.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2161B81E2CD964005FAF08 /* SGGLProgram.h */; };
+		9C590DFE1E60449000DE7172 /* SGGLFFProgram.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2161CC1E2CDCA9005FAF08 /* SGGLFFProgram.h */; };
+		9C590DFF1E60449000DE7172 /* SGFFDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C31006A1E1E50A2003C6611 /* SGFFDecoder.h */; };
+		9C590E001E60449000DE7172 /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB061E4DB01800F5201F /* common.h */; };
+		9C590E011E60449000DE7172 /* parseutils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB291E4DB01800F5201F /* parseutils.h */; };
+		9C590E021E60449000DE7172 /* conf.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB531E4DB01800F5201F /* conf.h */; };
+		9C590E031E60449000DE7172 /* swscale.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB431E4DB01800F5201F /* swscale.h */; };
+		9C590E041E60449000DE7172 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAF31E4DB01800F5201F /* version.h */; };
+		9C590E051E60449000DE7172 /* hmac.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB641E4DB01800F5201F /* hmac.h */; };
+		9C590E061E60449000DE7172 /* md5.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB6A1E4DB01800F5201F /* md5.h */; };
+		9C590E071E60449000DE7172 /* buffersink.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAED1E4DB01800F5201F /* buffersink.h */; };
+		9C590E081E60449000DE7172 /* audio_fifo.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAF91E4DB01800F5201F /* audio_fifo.h */; };
+		9C590E091E60449000DE7172 /* des_old.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB571E4DB01800F5201F /* des_old.h */; };
+		9C590E0A1E60449000DE7172 /* SGFFVideoDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C779A891E56A7A60069FD57 /* SGFFVideoDecoder.h */; };
+		9C590E0B1E60449000DE7172 /* asn1_mac.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB481E4DB01800F5201F /* asn1_mac.h */; };
+		9C590E0C1E60449000DE7172 /* hwcontext_dxva2.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB171E4DB01800F5201F /* hwcontext_dxva2.h */; };
+		9C590E0D1E60449000DE7172 /* camellia.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB4E1E4DB01800F5201F /* camellia.h */; };
+		9C590E0E1E60449000DE7172 /* objects.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB6E1E4DB01800F5201F /* objects.h */; };
+		9C590E0F1E60449000DE7172 /* threadmessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB371E4DB01800F5201F /* threadmessage.h */; };
+		9C590E101E60449000DE7172 /* rsa.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB7C1E4DB01800F5201F /* rsa.h */; };
+		9C590E111E60449000DE7172 /* SGPlayerDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C3335631E1B633800E4DDCC /* SGPlayerDecoder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590E121E60449000DE7172 /* mediacodec.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BADE1E4DB01800F5201F /* mediacodec.h */; };
+		9C590E131E60449000DE7172 /* SGPLFGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D8501E5FC92100292757 /* SGPLFGLView.h */; };
+		9C590E141E60449000DE7172 /* SGDistortionModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA377F11E13AAD9001C923C /* SGDistortionModel.h */; };
+		9C590E151E60449000DE7172 /* mathematics.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB231E4DB01800F5201F /* mathematics.h */; };
+		9C590E161E60449000DE7172 /* rc4.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB2F1E4DB01800F5201F /* rc4.h */; };
+		9C590E171E60449000DE7172 /* pem2.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB741E4DB01800F5201F /* pem2.h */; };
+		9C590E181E60449000DE7172 /* des.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB091E4DB01800F5201F /* des.h */; };
+		9C590E191E60449000DE7172 /* vdpau.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAE21E4DB01800F5201F /* vdpau.h */; };
+		9C590E1A1E60449000DE7172 /* xtea.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB3E1E4DB01800F5201F /* xtea.h */; };
+		9C590E1B1E60449000DE7172 /* aes.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB461E4DB01800F5201F /* aes.h */; };
+		9C590E1C1E60449000DE7172 /* vda.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAE11E4DB01800F5201F /* vda.h */; };
+		9C590E1D1E60449000DE7172 /* hmac.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB141E4DB01800F5201F /* hmac.h */; };
+		9C590E1E1E60449000DE7172 /* opt.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB281E4DB01800F5201F /* opt.h */; };
+		9C590E1F1E60449000DE7172 /* SGGLView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2161A91E2CD929005FAF08 /* SGGLView.h */; };
+		9C590E201E60449000DE7172 /* rand.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB781E4DB01800F5201F /* rand.h */; };
+		9C590E211E60449000DE7172 /* imgutils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB1B1E4DB01800F5201F /* imgutils.h */; };
+		9C590E221E60449000DE7172 /* pem.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB731E4DB01800F5201F /* pem.h */; };
+		9C590E231E60449000DE7172 /* vaapi.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAE01E4DB01800F5201F /* vaapi.h */; };
+		9C590E241E60449000DE7172 /* SGFFPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C3335511E1B51CD00E4DDCC /* SGFFPlayer.h */; };
+		9C590E251E60449000DE7172 /* SGFFAudioDecoder.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C779A8F1E56A7B30069FD57 /* SGFFAudioDecoder.h */; };
+		9C590E261E60449000DE7172 /* avassert.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAFA1E4DB01800F5201F /* avassert.h */; };
+		9C590E271E60449000DE7172 /* SGFFFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C31006F1E1F6E9C003C6611 /* SGFFFrame.h */; };
+		9C590E281E60449000DE7172 /* md4.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB691E4DB01800F5201F /* md4.h */; };
+		9C590E291E60449000DE7172 /* des.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB561E4DB01800F5201F /* des.h */; };
+		9C590E2A1E60449000DE7172 /* avconfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAFB1E4DB01800F5201F /* avconfig.h */; };
+		9C590E2B1E60449000DE7172 /* ssl3.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB851E4DB01800F5201F /* ssl3.h */; };
+		9C590E2C1E60449000DE7172 /* buffersrc.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAEE1E4DB01800F5201F /* buffersrc.h */; };
+		9C590E2D1E60449000DE7172 /* bprint.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB001E4DB01800F5201F /* bprint.h */; };
+		9C590E2E1E60449000DE7172 /* downmix_info.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB0C1E4DB01800F5201F /* downmix_info.h */; };
+		9C590E2F1E60449000DE7172 /* blowfish.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB4B1E4DB01800F5201F /* blowfish.h */; };
+		9C590E301E60449000DE7172 /* error.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB0D1E4DB01800F5201F /* error.h */; };
+		9C590E311E60449000DE7172 /* xvmc.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAE61E4DB01800F5201F /* xvmc.h */; };
+		9C590E321E60449000DE7172 /* version.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB441E4DB01800F5201F /* version.h */; };
+		9C590E331E60449000DE7172 /* attributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAF81E4DB01800F5201F /* attributes.h */; };
+		9C590E341E60449000DE7172 /* opensslconf.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB701E4DB01800F5201F /* opensslconf.h */; };
+		9C590E351E60449000DE7172 /* display.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB0B1E4DB01800F5201F /* display.h */; };
+		9C590E361E60449000DE7172 /* pkcs12.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB751E4DB01800F5201F /* pkcs12.h */; };
+		9C590E371E60449000DE7172 /* hwcontext_vaapi.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB191E4DB01800F5201F /* hwcontext_vaapi.h */; };
+		9C590E381E60449000DE7172 /* intfloat.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB1C1E4DB01800F5201F /* intfloat.h */; };
+		9C590E391E60449000DE7172 /* SGFFPacketQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C3A3A591E2F5652008CD0DB /* SGFFPacketQueue.h */; };
+		9C590E3A1E60449000DE7172 /* intreadwrite.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB1D1E4DB01800F5201F /* intreadwrite.h */; };
+		9C590E3B1E60449000DE7172 /* dso.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB5A1E4DB01800F5201F /* dso.h */; };
+		9C590E3C1E60449000DE7172 /* rc2.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB791E4DB01800F5201F /* rc2.h */; };
+		9C590E3D1E60449000DE7172 /* jni.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BADD1E4DB01800F5201F /* jni.h */; };
+		9C590E3E1E60449000DE7172 /* SGGLAVView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2161A51E2CD929005FAF08 /* SGGLAVView.h */; };
+		9C590E3F1E60449000DE7172 /* hash.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB131E4DB01800F5201F /* hash.h */; };
+		9C590E401E60449000DE7172 /* channel_layout.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB051E4DB01800F5201F /* channel_layout.h */; };
+		9C590E411E60449000DE7172 /* d3d11va.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAD91E4DB01800F5201F /* d3d11va.h */; };
+		9C590E421E60449000DE7172 /* srtp.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB811E4DB01800F5201F /* srtp.h */; };
+		9C590E431E60449000DE7172 /* modes.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB6C1E4DB01800F5201F /* modes.h */; };
+		9C590E441E60449000DE7172 /* comp.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB521E4DB01800F5201F /* comp.h */; };
+		9C590E451E60449000DE7172 /* hwcontext_vdpau.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB1A1E4DB01800F5201F /* hwcontext_vdpau.h */; };
+		9C590E461E60449000DE7172 /* safestack.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB7D1E4DB01800F5201F /* safestack.h */; };
+		9C590E471E60449000DE7172 /* murmur3.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB271E4DB01800F5201F /* murmur3.h */; };
+		9C590E481E60449000DE7172 /* ssl.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB821E4DB01800F5201F /* ssl.h */; };
+		9C590E491E60449000DE7172 /* stereo3d.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB351E4DB01800F5201F /* stereo3d.h */; };
+		9C590E4A1E60449000DE7172 /* pixdesc.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB2A1E4DB01800F5201F /* pixdesc.h */; };
+		9C590E4B1E60449000DE7172 /* blowfish.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAFF1E4DB01800F5201F /* blowfish.h */; };
+		9C590E4C1E60449000DE7172 /* ui_compat.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB8C1E4DB01800F5201F /* ui_compat.h */; };
+		9C590E4E1E60449000DE7172 /* dv_profile.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BADB1E4DB01800F5201F /* dv_profile.h */; };
+		9C590E4F1E60449000DE7172 /* ossl_typ.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB721E4DB01800F5201F /* ossl_typ.h */; };
+		9C590E501E60449000DE7172 /* aes_ctr.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAF71E4DB01800F5201F /* aes_ctr.h */; };
+		9C590E511E60449000DE7172 /* SGPlayerNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710D1DF904180098E2E7 /* SGPlayerNotification.h */; };
+		9C590E521E60449000DE7172 /* samplefmt.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB321E4DB01800F5201F /* samplefmt.h */; };
+		9C590E531E60449000DE7172 /* ui.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB8B1E4DB01800F5201F /* ui.h */; };
+		9C590E541E60449000DE7172 /* ebcdic.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB5D1E4DB01800F5201F /* ebcdic.h */; };
+		9C590E551E60449000DE7172 /* mastering_display_metadata.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB221E4DB01800F5201F /* mastering_display_metadata.h */; };
+		9C590E561E60449000DE7172 /* base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAFE1E4DB01800F5201F /* base64.h */; };
+		9C590E571E60449000DE7172 /* dtls1.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB5B1E4DB01800F5201F /* dtls1.h */; };
+		9C590E581E60449000DE7172 /* ripemd.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB7B1E4DB01800F5201F /* ripemd.h */; };
+		9C590E591E60449000DE7172 /* srp.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB801E4DB01800F5201F /* srp.h */; };
+		9C590E5A1E60449000DE7172 /* pixelutils.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB2B1E4DB01800F5201F /* pixelutils.h */; };
+		9C590E5B1E60449000DE7172 /* cms.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB511E4DB01800F5201F /* cms.h */; };
+		9C590E5C1E60449000DE7172 /* txt_db.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB8A1E4DB01800F5201F /* txt_db.h */; };
+		9C590E5D1E60449000DE7172 /* tree.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB3B1E4DB01800F5201F /* tree.h */; };
+		9C590E5E1E60449000DE7172 /* idea.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB651E4DB01800F5201F /* idea.h */; };
+		9C590E5F1E60449000DE7172 /* x509.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB8E1E4DB01800F5201F /* x509.h */; };
+		9C590E601E60449000DE7172 /* opensslv.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB711E4DB01800F5201F /* opensslv.h */; };
+		9C590E611E60449000DE7172 /* dict.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB0A1E4DB01800F5201F /* dict.h */; };
+		9C590E621E60449000DE7172 /* rc4.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB7A1E4DB01800F5201F /* rc4.h */; };
+		9C590E631E60449000DE7172 /* SGAVPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C71091DF904180098E2E7 /* SGAVPlayer.h */; };
+		9C590E641E60449000DE7172 /* SGPLFOpenGL.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D85A1E5FC94B00292757 /* SGPLFOpenGL.h */; };
+		9C590E651E60449000DE7172 /* avformat.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAF11E4DB01800F5201F /* avformat.h */; };
+		9C590E661E60449000DE7172 /* SGFFVideoFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C779AAB1E56D3640069FD57 /* SGFFVideoFrame.h */; };
+		9C590E671E60449000DE7172 /* ecdsa.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB601E4DB01800F5201F /* ecdsa.h */; };
+		9C590E681E60449000DE7172 /* SGGLNormalModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CE418441E2DB383009BCFB6 /* SGGLNormalModel.h */; };
+		9C590E691E60449000DE7172 /* SGGLVRModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CE4184A1E2DB390009BCFB6 /* SGGLVRModel.h */; };
+		9C590E6A1E60449000DE7172 /* cast.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB4F1E4DB01800F5201F /* cast.h */; };
+		9C590E6B1E60449000DE7172 /* ripemd.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB311E4DB01800F5201F /* ripemd.h */; };
+		9C590E6C1E60449000DE7172 /* rational.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB2E1E4DB01800F5201F /* rational.h */; };
+		9C590E6D1E60449000DE7172 /* x509_vfy.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB8F1E4DB01800F5201F /* x509_vfy.h */; };
+		9C590E6E1E60449000DE7172 /* SGMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C6E6D7B1E2CC8D7003D62D5 /* SGMatrix.h */; };
+		9C590E6F1E60449000DE7172 /* SGPlayerMacro.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C7C710F1DF904180098E2E7 /* SGPlayerMacro.h */; };
+		9C590E701E60449000DE7172 /* SGFingerRotation.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C65E8C01E2DC9C3007D81A9 /* SGFingerRotation.h */; };
+		9C590E711E60449000DE7172 /* dh.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB581E4DB01800F5201F /* dh.h */; };
+		9C590E721E60449000DE7172 /* adler32.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAF51E4DB01800F5201F /* adler32.h */; };
+		9C590E731E60449000DE7172 /* cast5.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB041E4DB01800F5201F /* cast5.h */; };
+		9C590E741E60449000DE7172 /* pkcs7.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB761E4DB01800F5201F /* pkcs7.h */; };
+		9C590E751E60449000DE7172 /* SGGLAVTexture.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2161C21E2CD99C005FAF08 /* SGGLAVTexture.h */; };
+		9C590E761E60449000DE7172 /* SGGLModel.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2161BF1E2CD99C005FAF08 /* SGGLModel.h */; };
+		9C590E771E60449000DE7172 /* pixfmt.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB2C1E4DB01800F5201F /* pixfmt.h */; };
+		9C590E781E60449000DE7172 /* SGDistortionRenderer.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CA377F31E13AAD9001C923C /* SGDistortionRenderer.h */; };
+		9C590E791E60449000DE7172 /* SGGLFFView.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C2161A71E2CD929005FAF08 /* SGGLFFView.h */; };
+		9C590E7A1E60449000DE7172 /* avcodec.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BAD61E4DB01800F5201F /* avcodec.h */; };
+		9C590E7B1E60449000DE7172 /* timestamp.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB3A1E4DB01800F5201F /* timestamp.h */; };
+		9C590E7C1E60449000DE7172 /* eval.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB0E1E4DB01800F5201F /* eval.h */; };
+		9C590E7D1E60449000DE7172 /* lhash.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C56BB681E4DB01800F5201F /* lhash.h */; };
+		9C590E861E6045B200DE7172 /* SGPlayerHeader_macOS.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C590D521E60300A00DE7172 /* SGPlayerHeader_macOS.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590E891E6045F800DE7172 /* SGMacAudioDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CD8858E1E5EE88200A63669 /* SGMacAudioDevice.h */; };
+		9C590E8A1E6045F800DE7172 /* SGMacAudioSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 9CD885901E5EE88200A63669 /* SGMacAudioSession.h */; };
+		9C590E8B1E60460700DE7172 /* SGMacAudioDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CD8858F1E5EE88200A63669 /* SGMacAudioDevice.m */; };
+		9C590E8C1E60460700DE7172 /* SGMacAudioSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 9CD885911E5EE88200A63669 /* SGMacAudioSession.m */; };
 		9C64D8521E5FC92100292757 /* SGPLFGLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D84E1E5FC92100292757 /* SGPLFGLContext.h */; };
 		9C64D8531E5FC92100292757 /* SGPLFGLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D84E1E5FC92100292757 /* SGPLFGLContext.h */; };
 		9C64D8541E5FC92100292757 /* SGPLFGLContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D84F1E5FC92100292757 /* SGPLFGLContext.m */; };
@@ -812,6 +1093,7 @@
 		9C590D581E603D6000DE7172 /* SGPLFScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPLFScreen.m; sourceTree = "<group>"; };
 		9C590D5D1E60411C00DE7172 /* SGPLFDisplayLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFDisplayLink.h; sourceTree = "<group>"; };
 		9C590D5E1E60411C00DE7172 /* SGPLFDisplayLink.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPLFDisplayLink.m; sourceTree = "<group>"; };
+		9C590E821E60449000DE7172 /* SGPlayer_macOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = SGPlayer_macOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C64D84E1E5FC92100292757 /* SGPLFGLContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFGLContext.h; sourceTree = "<group>"; };
 		9C64D84F1E5FC92100292757 /* SGPLFGLContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPLFGLContext.m; sourceTree = "<group>"; };
 		9C64D8501E5FC92100292757 /* SGPLFGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFGLView.h; sourceTree = "<group>"; };
@@ -893,6 +1175,23 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		9C590D8F1E60449000DE7172 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C590D901E60449000DE7172 /* libssl.a in Frameworks */,
+				9C590D911E60449000DE7172 /* libswresample.a in Frameworks */,
+				9C590D921E60449000DE7172 /* libavutil.a in Frameworks */,
+				9C590D931E60449000DE7172 /* libavfilter.a in Frameworks */,
+				9C590D941E60449000DE7172 /* AVFoundation.framework in Frameworks */,
+				9C590D951E60449000DE7172 /* libavdevice.a in Frameworks */,
+				9C590D961E60449000DE7172 /* libswscale.a in Frameworks */,
+				9C590D971E60449000DE7172 /* libavformat.a in Frameworks */,
+				9C590D981E60449000DE7172 /* libavcodec.a in Frameworks */,
+				9C590D991E60449000DE7172 /* libcrypto.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9C7C70EB1DF9020A0098E2E7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1430,6 +1729,7 @@
 			children = (
 				9CA476251DE531FE00B1B0D1 /* SGMediaKit.framework */,
 				9C7C70EF1DF9020A0098E2E7 /* SGPlayer.framework */,
+				9C590E821E60449000DE7172 /* SGPlayer_macOS.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1529,6 +1829,241 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		9C590D9A1E60449000DE7172 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C590E861E6045B200DE7172 /* SGPlayerHeader_macOS.h in Headers */,
+				9C590D9B1E60449000DE7172 /* SGPLFDisplayLink.h in Headers */,
+				9C590D9C1E60449000DE7172 /* SGPLFScreen.h in Headers */,
+				9C590D9E1E60449000DE7172 /* SGPLFColor.h in Headers */,
+				9C590D9F1E60449000DE7172 /* SGPLFImage.h in Headers */,
+				9C590DA01E60449000DE7172 /* SGPLFView.h in Headers */,
+				9C590DA11E60449000DE7172 /* SGPLFObject.h in Headers */,
+				9C590DA21E60449000DE7172 /* SGPLFMacro.h in Headers */,
+				9C590DA31E60449000DE7172 /* SGPlayer.h in Headers */,
+				9C590DA41E60449000DE7172 /* ssl2.h in Headers */,
+				9C590DA51E60449000DE7172 /* frame.h in Headers */,
+				9C590E891E6045F800DE7172 /* SGMacAudioDevice.h in Headers */,
+				9C590E8A1E6045F800DE7172 /* SGMacAudioSession.h in Headers */,
+				9C590DA61E60449000DE7172 /* SGPlayerAction.h in Headers */,
+				9C590DA71E60449000DE7172 /* avfft.h in Headers */,
+				9C590DA81E60449000DE7172 /* hwcontext_qsv.h in Headers */,
+				9C590DA91E60449000DE7172 /* timecode.h in Headers */,
+				9C590DAA1E60449000DE7172 /* tls1.h in Headers */,
+				9C590DAB1E60449000DE7172 /* version.h in Headers */,
+				9C590DAC1E60449000DE7172 /* buffer.h in Headers */,
+				9C590DAD1E60449000DE7172 /* evp.h in Headers */,
+				9C590DAE1E60449000DE7172 /* sha.h in Headers */,
+				9C590DAF1E60449000DE7172 /* log.h in Headers */,
+				9C590DB01E60449000DE7172 /* random_seed.h in Headers */,
+				9C590DB11E60449000DE7172 /* version.h in Headers */,
+				9C590DB21E60449000DE7172 /* videotoolbox.h in Headers */,
+				9C590DB31E60449000DE7172 /* SGDisplayView.h in Headers */,
+				9C590DB41E60449000DE7172 /* dsa.h in Headers */,
+				9C590DB51E60449000DE7172 /* bio.h in Headers */,
+				9C590DB61E60449000DE7172 /* twofish.h in Headers */,
+				9C590DB71E60449000DE7172 /* engine.h in Headers */,
+				9C590DB81E60449000DE7172 /* SGFFAudioFrame.h in Headers */,
+				9C590DB91E60449000DE7172 /* crypto.h in Headers */,
+				9C590DBA1E60449000DE7172 /* mem.h in Headers */,
+				9C590DBB1E60449000DE7172 /* mdc2.h in Headers */,
+				9C590DBC1E60449000DE7172 /* time.h in Headers */,
+				9C590DBD1E60449000DE7172 /* md5.h in Headers */,
+				9C590DBE1E60449000DE7172 /* asn1.h in Headers */,
+				9C590DBF1E60449000DE7172 /* ssl23.h in Headers */,
+				9C590DC01E60449000DE7172 /* vorbis_parser.h in Headers */,
+				9C590DC11E60449000DE7172 /* err.h in Headers */,
+				9C590DC21E60449000DE7172 /* ecdh.h in Headers */,
+				9C590DC31E60449000DE7172 /* dirac.h in Headers */,
+				9C590DC41E60449000DE7172 /* motion_vector.h in Headers */,
+				9C590DC51E60449000DE7172 /* macros.h in Headers */,
+				9C590DC61E60449000DE7172 /* fifo.h in Headers */,
+				9C590DC71E60449000DE7172 /* file.h in Headers */,
+				9C590DC81E60449000DE7172 /* x509v3.h in Headers */,
+				9C590DC91E60449000DE7172 /* stack.h in Headers */,
+				9C590DCA1E60449000DE7172 /* version.h in Headers */,
+				9C590DCB1E60449000DE7172 /* symhacks.h in Headers */,
+				9C590DCC1E60449000DE7172 /* aes.h in Headers */,
+				9C590DCD1E60449000DE7172 /* avutil.h in Headers */,
+				9C590DCE1E60449000DE7172 /* conf_api.h in Headers */,
+				9C590DCF1E60449000DE7172 /* SGPLFGLContext.h in Headers */,
+				9C590DD01E60449000DE7172 /* qsv.h in Headers */,
+				9C590DD11E60449000DE7172 /* sha512.h in Headers */,
+				9C590DD21E60449000DE7172 /* replaygain.h in Headers */,
+				9C590DD31E60449000DE7172 /* krb5_asn.h in Headers */,
+				9C590DD41E60449000DE7172 /* cpu.h in Headers */,
+				9C590DD51E60449000DE7172 /* asn1t.h in Headers */,
+				9C590DD61E60449000DE7172 /* SGFFFrameQueue.h in Headers */,
+				9C590DD71E60449000DE7172 /* e_os2.h in Headers */,
+				9C590DD81E60449000DE7172 /* bswap.h in Headers */,
+				9C590DD91E60449000DE7172 /* ffversion.h in Headers */,
+				9C590DDA1E60449000DE7172 /* sha.h in Headers */,
+				9C590DDB1E60449000DE7172 /* camellia.h in Headers */,
+				9C590DDC1E60449000DE7172 /* ec.h in Headers */,
+				9C590DDD1E60449000DE7172 /* hwcontext.h in Headers */,
+				9C590DDE1E60449000DE7172 /* SGFFTools.h in Headers */,
+				9C590DDF1E60449000DE7172 /* kssl.h in Headers */,
+				9C590DE01E60449000DE7172 /* pqueue.h in Headers */,
+				9C590DE11E60449000DE7172 /* version.h in Headers */,
+				9C590DE21E60449000DE7172 /* buffer.h in Headers */,
+				9C590DE31E60449000DE7172 /* lzo.h in Headers */,
+				9C590DE41E60449000DE7172 /* avdct.h in Headers */,
+				9C590DE51E60449000DE7172 /* avfiltergraph.h in Headers */,
+				9C590DE61E60449000DE7172 /* SGFFVideoToolBox.h in Headers */,
+				9C590DE71E60449000DE7172 /* crc.h in Headers */,
+				9C590DE81E60449000DE7172 /* cmac.h in Headers */,
+				9C590DE91E60449000DE7172 /* avdevice.h in Headers */,
+				9C590DEA1E60449000DE7172 /* SGFFFormatContext.h in Headers */,
+				9C590DEB1E60449000DE7172 /* avio.h in Headers */,
+				9C590DEC1E60449000DE7172 /* SGAudioManager.h in Headers */,
+				9C590DED1E60449000DE7172 /* tea.h in Headers */,
+				9C590DEE1E60449000DE7172 /* ts.h in Headers */,
+				9C590DEF1E60449000DE7172 /* obj_mac.h in Headers */,
+				9C590DF01E60449000DE7172 /* swresample.h in Headers */,
+				9C590DF11E60449000DE7172 /* seed.h in Headers */,
+				9C590DF21E60449000DE7172 /* SGGLAVProgram.h in Headers */,
+				9C590DF31E60449000DE7172 /* ocsp.h in Headers */,
+				9C590DF41E60449000DE7172 /* lfg.h in Headers */,
+				9C590DF51E60449000DE7172 /* version.h in Headers */,
+				9C590DF61E60449000DE7172 /* SGPlayer+DisplayView.h in Headers */,
+				9C590DF71E60449000DE7172 /* dxva2.h in Headers */,
+				9C590DF81E60449000DE7172 /* avfilter.h in Headers */,
+				9C590DF91E60449000DE7172 /* bn.h in Headers */,
+				9C590DFA1E60449000DE7172 /* avstring.h in Headers */,
+				9C590DFB1E60449000DE7172 /* hwcontext_cuda.h in Headers */,
+				9C590DFC1E60449000DE7172 /* whrlpool.h in Headers */,
+				9C590DFD1E60449000DE7172 /* SGGLProgram.h in Headers */,
+				9C590DFE1E60449000DE7172 /* SGGLFFProgram.h in Headers */,
+				9C590DFF1E60449000DE7172 /* SGFFDecoder.h in Headers */,
+				9C590E001E60449000DE7172 /* common.h in Headers */,
+				9C590E011E60449000DE7172 /* parseutils.h in Headers */,
+				9C590E021E60449000DE7172 /* conf.h in Headers */,
+				9C590E031E60449000DE7172 /* swscale.h in Headers */,
+				9C590E041E60449000DE7172 /* version.h in Headers */,
+				9C590E051E60449000DE7172 /* hmac.h in Headers */,
+				9C590E061E60449000DE7172 /* md5.h in Headers */,
+				9C590E071E60449000DE7172 /* buffersink.h in Headers */,
+				9C590E081E60449000DE7172 /* audio_fifo.h in Headers */,
+				9C590E091E60449000DE7172 /* des_old.h in Headers */,
+				9C590E0A1E60449000DE7172 /* SGFFVideoDecoder.h in Headers */,
+				9C590E0B1E60449000DE7172 /* asn1_mac.h in Headers */,
+				9C590E0C1E60449000DE7172 /* hwcontext_dxva2.h in Headers */,
+				9C590E0D1E60449000DE7172 /* camellia.h in Headers */,
+				9C590E0E1E60449000DE7172 /* objects.h in Headers */,
+				9C590E0F1E60449000DE7172 /* threadmessage.h in Headers */,
+				9C590E101E60449000DE7172 /* rsa.h in Headers */,
+				9C590E111E60449000DE7172 /* SGPlayerDecoder.h in Headers */,
+				9C590E121E60449000DE7172 /* mediacodec.h in Headers */,
+				9C590E131E60449000DE7172 /* SGPLFGLView.h in Headers */,
+				9C590E141E60449000DE7172 /* SGDistortionModel.h in Headers */,
+				9C590E151E60449000DE7172 /* mathematics.h in Headers */,
+				9C590E161E60449000DE7172 /* rc4.h in Headers */,
+				9C590E171E60449000DE7172 /* pem2.h in Headers */,
+				9C590E181E60449000DE7172 /* des.h in Headers */,
+				9C590E191E60449000DE7172 /* vdpau.h in Headers */,
+				9C590E1A1E60449000DE7172 /* xtea.h in Headers */,
+				9C590E1B1E60449000DE7172 /* aes.h in Headers */,
+				9C590E1C1E60449000DE7172 /* vda.h in Headers */,
+				9C590E1D1E60449000DE7172 /* hmac.h in Headers */,
+				9C590E1E1E60449000DE7172 /* opt.h in Headers */,
+				9C590E1F1E60449000DE7172 /* SGGLView.h in Headers */,
+				9C590E201E60449000DE7172 /* rand.h in Headers */,
+				9C590E211E60449000DE7172 /* imgutils.h in Headers */,
+				9C590E221E60449000DE7172 /* pem.h in Headers */,
+				9C590E231E60449000DE7172 /* vaapi.h in Headers */,
+				9C590E241E60449000DE7172 /* SGFFPlayer.h in Headers */,
+				9C590E251E60449000DE7172 /* SGFFAudioDecoder.h in Headers */,
+				9C590E261E60449000DE7172 /* avassert.h in Headers */,
+				9C590E271E60449000DE7172 /* SGFFFrame.h in Headers */,
+				9C590E281E60449000DE7172 /* md4.h in Headers */,
+				9C590E291E60449000DE7172 /* des.h in Headers */,
+				9C590E2A1E60449000DE7172 /* avconfig.h in Headers */,
+				9C590E2B1E60449000DE7172 /* ssl3.h in Headers */,
+				9C590E2C1E60449000DE7172 /* buffersrc.h in Headers */,
+				9C590E2D1E60449000DE7172 /* bprint.h in Headers */,
+				9C590E2E1E60449000DE7172 /* downmix_info.h in Headers */,
+				9C590E2F1E60449000DE7172 /* blowfish.h in Headers */,
+				9C590E301E60449000DE7172 /* error.h in Headers */,
+				9C590E311E60449000DE7172 /* xvmc.h in Headers */,
+				9C590E321E60449000DE7172 /* version.h in Headers */,
+				9C590E331E60449000DE7172 /* attributes.h in Headers */,
+				9C590E341E60449000DE7172 /* opensslconf.h in Headers */,
+				9C590E351E60449000DE7172 /* display.h in Headers */,
+				9C590E361E60449000DE7172 /* pkcs12.h in Headers */,
+				9C590E371E60449000DE7172 /* hwcontext_vaapi.h in Headers */,
+				9C590E381E60449000DE7172 /* intfloat.h in Headers */,
+				9C590E391E60449000DE7172 /* SGFFPacketQueue.h in Headers */,
+				9C590E3A1E60449000DE7172 /* intreadwrite.h in Headers */,
+				9C590E3B1E60449000DE7172 /* dso.h in Headers */,
+				9C590E3C1E60449000DE7172 /* rc2.h in Headers */,
+				9C590E3D1E60449000DE7172 /* jni.h in Headers */,
+				9C590E3E1E60449000DE7172 /* SGGLAVView.h in Headers */,
+				9C590E3F1E60449000DE7172 /* hash.h in Headers */,
+				9C590E401E60449000DE7172 /* channel_layout.h in Headers */,
+				9C590E411E60449000DE7172 /* d3d11va.h in Headers */,
+				9C590E421E60449000DE7172 /* srtp.h in Headers */,
+				9C590E431E60449000DE7172 /* modes.h in Headers */,
+				9C590E441E60449000DE7172 /* comp.h in Headers */,
+				9C590E451E60449000DE7172 /* hwcontext_vdpau.h in Headers */,
+				9C590E461E60449000DE7172 /* safestack.h in Headers */,
+				9C590E471E60449000DE7172 /* murmur3.h in Headers */,
+				9C590E481E60449000DE7172 /* ssl.h in Headers */,
+				9C590E491E60449000DE7172 /* stereo3d.h in Headers */,
+				9C590E4A1E60449000DE7172 /* pixdesc.h in Headers */,
+				9C590E4B1E60449000DE7172 /* blowfish.h in Headers */,
+				9C590E4C1E60449000DE7172 /* ui_compat.h in Headers */,
+				9C590E4E1E60449000DE7172 /* dv_profile.h in Headers */,
+				9C590E4F1E60449000DE7172 /* ossl_typ.h in Headers */,
+				9C590E501E60449000DE7172 /* aes_ctr.h in Headers */,
+				9C590E511E60449000DE7172 /* SGPlayerNotification.h in Headers */,
+				9C590E521E60449000DE7172 /* samplefmt.h in Headers */,
+				9C590E531E60449000DE7172 /* ui.h in Headers */,
+				9C590E541E60449000DE7172 /* ebcdic.h in Headers */,
+				9C590E551E60449000DE7172 /* mastering_display_metadata.h in Headers */,
+				9C590E561E60449000DE7172 /* base64.h in Headers */,
+				9C590E571E60449000DE7172 /* dtls1.h in Headers */,
+				9C590E581E60449000DE7172 /* ripemd.h in Headers */,
+				9C590E591E60449000DE7172 /* srp.h in Headers */,
+				9C590E5A1E60449000DE7172 /* pixelutils.h in Headers */,
+				9C590E5B1E60449000DE7172 /* cms.h in Headers */,
+				9C590E5C1E60449000DE7172 /* txt_db.h in Headers */,
+				9C590E5D1E60449000DE7172 /* tree.h in Headers */,
+				9C590E5E1E60449000DE7172 /* idea.h in Headers */,
+				9C590E5F1E60449000DE7172 /* x509.h in Headers */,
+				9C590E601E60449000DE7172 /* opensslv.h in Headers */,
+				9C590E611E60449000DE7172 /* dict.h in Headers */,
+				9C590E621E60449000DE7172 /* rc4.h in Headers */,
+				9C590E631E60449000DE7172 /* SGAVPlayer.h in Headers */,
+				9C590E641E60449000DE7172 /* SGPLFOpenGL.h in Headers */,
+				9C590E651E60449000DE7172 /* avformat.h in Headers */,
+				9C590E661E60449000DE7172 /* SGFFVideoFrame.h in Headers */,
+				9C590E671E60449000DE7172 /* ecdsa.h in Headers */,
+				9C590E681E60449000DE7172 /* SGGLNormalModel.h in Headers */,
+				9C590E691E60449000DE7172 /* SGGLVRModel.h in Headers */,
+				9C590E6A1E60449000DE7172 /* cast.h in Headers */,
+				9C590E6B1E60449000DE7172 /* ripemd.h in Headers */,
+				9C590E6C1E60449000DE7172 /* rational.h in Headers */,
+				9C590E6D1E60449000DE7172 /* x509_vfy.h in Headers */,
+				9C590E6E1E60449000DE7172 /* SGMatrix.h in Headers */,
+				9C590E6F1E60449000DE7172 /* SGPlayerMacro.h in Headers */,
+				9C590E701E60449000DE7172 /* SGFingerRotation.h in Headers */,
+				9C590E711E60449000DE7172 /* dh.h in Headers */,
+				9C590E721E60449000DE7172 /* adler32.h in Headers */,
+				9C590E731E60449000DE7172 /* cast5.h in Headers */,
+				9C590E741E60449000DE7172 /* pkcs7.h in Headers */,
+				9C590E751E60449000DE7172 /* SGGLAVTexture.h in Headers */,
+				9C590E761E60449000DE7172 /* SGGLModel.h in Headers */,
+				9C590E771E60449000DE7172 /* pixfmt.h in Headers */,
+				9C590E781E60449000DE7172 /* SGDistortionRenderer.h in Headers */,
+				9C590E791E60449000DE7172 /* SGGLFFView.h in Headers */,
+				9C590E7A1E60449000DE7172 /* avcodec.h in Headers */,
+				9C590E7B1E60449000DE7172 /* timestamp.h in Headers */,
+				9C590E7C1E60449000DE7172 /* eval.h in Headers */,
+				9C590E7D1E60449000DE7172 /* lhash.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9C7C70EC1DF9020A0098E2E7 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -2005,6 +2540,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		9C590D631E60449000DE7172 /* SGPlayer_macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9C590E7F1E60449000DE7172 /* Build configuration list for PBXNativeTarget "SGPlayer_macOS" */;
+			buildPhases = (
+				9C590D641E60449000DE7172 /* Sources */,
+				9C590D8F1E60449000DE7172 /* Frameworks */,
+				9C590D9A1E60449000DE7172 /* Headers */,
+				9C590E7E1E60449000DE7172 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SGPlayer_macOS;
+			productName = SGPlayer;
+			productReference = 9C590E821E60449000DE7172 /* SGPlayer_macOS.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		9C7C70EE1DF9020A0098E2E7 /* SGPlayer */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9C7C70F61DF9020A0098E2E7 /* Build configuration list for PBXNativeTarget "SGPlayer" */;
@@ -2050,6 +2603,9 @@
 				LastUpgradeCheck = 0810;
 				ORGANIZATIONNAME = single;
 				TargetAttributes = {
+					9C590D631E60449000DE7172 = {
+						DevelopmentTeam = 79WDBYQ4TC;
+					};
 					9C7C70EE1DF9020A0098E2E7 = {
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = 79WDBYQ4TC;
@@ -2076,11 +2632,19 @@
 			targets = (
 				9CA476241DE531FE00B1B0D1 /* SGMediaKit */,
 				9C7C70EE1DF9020A0098E2E7 /* SGPlayer */,
+				9C590D631E60449000DE7172 /* SGPlayer_macOS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		9C590E7E1E60449000DE7172 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9C7C70ED1DF9020A0098E2E7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2098,6 +2662,56 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		9C590D641E60449000DE7172 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C590E8B1E60460700DE7172 /* SGMacAudioDevice.m in Sources */,
+				9C590E8C1E60460700DE7172 /* SGMacAudioSession.m in Sources */,
+				9C590D651E60449000DE7172 /* SGPlayerNotification.m in Sources */,
+				9C590D661E60449000DE7172 /* SGFFDecoder.m in Sources */,
+				9C590D671E60449000DE7172 /* SGFFFrameQueue.m in Sources */,
+				9C590D681E60449000DE7172 /* SGPLFGLContext.m in Sources */,
+				9C590D691E60449000DE7172 /* SGPlayer+DisplayView.m in Sources */,
+				9C590D6A1E60449000DE7172 /* SGGLFFProgram.m in Sources */,
+				9C590D6B1E60449000DE7172 /* SGPLFGLView.m in Sources */,
+				9C590D6C1E60449000DE7172 /* SGFFPlayer.m in Sources */,
+				9C590D6D1E60449000DE7172 /* SGGLAVView.m in Sources */,
+				9C590D6E1E60449000DE7172 /* SGGLProgram.m in Sources */,
+				9C590D6F1E60449000DE7172 /* SGFFVideoFrame.m in Sources */,
+				9C590D701E60449000DE7172 /* SGDistortionRenderer.m in Sources */,
+				9C590D711E60449000DE7172 /* SGPlayer.m in Sources */,
+				9C590D721E60449000DE7172 /* SGFFAudioDecoder.m in Sources */,
+				9C590D731E60449000DE7172 /* SGFFFormatContext.m in Sources */,
+				9C590D741E60449000DE7172 /* SGFFVideoToolBox.m in Sources */,
+				9C590D751E60449000DE7172 /* SGGLView.m in Sources */,
+				9C590D761E60449000DE7172 /* SGFingerRotation.m in Sources */,
+				9C590D771E60449000DE7172 /* SGFFAudioFrame.m in Sources */,
+				9C590D781E60449000DE7172 /* SGGLNormalModel.m in Sources */,
+				9C590D791E60449000DE7172 /* SGPlayerDecoder.m in Sources */,
+				9C590D7A1E60449000DE7172 /* SGPLFImage.m in Sources */,
+				9C590D7B1E60449000DE7172 /* SGMatrix.m in Sources */,
+				9C590D7C1E60449000DE7172 /* SGAVPlayer.m in Sources */,
+				9C590D7D1E60449000DE7172 /* SGGLAVProgram.m in Sources */,
+				9C590D7E1E60449000DE7172 /* SGPLFScreen.m in Sources */,
+				9C590D7F1E60449000DE7172 /* SGGLModel.m in Sources */,
+				9C590D801E60449000DE7172 /* SGGLFFView.m in Sources */,
+				9C590D811E60449000DE7172 /* SGGLVRModel.m in Sources */,
+				9C590D821E60449000DE7172 /* SGPLFView.m in Sources */,
+				9C590D831E60449000DE7172 /* SGPlayerAction.m in Sources */,
+				9C590D841E60449000DE7172 /* SGDisplayView.m in Sources */,
+				9C590D861E60449000DE7172 /* SGFFVideoDecoder.m in Sources */,
+				9C590D871E60449000DE7172 /* SGAudioManager.m in Sources */,
+				9C590D881E60449000DE7172 /* SGPLFColor.m in Sources */,
+				9C590D891E60449000DE7172 /* SGFFPacketQueue.m in Sources */,
+				9C590D8A1E60449000DE7172 /* SGFFFrame.m in Sources */,
+				9C590D8B1E60449000DE7172 /* SGFFTools.m in Sources */,
+				9C590D8C1E60449000DE7172 /* SGDistortionModel.m in Sources */,
+				9C590D8D1E60449000DE7172 /* SGGLAVTexture.m in Sources */,
+				9C590D8E1E60449000DE7172 /* SGPLFDisplayLink.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		9C7C70EA1DF9020A0098E2E7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -2206,6 +2820,62 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		9C590E801E60449000DE7172 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 79WDBYQ4TC;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/include\"";
+				INFOPLIST_FILE = SGPlayer/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/lib\"",
+					"$(PROJECT_DIR)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/lib",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "$(PROJECT_DIR)/SGPlayer/module_macOS.modulemap";
+				PRODUCT_BUNDLE_IDENTIFIER = com.single.SGPlayer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		9C590E811E60449000DE7172 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = 79WDBYQ4TC;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/include\"";
+				INFOPLIST_FILE = SGPlayer/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/lib\"",
+					"$(PROJECT_DIR)/SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/lib",
+				);
+				MACH_O_TYPE = staticlib;
+				MODULEMAP_FILE = "$(PROJECT_DIR)/SGPlayer/module_macOS.modulemap";
+				PRODUCT_BUNDLE_IDENTIFIER = com.single.SGPlayer;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		9C7C70F41DF9020A0098E2E7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2413,6 +3083,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		9C590E7F1E60449000DE7172 /* Build configuration list for PBXNativeTarget "SGPlayer_macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C590E801E60449000DE7172 /* Debug */,
+				9C590E811E60449000DE7172 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		9C7C70F61DF9020A0098E2E7 /* Build configuration list for PBXNativeTarget "SGPlayer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
