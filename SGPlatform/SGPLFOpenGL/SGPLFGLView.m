@@ -12,6 +12,10 @@
 
 @implementation SGPLFGLView
 
+- (SGPLFImage *)snapshot
+{
+    return nil;
+}
 
 @end
 

@@ -10,6 +10,7 @@
 
 #import <GLKit/GLKit.h>
 #import "SGPLFGLContext.h"
+#import "SGPLFImage.h"
 
 #if SGPLATFORM_TARGET_OS_IPHONE
 
@@ -34,6 +35,8 @@ typedef GLKView SGPLFGLView;
 @interface SGPLFGLView : NSView
 
 @property (nonatomic, strong) SGPLFGLContext * context;
+
+- (SGPLFImage *)snapshot;
 
 @end
 
