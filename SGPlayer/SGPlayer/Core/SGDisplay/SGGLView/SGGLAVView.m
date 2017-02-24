@@ -13,7 +13,7 @@
 
 @interface SGGLAVView ()
 
-@property (nonatomic, strong) CADisplayLink * displayLink;
+@property (nonatomic, strong) SGPLFDisplayLink * displayLink;
 @property (nonatomic, strong) SGGLAVProgram * program;
 @property (nonatomic, strong) SGGLAVTexture * texture;
 
@@ -37,7 +37,7 @@
 
 - (void)setupSubClass
 {
-    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(displayLinkAction)];
+    self.displayLink = [SGPLFDisplayLink displayLinkWithTarget:self selector:@selector(displayLinkAction)];
     [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     self.displayLink.paused = NO;
 }
