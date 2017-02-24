@@ -59,6 +59,7 @@
         const int frameHeight = frame.height;
         * aspect = (frameWidth * 1.0) / (frameHeight * 1.0);
         
+#if SGPLATFORM_TARGET_OS_IPHONE
         glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
         
         const int widths[3]  = {
@@ -90,6 +91,7 @@
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
+#endif
     }
     else if ([self.videoFrame isKindOfClass:[SGFFCVYUVVideoFrame class]])
     {
