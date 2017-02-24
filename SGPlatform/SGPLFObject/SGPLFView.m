@@ -16,11 +16,21 @@ void SGPLFViewSetBackgroundColor(SGPLFView * view, SGPLFColor * color)
     view.layer.backgroundColor = color.CGColor;
 }
 
+void SGPLFViewInsertSubview(SGPLFView * superView, SGPLFView * subView, NSInteger index)
+{
+    
+}
+
 #elif SGPLATFORM_TARGET_OS_IPHONE
 
 void SGPLFViewSetBackgroundColor(SGPLFView * view, SGPLFColor * color)
 {
     view.backgroundColor = color;
+}
+
+void SGPLFViewInsertSubview(SGPLFView * superView, SGPLFView * subView, NSInteger index)
+{
+    [superView insertSubview:subView atIndex:index];
 }
 
 #endif

@@ -73,13 +73,14 @@
             if (!self.avplayerView) {
                 self.avplayerView = [SGGLAVView viewWithDisplayView:self];
                 [self insertSubview:self.avplayerView atIndex:0];
+                SGPLFViewInsertSubview(self, self.avplayerView, 0);
             }
             break;
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
             if (!self.ffplayerView) {
                 self.ffplayerView = [SGGLFFView viewWithDisplayView:self];
-                [self insertSubview:self.ffplayerView atIndex:0];
+                SGPLFViewInsertSubview(self, self.ffplayerView, 0);
             }
             break;
     }
