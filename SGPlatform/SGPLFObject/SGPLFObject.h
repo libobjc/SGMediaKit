@@ -14,5 +14,6 @@
 #import "SGPLFView.h"
 #import "SGPLFImage.h"
 #import "SGPLFColor.h"
+#import "SGPLFScreen.h"
 
 #endif /* SGPLFObject_h */

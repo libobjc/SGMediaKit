@@ -452,6 +452,10 @@
 		9C56BD121E4DB01800F5201F /* libswresample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB991E4DB01800F5201F /* libswresample.a */; };
 		9C56BD131E4DB01800F5201F /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB9A1E4DB01800F5201F /* libswscale.a */; };
 		9C56BD141E4DB01800F5201F /* libswscale.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9C56BB9A1E4DB01800F5201F /* libswscale.a */; };
+		9C590D591E603D6000DE7172 /* SGPLFScreen.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C590D571E603D6000DE7172 /* SGPLFScreen.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590D5A1E603D6000DE7172 /* SGPLFScreen.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C590D571E603D6000DE7172 /* SGPLFScreen.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		9C590D5B1E603D6000DE7172 /* SGPLFScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C590D581E603D6000DE7172 /* SGPLFScreen.m */; };
+		9C590D5C1E603D6000DE7172 /* SGPLFScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C590D581E603D6000DE7172 /* SGPLFScreen.m */; };
 		9C64D8521E5FC92100292757 /* SGPLFGLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D84E1E5FC92100292757 /* SGPLFGLContext.h */; };
 		9C64D8531E5FC92100292757 /* SGPLFGLContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 9C64D84E1E5FC92100292757 /* SGPLFGLContext.h */; };
 		9C64D8541E5FC92100292757 /* SGPLFGLContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 9C64D84F1E5FC92100292757 /* SGPLFGLContext.m */; };
@@ -800,6 +804,8 @@
 		9C56BB991E4DB01800F5201F /* libswresample.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswresample.a; sourceTree = "<group>"; };
 		9C56BB9A1E4DB01800F5201F /* libswscale.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libswscale.a; sourceTree = "<group>"; };
 		9C590D521E60300A00DE7172 /* SGPlayerHeader_macOS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPlayerHeader_macOS.h; sourceTree = "<group>"; };
+		9C590D571E603D6000DE7172 /* SGPLFScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFScreen.h; sourceTree = "<group>"; };
+		9C590D581E603D6000DE7172 /* SGPLFScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPLFScreen.m; sourceTree = "<group>"; };
 		9C64D84E1E5FC92100292757 /* SGPLFGLContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFGLContext.h; sourceTree = "<group>"; };
 		9C64D84F1E5FC92100292757 /* SGPLFGLContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SGPLFGLContext.m; sourceTree = "<group>"; };
 		9C64D8501E5FC92100292757 /* SGPLFGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SGPLFGLView.h; sourceTree = "<group>"; };
@@ -1288,6 +1294,8 @@
 				9C64D8951E5FD9C800292757 /* SGPLFImage.m */,
 				9C64D89A1E5FDCB900292757 /* SGPLFColor.h */,
 				9C64D89B1E5FDCB900292757 /* SGPLFColor.m */,
+				9C590D571E603D6000DE7172 /* SGPLFScreen.h */,
+				9C590D581E603D6000DE7172 /* SGPLFScreen.m */,
 			);
 			path = SGPLFObject;
 			sourceTree = "<group>";
@@ -1517,6 +1525,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C590D5A1E603D6000DE7172 /* SGPLFScreen.h in Headers */,
 				9C7C716F1DF909440098E2E7 /* SGPlayerHeader.h in Headers */,
 				9C64D89D1E5FDCB900292757 /* SGPLFColor.h in Headers */,
 				9C64D8971E5FD9C800292757 /* SGPLFImage.h in Headers */,
@@ -1749,6 +1758,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9C590D591E603D6000DE7172 /* SGPLFScreen.h in Headers */,
 				9C64D89C1E5FDCB900292757 /* SGPLFColor.h in Headers */,
 				9C64D8961E5FD9C800292757 /* SGPLFImage.h in Headers */,
 				9C64D8871E5FD84800292757 /* SGPLFView.h in Headers */,
@@ -2107,6 +2117,7 @@
 				9C6E6D801E2CC8D7003D62D5 /* SGMatrix.m in Sources */,
 				9C7C71331DF904180098E2E7 /* SGAVPlayer.m in Sources */,
 				9C2161D71E2CDCBC005FAF08 /* SGGLAVProgram.m in Sources */,
+				9C590D5C1E603D6000DE7172 /* SGPLFScreen.m in Sources */,
 				9C2161C71E2CD99C005FAF08 /* SGGLModel.m in Sources */,
 				9C2161B21E2CD929005FAF08 /* SGGLFFView.m in Sources */,
 				9CE4184F1E2DB390009BCFB6 /* SGGLVRModel.m in Sources */,
@@ -2149,6 +2160,7 @@
 				9CA2D9141DEBE35700AEC8A9 /* SGAudioConfiguration.m in Sources */,
 				9C97CBF01E5167E9000EB943 /* SGPlayerAction.m in Sources */,
 				9C7C71441DF904180098E2E7 /* SGPlayer.m in Sources */,
+				9C590D5B1E603D6000DE7172 /* SGPLFScreen.m in Sources */,
 				9CEC9A8A1E233A6D00657B35 /* SGAudioManager.m in Sources */,
 				9C8820CC1E2735B000EBEA93 /* SGDisplayView.m in Sources */,
 				9C779AA91E56D3580069FD57 /* SGFFAudioFrame.m in Sources */,
