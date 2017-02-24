@@ -12,6 +12,21 @@
 
 @implementation SGPLFDisplayLink
 
++ (SGPLFDisplayLink *)displayLinkWithTarget:(id)target selector:(SEL)selector
+{
+    return nil;
+}
+
+- (void)addToRunLoop:(NSRunLoop *)runloop forMode:(NSRunLoopMode)mode
+{
+    
+}
+
+- (void)invalidate
+{
+    
+}
+
 @end
 
 #endif

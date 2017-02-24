@@ -14,6 +14,13 @@
 
 @interface SGPLFDisplayLink : NSObject
 
++ (SGPLFDisplayLink *)displayLinkWithTarget:(id)target selector:(SEL)sel;
+
+@property (nonatomic, assign) BOOL paused;
+
+- (void)addToRunLoop:(NSRunLoop *)runloop forMode:(NSRunLoopMode)mode;
+- (void)invalidate;
+
 @end
 
 #elif SGPLATFORM_TARGET_OS_IPHONE
