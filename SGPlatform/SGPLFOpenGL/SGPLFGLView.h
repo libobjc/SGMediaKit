@@ -35,6 +35,7 @@ typedef GLKView SGPLFGLView;
 @interface SGPLFGLView : NSView
 
 @property (nonatomic, strong) SGPLFGLContext * context;
+@property (nonatomic, weak) id <SGPLFGLViewDelegate> delegate;
 
 - (SGPLFImage *)snapshot;
 - (void)bindDrawable;
