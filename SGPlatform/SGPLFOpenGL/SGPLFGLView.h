@@ -12,15 +12,7 @@
 #import "SGPLFGLContext.h"
 #import "SGPLFImage.h"
 
-#if SGPLATFORM_TARGET_OS_IPHONE
-
-typedef GLKView SGPLFGLView;
-
-@protocol SGPLFGLViewDelegate <GLKViewDelegate>
-
-@end
-
-#elif SGPLATFORM_TARGET_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC
 
 #import <Cocoa/Cocoa.h>
 
@@ -42,4 +34,14 @@ typedef GLKView SGPLFGLView;
 
 @end
 
+#elif SGPLATFORM_TARGET_OS_IPHONE
+
+typedef GLKView SGPLFGLView;
+
+@protocol SGPLFGLViewDelegate <GLKViewDelegate>
+
+@end
+
 #endif
+
+void SGPLFGLViewDisplay(SGPLFGLView * view);

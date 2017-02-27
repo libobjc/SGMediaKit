@@ -116,7 +116,7 @@
 #if SGPLATFORM_TARGET_OS_IPHONE
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) return;
 #endif
-    [self display];
+    SGPLFGLViewDisplay(self);
 }
 
 - (void)cleanEmptyBuffer

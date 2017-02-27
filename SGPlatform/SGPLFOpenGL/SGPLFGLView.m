@@ -22,6 +22,23 @@
     
 }
 
+- (void)glDisplay
+{
+    NSLog(@"%s", __func__);
+}
+
 @end
+
+void SGPLFGLViewDisplay(SGPLFGLView * view)
+{
+    [view glDisplay];
+}
+
+#elif SGPLATFORM_TARGET_OS_IPHONE
+
+void SGPLFGLViewDisplay(SGPLFGLView * view)
+{
+    [view display];
+}
 
 #endif
