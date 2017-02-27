@@ -231,19 +231,25 @@
 
 #if SGPLATFORM_TARGET_OS_MAC
 
+static BOOL mouse_dragged = NO;
+
 - (void)mouseDragged:(NSEvent *)event
 {
     NSLog(@"%s", __func__);
+    mouse_dragged = YES;
 }
 
 - (void)mouseUp:(NSEvent *)event
 {
-    NSLog(@"%s", __func__);
+    if (!mouse_dragged && self.abstractPlayer.viewTapAction) {
+        self.abstractPlayer.viewTapAction(self.abstractPlayer, self.abstractPlayer.view);
+    }
+    mouse_dragged = NO;
 }
 
 - (void)mouseDown:(NSEvent *)event
 {
-    NSLog(@"%s", __func__);
+    mouse_dragged = NO;
 }
 
 - (void)macOS_updateFrameAction:(NSNotification *)notification
