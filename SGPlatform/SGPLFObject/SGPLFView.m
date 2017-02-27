@@ -18,7 +18,16 @@ void SGPLFViewSetBackgroundColor(SGPLFView * view, SGPLFColor * color)
 
 void SGPLFViewInsertSubview(SGPLFView * superView, SGPLFView * subView, NSInteger index)
 {
-    
+    __block BOOL added = NO;
+    [superView.subviews enumerateObjectsUsingBlock:^(__kindof NSView * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if (index <= idx) {
+            [superView addSubview:subView positioned:NSWindowBelow relativeTo:obj];
+            added = YES;
+        }
+    }];
+    if (!added) {
+        [superView addSubview:subView];
+    }
 }
 
 #elif SGPLATFORM_TARGET_OS_IPHONE
