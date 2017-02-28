@@ -25,6 +25,7 @@ static const char vertexShaderString[] = SG_GLES_STRINGIZE
  }
  );
 
+#if SGPLATFORM_TARGET_OS_MAC
 static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 (
  uniform sampler2D SamplerY;
@@ -45,8 +46,8 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
      gl_FragColor = vec4(r , g, b, 1.0);
  }
  );
-
-static const char mac_fragmentShaderString[] = SG_GLES_STRINGIZE
+#elif SGPLATFORM_TARGET_OS_IPHONE
+static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 (
  uniform sampler2D SamplerY;
  uniform sampler2D SamplerU;
@@ -66,18 +67,14 @@ static const char mac_fragmentShaderString[] = SG_GLES_STRINGIZE
      gl_FragColor = vec4(r , g, b, 1.0);
  }
  );
+#endif
 
 @implementation SGGLFFProgram
 
 + (instancetype)program
 {
-#if SGPLATFORM_TARGET_OS_MAC
-    return [self programWithVertexShader:[NSString stringWithUTF8String:vertexShaderString]
-                          fragmentShader:[NSString stringWithUTF8String:mac_fragmentShaderString]];
-#elif SGPLATFORM_TARGET_OS_IPHONE
     return [self programWithVertexShader:[NSString stringWithUTF8String:vertexShaderString]
                           fragmentShader:[NSString stringWithUTF8String:fragmentShaderString]];
-#endif
 }
 
 - (void)bindVariable

@@ -25,6 +25,7 @@ static const char vertexShaderString[] = SG_GLES_STRINGIZE
  }
  );
 
+#if SGPLATFORM_TARGET_OS_MAC
 static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 (
  precision mediump float;
@@ -47,8 +48,8 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
      gl_FragColor = vec4(rgb, 1);
  }
  );
-
-static const char mac_fragmentShaderString[] = SG_GLES_STRINGIZE
+#elif SGPLATFORM_TARGET_OS_IPHONE
+static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 (
  precision mediump float;
  
@@ -70,6 +71,7 @@ static const char mac_fragmentShaderString[] = SG_GLES_STRINGIZE
      gl_FragColor = vec4(rgb, 1);
  }
  );
+#endif
 
 @interface SGGLAVProgram ()
 
@@ -79,13 +81,8 @@ static const char mac_fragmentShaderString[] = SG_GLES_STRINGIZE
 
 + (instancetype)program
 {
-#if SGPLATFORM_TARGET_OS_MAC
-    return [self programWithVertexShader:[NSString stringWithUTF8String:vertexShaderString]
-                          fragmentShader:[NSString stringWithUTF8String:mac_fragmentShaderString]];
-#elif SGPLATFORM_TARGET_OS_IPHONE
     return [self programWithVertexShader:[NSString stringWithUTF8String:vertexShaderString]
                           fragmentShader:[NSString stringWithUTF8String:fragmentShaderString]];
-#endif
 }
 
 - (void)bindVariable
