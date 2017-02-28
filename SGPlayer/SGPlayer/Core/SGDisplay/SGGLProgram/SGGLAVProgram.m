@@ -7,6 +7,7 @@
 //
 
 #import "SGGLAVProgram.h"
+#import "SGPLFMacro.h"
 
 #define SG_GLES_STRINGIZE(x) #x
 
@@ -47,6 +48,29 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
  }
  );
 
+static const char mac_fragmentShaderString[] = SG_GLES_STRINGIZE
+(
+ precision mediump float;
+ 
+ uniform sampler2D SamplerY;
+ uniform sampler2D SamplerUV;
+ uniform mat3 colorConversionMatrix;
+ varying mediump vec2 v_textureCoord;
+ 
+ void main()
+ {
+     mediump vec3 yuv;
+     lowp vec3 rgb;
+     
+     yuv.x = texture2D(SamplerY, v_textureCoord).r - (16.0/255.0);
+     yuv.yz = texture2D(SamplerUV, v_textureCoord).rg - vec2(0.5, 0.5);
+     
+     rgb = colorConversionMatrix * yuv;
+     
+     gl_FragColor = vec4(rgb, 1);
+ }
+ );
+
 @interface SGGLAVProgram ()
 
 @end
@@ -55,8 +79,13 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 
 + (instancetype)program
 {
+#if SGPLATFORM_TARGET_OS_MAC
+    return [self programWithVertexShader:[NSString stringWithUTF8String:vertexShaderString]
+                          fragmentShader:[NSString stringWithUTF8String:mac_fragmentShaderString]];
+#elif SGPLATFORM_TARGET_OS_IPHONE
     return [self programWithVertexShader:[NSString stringWithUTF8String:vertexShaderString]
                           fragmentShader:[NSString stringWithUTF8String:fragmentShaderString]];
+#endif
 }
 
 - (void)bindVariable
