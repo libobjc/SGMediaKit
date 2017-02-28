@@ -6,7 +6,7 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
-#import <GLKit/GLKit.h>
+#import "SGPLFOpenGL.h"
 
 @interface SGGLProgram : NSObject
 
