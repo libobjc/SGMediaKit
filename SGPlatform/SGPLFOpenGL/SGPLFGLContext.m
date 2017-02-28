@@ -12,7 +12,14 @@
 
 SGPLFGLContext * SGPLFGLContextAllocInit()
 {
-    return [[NSOpenGLContext alloc] init];
+    NSOpenGLPixelFormatAttribute pixelFormatAttributes[] = {
+        NSOpenGLPFADoubleBuffer,
+        NSOpenGLPFAAccelerated, 0,
+        0
+    };
+    
+    NSOpenGLPixelFormat * pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:pixelFormatAttributes];
+    return [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
 }
 
 void SGPLGLContextSetCurrentContext(SGPLFGLContext * context)

@@ -11,6 +11,7 @@
 #if SGPLATFORM_TARGET_OS_MAC
 
 #import <Cocoa/Cocoa.h>
+#import <OpenGL/OpenGL.h>
 
 typedef NSOpenGLContext SGPLFGLContext;
 
