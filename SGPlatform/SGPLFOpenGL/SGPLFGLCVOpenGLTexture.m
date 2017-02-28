@@ -16,7 +16,7 @@ CV_EXPORT CVReturn SGPLFGLCVOpenGLTextureCacheCreate(SGPLFGLContext * context, S
     CVReturn result = CVOpenGLTextureCacheCreate(
                                                  kCFAllocatorDefault,
                                                  NULL,
-                                                 (__bridge void *)context,
+                                                 [context CGLContextObj],
                                                  [pixelFormat CGLPixelFormatObj],
                                                  NULL,
                                                  cacheRef
