@@ -8,27 +8,32 @@
 
 #import "SGPLFGLContext.h"
 
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_MAC
 
-SGPLFGLContext * SGPLFGLContext_Alloc_Init()
+SGPLFGLContext * SGPLFGLContextAllocInit()
+{
+    return [[NSOpenGLContext alloc] init];
+}
+
+void SGPLGLContextSetCurrentContext(SGPLFGLContext * context)
+{
+    if (context) {
+        [context makeCurrentContext];
+    } else {
+        [NSOpenGLContext clearCurrentContext];
+    }
+}
+
+#elif SGPLATFORM_TARGET_OS_IPHONE
+
+SGPLFGLContext * SGPLFGLContextAllocInit()
 {
     return [[SGPLFGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
 }
 
-#elif SGPLATFORM_TARGET_OS_MAC
-
-SGPLFGLContext * SGPLFGLContext_Alloc_Init()
+void SGPLGLContextSetCurrentContext(SGPLFGLContext * context)
 {
-    return [[SGPLFGLContext alloc] init];
+    [EAGLContext setCurrentContext:context];
 }
-
-@implementation SGPLFGLContext
-
-+ (void)setCurrentContext:(SGPLFGLContext *)context
-{
-    
-}
-
-@end
 
 #endif

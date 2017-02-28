@@ -14,7 +14,7 @@
 #import "SGMatrix.h"
 #import "SGDistortionRenderer.h"
 
-@interface SGGLView () <SGPLFGLViewDelegate>
+@interface SGGLView ()
 
 @property (nonatomic, assign) BOOL setupToken;
 @property (nonatomic, weak) SGDisplayView * displayView;
@@ -92,9 +92,9 @@
     self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     self.contentScaleFactor = [UIScreen mainScreen].scale;
 #endif
-    self.delegate = self;
-    self.context = SGPLFGLContext_Alloc_Init();
-    [SGPLFGLContext setCurrentContext:self.context];
+    SGPLFGLContext * context = SGPLFGLContextAllocInit();
+    SGPLFGLViewSetContext(self, context);
+    SGPLGLContextSetCurrentContext(context);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 }
 
@@ -116,7 +116,9 @@
 #if SGPLATFORM_TARGET_OS_IPHONE
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) return;
 #endif
-    SGPLFGLViewDisplay(self);
+    SGPLFGLViewPrepareOpenGL(self);
+    [self drawOpenGL];
+    SGPLFGLViewFlushBuffer(self);
 }
 
 - (void)cleanEmptyBuffer
@@ -125,15 +127,8 @@
     [self displayAsyncOnMainThread];
 }
 
-- (void)glkView:(SGPLFGLView *)view drawInRect:(CGRect)rect
+- (void)drawOpenGL
 {
-    [self render];
-}
-
-- (void)render
-{
-    [SGPLFGLContext setCurrentContext:self.context];
-    
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -226,7 +221,7 @@
     }
     
     if (videoType == SGVideoTypeVR && displayMode == SGDisplayModeBox) {
-        [self bindDrawable];
+        SGPLFGLViewBindFrameBuffer(self);
         [self.distorionRenderer afterDrawFrame];
     }
 }
@@ -249,7 +244,7 @@
 
 - (void)dealloc
 {
-    [SGPLFGLContext setCurrentContext:nil];
+    SGPLGLContextSetCurrentContext(nil);
     SGPlayerLog(@"%@ release", self.class);
 }
 

@@ -60,7 +60,7 @@
 - (SGGLAVTexture *)texture
 {
     if (!_texture) {
-        _texture = [[SGGLAVTexture alloc] initWithContext:self.context];
+        _texture = [[SGGLAVTexture alloc] initWithContext:SGPLFGLViewGetContext(self)];
     }
     return _texture;
 }

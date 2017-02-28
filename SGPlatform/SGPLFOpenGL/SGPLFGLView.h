@@ -8,7 +8,6 @@
 
 #import "SGPLFMacro.h"
 
-#import <GLKit/GLKit.h>
 #import "SGPLFGLContext.h"
 #import "SGPLFImage.h"
 
@@ -16,32 +15,21 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class SGPLFGLView;
-
-@protocol SGPLFGLViewDelegate <NSObject>
-
-- (void)glkView:(SGPLFGLView *)view drawInRect:(CGRect)rect;
-
-@end
-
-@interface SGPLFGLView : NSView
-
-@property (nonatomic, strong) SGPLFGLContext * context;
-@property (nonatomic, weak) id <SGPLFGLViewDelegate> delegate;
-
-- (SGPLFImage *)snapshot;
-- (void)bindDrawable;
-
-@end
+typedef NSOpenGLView SGPLFGLView;
 
 #elif SGPLATFORM_TARGET_OS_IPHONE
 
+#import <GLKit/GLKit.h>
+
 typedef GLKView SGPLFGLView;
-
-@protocol SGPLFGLViewDelegate <GLKViewDelegate>
-
-@end
 
 #endif
 
-void SGPLFGLViewDisplay(SGPLFGLView * view);
+void SGPLFGLViewPrepareOpenGL(SGPLFGLView * view);
+void SGPLFGLViewFlushBuffer(SGPLFGLView * view);
+void SGPLFGLViewBindFrameBuffer(SGPLFGLView * view);
+
+void SGPLFGLViewSetContext(SGPLFGLView * view, SGPLFGLContext * context);
+SGPLFGLContext * SGPLFGLViewGetContext(SGPLFGLView * view);
+
+SGPLFImage * SGPLFGLViewGetCurrentSnapshot(SGPLFGLView * view);

@@ -10,35 +10,72 @@
 
 #if SGPLATFORM_TARGET_OS_MAC
 
-@implementation SGPLFGLView
-
-- (SGPLFImage *)snapshot
-{
-    return nil;
-}
-
-- (void)bindDrawable
+void SGPLFGLViewBindFrameBuffer(SGPLFGLView * view)
 {
     
 }
 
-- (void)glDisplay
+void SGPLFGLViewPrepareOpenGL(SGPLFGLView * view)
 {
-    NSLog(@"%s", __func__);
+    SGPLFGLContext * context = SGPLFGLViewGetContext(view);
+    SGPLGLContextSetCurrentContext(context);
 }
 
-@end
-
-void SGPLFGLViewDisplay(SGPLFGLView * view)
+void SGPLFGLViewFlushBuffer(SGPLFGLView * view)
 {
-    [view glDisplay];
+    [view.openGLContext flushBuffer];
+}
+
+void SGPLFGLViewSetContext(SGPLFGLView * view, SGPLFGLContext * context)
+{
+    view.openGLContext = context;
+}
+
+SGPLFGLContext * SGPLFGLViewGetContext(SGPLFGLView * view)
+{
+    return view.openGLContext;
+}
+
+SGPLFImage * SGPLFGLViewGetCurrentSnapshot(SGPLFGLView * view)
+{
+    return nil;
 }
 
 #elif SGPLATFORM_TARGET_OS_IPHONE
 
-void SGPLFGLViewDisplay(SGPLFGLView * view)
+void SGPLFGLViewBindFrameBuffer(SGPLFGLView * view)
 {
-    [view display];
+    [view bindDrawable];
+}
+
+void SGPLFGLViewPrepareOpenGL(SGPLFGLView * view)
+{
+    SGPLFGLContext * context = SGPLFGLViewGetContext(view);
+    SGPLGLContextSetCurrentContext(context);
+}
+
+void SGPLFGLViewFlushBuffer(SGPLFGLView * view)
+{
+    if (view.enableSetNeedsDisplay) {
+        [view setNeedsDisplay];
+    } else {
+        [view display];
+    }
+}
+
+void SGPLFGLViewSetContext(SGPLFGLView * view, SGPLFGLContext * context)
+{
+    view.context = context;
+}
+
+SGPLFGLContext * SGPLFGLViewGetContext(SGPLFGLView * view)
+{
+    return view.context;
+}
+
+SGPLFImage * SGPLFGLViewGetCurrentSnapshot(SGPLFGLView * view)
+{
+    return view.snapshot;
 }
 
 #endif

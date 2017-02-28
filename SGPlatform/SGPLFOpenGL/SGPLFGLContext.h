@@ -8,20 +8,19 @@
 
 #import "SGPLFMacro.h"
 
-#import <GLKit/GLKit.h>
+#if SGPLATFORM_TARGET_OS_MAC
 
-#if SGPLATFORM_TARGET_OS_IPHONE
+#import <Cocoa/Cocoa.h>
+
+typedef NSOpenGLContext SGPLFGLContext;
+
+#elif SGPLATFORM_TARGET_OS_IPHONE
+
+#import <GLKit/GLKit.h>
 
 typedef EAGLContext SGPLFGLContext;
 
-#elif SGPLATFORM_TARGET_OS_MAC
-
-@interface SGPLFGLContext : NSObject
-
-+ (void)setCurrentContext:(SGPLFGLContext *)context;
-
-@end
-
 #endif
 
-SGPLFGLContext * SGPLFGLContext_Alloc_Init();
+SGPLFGLContext * SGPLFGLContextAllocInit();
+void SGPLGLContextSetCurrentContext(SGPLFGLContext * context);

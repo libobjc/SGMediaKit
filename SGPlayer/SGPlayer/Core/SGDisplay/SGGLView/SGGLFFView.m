@@ -119,7 +119,7 @@
 - (void)setupCVPixelBuffer
 {
     if (!self.cvSetupToken) {
-        self.cvTexture = [[SGGLAVTexture alloc] initWithContext:self.context];
+        self.cvTexture = [[SGGLAVTexture alloc] initWithContext:SGPLFGLViewGetContext(self)];
         self.cvProgram = [SGGLAVProgram program];
         self.cvSetupToken = YES;
     }
