@@ -19,7 +19,7 @@ CV_EXPORT CVReturn SGPLFGLCVOpenGLTextureCacheCreate(SGPLFGLContext * context, S
                                                  (__bridge void *)context,
                                                  [pixelFormat CGLPixelFormatObj],
                                                  NULL,
-                                                 &cacheRef
+                                                 cacheRef
                                                  );
     return result;
 }
