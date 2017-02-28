@@ -10,6 +10,11 @@
 
 #if SGPLATFORM_TARGET_OS_MAC
 
+NSOpenGLPixelFormat * SGPLFGLContextGetPixelFormat(SGPLFGLContext * context)
+{
+    return context.pixelFormat;
+}
+
 SGPLFGLContext * SGPLFGLContextAllocInit()
 {
     NSOpenGLPixelFormatAttribute pixelFormatAttributes[] = {

@@ -15,6 +15,8 @@
 
 typedef NSOpenGLContext SGPLFGLContext;
 
+NSOpenGLPixelFormat * SGPLFGLContextGetPixelFormat(SGPLFGLContext * context);
+
 #elif SGPLATFORM_TARGET_OS_IPHONE
 
 #import <GLKit/GLKit.h>
