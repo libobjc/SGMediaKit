@@ -129,7 +129,13 @@
 - (void)cleanEmptyBuffer
 {
     [self cleanTexture];
-    [self displayAsyncOnMainThread];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        SGPLFGLViewPrepareOpenGL(self);
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+        SGPLFGLViewFlushBuffer(self);
+    });
 }
 
 - (void)drawOpenGL
