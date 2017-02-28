@@ -80,7 +80,7 @@
     // Y-plane
     glActiveTexture(GL_TEXTURE0);
 #if SGPLATFORM_TARGET_OS_MAC
-    
+    result = CVOpenGLTextureCacheCreateTextureFromImage(kCFAllocatorDefault, self.videoTextureCache, pixelBuffer, NULL, &_lumaTexture);
 #elif SGPLATFORM_TARGET_OS_IPHONE
     result = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
                                                           self.videoTextureCache,
@@ -95,7 +95,7 @@
                                                           0,
                                                           &_lumaTexture);
 #endif
-    if (result) {
+    if (result != kCVReturnSuccess) {
         SGPlayerLog(@"create CVOpenGLESTextureCacheCreateTextureFromImage failure 1 %d", result);
     }
     
@@ -108,7 +108,7 @@
     // UV-plane.
     glActiveTexture(GL_TEXTURE1);
 #if SGPLATFORM_TARGET_OS_MAC
-    
+    result = CVOpenGLTextureCacheCreateTextureFromImage(kCFAllocatorDefault, self.videoTextureCache, pixelBuffer, NULL, &_chromaTexture);
 #elif SGPLATFORM_TARGET_OS_IPHONE
     result = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
                                                           self.videoTextureCache,
@@ -123,7 +123,7 @@
                                                           1,
                                                           &_chromaTexture);
 #endif
-    if (result) {
+    if (result != kCVReturnSuccess) {
         SGPlayerLog(@"create CVOpenGLESTextureCacheCreateTextureFromImage failure 2 %d", result);
     }
     
