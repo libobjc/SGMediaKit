@@ -22,7 +22,10 @@
 @property (nonatomic, strong) SGGLNormalModel * normalModel;
 @property (nonatomic, strong) SGGLVRModel * vrModel;
 @property (nonatomic, strong) SGMatrix * matrix;
+
+#if SGPLATFORM_TARGET_OS_IPHONE
 @property (nonatomic, strong) SGDistortionRenderer * distorionRenderer;
+#endif
 
 @end
 
@@ -65,7 +68,9 @@
         [self setup];
         self.setupToken = YES;
     }
+#if SGPLATFORM_TARGET_OS_IPHONE
     self.distorionRenderer.viewportSize = [self pixelSize];
+#endif
 }
 
 - (CGSize)pixelSize
@@ -136,9 +141,11 @@
     SGDisplayMode displayMode = self.displayView.abstractPlayer.displayMode;
     SGGravityMode gravityMode = self.displayView.abstractPlayer.viewGravityMode;
     
+#if SGPLATFORM_TARGET_OS_IPHONE
     if (videoType == SGVideoTypeVR && displayMode == SGDisplayModeBox) {
         [self.distorionRenderer beforDrawFrame];
     }
+#endif
 
     CGFloat aspect = 16.0/9.0;
     BOOL success = [self updateTextureAspect:&aspect];
@@ -220,10 +227,12 @@
             break;
     }
     
+#if SGPLATFORM_TARGET_OS_IPHONE
     if (videoType == SGVideoTypeVR && displayMode == SGDisplayModeBox) {
         SGPLFGLViewBindFrameBuffer(self);
         [self.distorionRenderer afterDrawFrame];
     }
+#endif
 }
 
 - (SGMatrix *)matrix
@@ -234,6 +243,7 @@
     return _matrix;
 }
 
+#if SGPLATFORM_TARGET_OS_IPHONE
 - (SGDistortionRenderer *)distorionRenderer
 {
     if (!_distorionRenderer) {
@@ -241,6 +251,7 @@
     }
     return _distorionRenderer;
 }
+#endif
 
 - (void)dealloc
 {
