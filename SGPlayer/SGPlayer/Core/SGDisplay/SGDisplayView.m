@@ -235,8 +235,26 @@ static BOOL mouse_dragged = NO;
 
 - (void)mouseDragged:(NSEvent *)event
 {
-    NSLog(@"%s", __func__);
     mouse_dragged = YES;
+    switch (self.rendererType) {
+        case SGDisplayRendererTypeEmpty:
+        case SGDisplayRendererTypeAVPlayerLayer:
+            return;
+        default:
+        {
+            float m = 0.005;
+            if (self.bounds.size.width > 700) {
+                m = 0.003;
+            }
+            float distanceX = event.deltaX;
+            float distanceY = event.deltaY;
+            distanceX *= m;
+            distanceY *= m;
+            self.fingerRotation.x += distanceY *  [SGFingerRotation degress] / 100;
+            self.fingerRotation.y -= distanceX *  [SGFingerRotation degress] / 100;
+        }
+            break;
+    }
 }
 
 - (void)mouseUp:(NSEvent *)event
