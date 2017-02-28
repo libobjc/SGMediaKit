@@ -8,25 +8,15 @@
 
 #import "SGGLAVTexture.h"
 #import "SGPlayerMacro.h"
-
-#if SGPLATFORM_TARGET_OS_MAC
-
-#elif SGPLATFORM_TARGET_OS_IPHONE
-#import <OpenGLES/ES2/gl.h>
-#import <OpenGLES/ES2/glext.h>
-#endif
+#import "SGPLFGLCVOpenGLTexture.h"
 
 @interface SGGLAVTexture ()
 
 @property (nonatomic, strong) SGPLFGLContext * context;
 
-#if SGPLATFORM_TARGET_OS_MAC
-
-#elif SGPLATFORM_TARGET_OS_IPHONE
-@property (nonatomic, assign) CVOpenGLESTextureRef lumaTexture;
-@property (nonatomic, assign) CVOpenGLESTextureRef chromaTexture;
-@property (nonatomic, assign) CVOpenGLESTextureCacheRef videoTextureCache;
-#endif
+@property (nonatomic, assign) SGPLFGLCVOpenGLTextureRef lumaTexture;
+@property (nonatomic, assign) SGPLFGLCVOpenGLTextureRef chromaTexture;
+@property (nonatomic, assign) SGPLFGLCVOpenGLTextureCacheRef videoTextureCache;
 
 @property (nonatomic, assign) CGFloat textureAspect;
 
@@ -45,33 +35,28 @@
 
 - (void)setupVideoCache
 {
-#if SGPLATFORM_TARGET_OS_MAC
-    
-#elif SGPLATFORM_TARGET_OS_IPHONE
-    if (!self.videoTextureCache) {
-        CVReturn result = CVOpenGLESTextureCacheCreate(kCFAllocatorDefault, NULL, self.context, NULL, &_videoTextureCache);
-        if (result != noErr) {
-            SGPlayerLog(@"create CVOpenGLESTextureCacheCreate failure %d", result);
+    if (!self.videoTextureCache)
+    {
+        CVReturn result = SGPLFGLCVOpenGLTextureCacheCreate(self.context, &_videoTextureCache);
+        if (result != noErr)
+        {
+            SGPlayerLog(@"create CVOpenGLTextureCacheCreate failure %d", result);
             return;
         }
     }
-#endif
 }
 
 - (void)updateTextureWithPixelBuffer:(CVPixelBufferRef)pixelBuffer aspect:(CGFloat *)aspect needRelease:(BOOL)needRelease
 {
-#if SGPLATFORM_TARGET_OS_MAC
-    
-#elif SGPLATFORM_TARGET_OS_IPHONE
     if (pixelBuffer == nil) {
         if (self.lumaTexture) {
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(CVOpenGLESTextureGetTarget(self.lumaTexture), CVOpenGLESTextureGetName(self.lumaTexture));
+            glBindTexture(SGPLFGLCVOpenGLTextureGetTarget(self.lumaTexture), SGPLFGLCVOpenGLTextureGetName(self.lumaTexture));
             * aspect = self.textureAspect;
         }
         if (self.chromaTexture) {
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(CVOpenGLESTextureGetTarget(self.chromaTexture), CVOpenGLESTextureGetName(self.chromaTexture));
+            glBindTexture(SGPLFGLCVOpenGLTextureGetTarget(self.chromaTexture), SGPLFGLCVOpenGLTextureGetName(self.chromaTexture));
             * aspect = self.textureAspect;
         }
         return;
@@ -91,8 +76,12 @@
     
     [self cleanTextures];
     
+    
     // Y-plane
     glActiveTexture(GL_TEXTURE0);
+#if SGPLATFORM_TARGET_OS_MAC
+    
+#elif SGPLATFORM_TARGET_OS_IPHONE
     result = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
                                                           self.videoTextureCache,
                                                           pixelBuffer,
@@ -105,11 +94,12 @@
                                                           GL_UNSIGNED_BYTE,
                                                           0,
                                                           &_lumaTexture);
+#endif
     if (result) {
         SGPlayerLog(@"create CVOpenGLESTextureCacheCreateTextureFromImage failure 1 %d", result);
     }
     
-    glBindTexture(CVOpenGLESTextureGetTarget(self.lumaTexture), CVOpenGLESTextureGetName(self.lumaTexture));
+    glBindTexture(SGPLFGLCVOpenGLTextureGetTarget(self.lumaTexture), SGPLFGLCVOpenGLTextureGetName(self.lumaTexture));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -117,6 +107,9 @@
     
     // UV-plane.
     glActiveTexture(GL_TEXTURE1);
+#if SGPLATFORM_TARGET_OS_MAC
+    
+#elif SGPLATFORM_TARGET_OS_IPHONE
     result = CVOpenGLESTextureCacheCreateTextureFromImage(kCFAllocatorDefault,
                                                           self.videoTextureCache,
                                                           pixelBuffer,
@@ -129,11 +122,12 @@
                                                           GL_UNSIGNED_BYTE,
                                                           1,
                                                           &_chromaTexture);
+#endif
     if (result) {
         SGPlayerLog(@"create CVOpenGLESTextureCacheCreateTextureFromImage failure 2 %d", result);
     }
     
-    glBindTexture(CVOpenGLESTextureGetTarget(self.chromaTexture), CVOpenGLESTextureGetName(self.chromaTexture));
+    glBindTexture(SGPLFGLCVOpenGLTextureGetTarget(self.chromaTexture), SGPLFGLCVOpenGLTextureGetName(self.chromaTexture));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -144,7 +138,6 @@
     }
     
     _hasTexture = YES;
-#endif
 }
 
 - (void)dealloc
@@ -157,19 +150,14 @@
 
 - (void)clearVideoCache
 {
-#if SGPLATFORM_TARGET_OS_MAC
-    
-#elif SGPLATFORM_TARGET_OS_IPHONE
-    CFRelease(_videoTextureCache);
-    self.videoTextureCache = nil;
-#endif
+    if (_videoTextureCache) {
+        CFRelease(_videoTextureCache);
+        self.videoTextureCache = nil;
+    }
 }
 
 - (void)cleanTextures
 {
-#if SGPLATFORM_TARGET_OS_MAC
-    
-#elif SGPLATFORM_TARGET_OS_IPHONE
     if (self.lumaTexture) {
         CFRelease(_lumaTexture);
         self.lumaTexture = NULL;
@@ -181,8 +169,7 @@
     }
     
     self.textureAspect = 16.0 / 9.0;
-    CVOpenGLESTextureCacheFlush(_videoTextureCache, 0);
-#endif
+    SGPLFGLCVOpenGLTextureCacheFlush(_videoTextureCache, 0);
 }
 
 @end
