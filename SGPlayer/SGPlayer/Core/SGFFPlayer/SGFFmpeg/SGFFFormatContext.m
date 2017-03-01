@@ -196,7 +196,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
             if (!error) {
                 self.audioStreamIndex = index;
                 self.audioEnable = YES;
-                self.audioTimebase = sg_ff_get_timebase(_format_context->streams[self.audioStreamIndex], 0.000025);
+                self.audioTimebase = SGFFStreamGetTimebase(_format_context->streams[self.audioStreamIndex], 0.000025);
                 self->_audio_codec_context = codec_context;
                 break;
             }
