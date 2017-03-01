@@ -50,26 +50,24 @@
         return;
     }
     
-    GLsizei textureWidth = (GLsizei)CVPixelBufferGetWidth(pixelBuffer);
-    GLsizei textureHeight = (GLsizei)CVPixelBufferGetHeight(pixelBuffer);
-    self.textureAspect = (textureWidth * 1.0) / (textureHeight * 1.0);
-    * aspect = self.textureAspect;
-    
     CVPixelBufferLockBaseAddress(pixelBuffer, kCVPixelBufferLock_ReadOnly);
     
     void * data_y = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 0);
-    size_t linesize_y = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0);
-    size_t width_y = CVPixelBufferGetWidthOfPlane(pixelBuffer, 0);
-    size_t height_y = CVPixelBufferGetHeightOfPlane(pixelBuffer, 0);
+    int linesize_y = (int)CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 0);
+    int width_y = (int)CVPixelBufferGetWidthOfPlane(pixelBuffer, 0);
+    int height_y = (int)CVPixelBufferGetHeightOfPlane(pixelBuffer, 0);
+    
+    self.textureAspect = (width_y * 1.0) / (height_y * 1.0);
+    * aspect = self.textureAspect;
     
     void * data_uv = CVPixelBufferGetBaseAddressOfPlane(pixelBuffer, 1);
-    size_t linesize_uv = CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1);
-    size_t width_uv = CVPixelBufferGetWidthOfPlane(pixelBuffer, 1);
-    size_t height_uv = CVPixelBufferGetHeightOfPlane(pixelBuffer, 1);
+    int linesize_uv = (int)CVPixelBufferGetBytesPerRowOfPlane(pixelBuffer, 1);
+    int width_uv = (int)CVPixelBufferGetWidthOfPlane(pixelBuffer, 1);
+    int height_uv = (int)CVPixelBufferGetHeightOfPlane(pixelBuffer, 1);
     
-    void * real_y;
+    UInt8 * real_y;
     convert_Y(data_y, linesize_y, width_y, height_y, &real_y);
-    void * real_uv;
+    UInt8 * real_uv;
     convert_UV(data_uv, linesize_uv, width_uv, height_uv, &real_uv);
     
     glActiveTexture(GL_TEXTURE0);
