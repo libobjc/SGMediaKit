@@ -28,9 +28,19 @@
 
 @implementation SGGLAVTexture
 
+static UInt8 * texture_data_y = NULL;
+static UInt8 * texture_data_uv = NULL;
+static size_t texture_datasize_y = 4096 * 2160;
+static size_t texture_datasize_uv = 2048 * 1080 * 2;
+
 - (instancetype)initWithContext:(SGPLFGLContext *)context
 {
     if (self = [super init]) {
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            texture_data_y = malloc(texture_datasize_y);
+            texture_data_uv = malloc(texture_datasize_uv);
+        });
         glGenTextures(1, &_texture_y_id);
         glGenTextures(1, &_texture_uv_id);
     }
@@ -65,14 +75,12 @@
     int width_uv = (int)CVPixelBufferGetWidthOfPlane(pixelBuffer, 1);
     int height_uv = (int)CVPixelBufferGetHeightOfPlane(pixelBuffer, 1);
     
-    UInt8 * real_y;
-    convert_Y(data_y, linesize_y, width_y, height_y, &real_y);
-    UInt8 * real_uv;
-    convert_UV(data_uv, linesize_uv, width_uv, height_uv, &real_uv);
+    convert(data_y, linesize_y, width_y, height_y, texture_data_y, texture_datasize_y, 1);
+    convert(data_uv, linesize_uv, width_uv, height_uv, texture_data_uv, texture_datasize_uv, 2);
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, _texture_y_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width_y, height_y, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, real_y);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width_y, height_y, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, texture_data_y);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -81,7 +89,7 @@
     
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, _texture_uv_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, width_uv, height_uv, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, real_uv);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, width_uv, height_uv, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, texture_data_uv);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -94,35 +102,18 @@
         CVPixelBufferRelease(pixelBuffer);
     }
     
-    free(real_y);
-    free(real_uv);
-    
     _hasTexture = YES;
     self.didBindTexture = YES;
 }
 
-void convert_Y(UInt8 * src, int linesize, int width, int height, UInt8 ** dst)
+void convert(UInt8 * src, int linesize, int width, int height, UInt8 * dst, size_t dissize, int planesize)
 {
     width = MIN(linesize, width);
-    * dst = malloc(width * height);
-    UInt8 * temp = * dst;
-    memset(* dst, 0, width * height);
+    UInt8 * temp = dst;
+    memset(dst, 0, dissize);
     for (int i = 0; i < height; i++) {
-        memcpy(temp, src, width);
-        temp += width;
-        src += linesize;
-    }
-}
-
-void convert_UV(UInt8 * src, int linesize, int width, int height, UInt8 ** dst)
-{
-    width = MIN(linesize, width);
-    * dst = malloc(width * height * 2);
-    UInt8 * temp = * dst;
-    memset(* dst, 0, width * height * 2);
-    for (int i = 0; i < height; i++) {
-        memcpy(temp, src, width * 2);
-        temp += (width * 2);
+        memcpy(temp, src, width * planesize);
+        temp += (width * planesize);
         src += linesize;
     }
 }
@@ -137,6 +128,9 @@ void convert_UV(UInt8 * src, int linesize, int width, int height, UInt8 ** dst)
         glDeleteTextures(1, &_texture_uv_id);
         _texture_uv_id = 0;
     }
+    
+    memset(texture_data_y, 0, texture_datasize_y);
+    memset(texture_data_uv, 0, texture_datasize_uv);
 }
 
 - (void)dealloc
