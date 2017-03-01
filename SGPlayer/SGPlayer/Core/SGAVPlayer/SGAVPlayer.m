@@ -524,11 +524,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 {
     [self cleanOutput];
     
-#if SGPLATFORM_TARGET_OS_MAC
-    NSDictionary * pixelBuffer = @{(id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_32BGRA)};
-#elif SGPLATFORM_TARGET_OS_IPHONE
     NSDictionary * pixelBuffer = @{(id)kCVPixelBufferPixelFormatTypeKey : @(kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)};
-#endif
     self.avOutput = [[AVPlayerItemVideoOutput alloc] initWithPixelBufferAttributes:pixelBuffer];
     [self.avOutput requestNotificationOfMediaDataChangeWithAdvanceInterval:PixelBufferRequestInterval];
     [self.avPlayerItem addOutput:self.avOutput];

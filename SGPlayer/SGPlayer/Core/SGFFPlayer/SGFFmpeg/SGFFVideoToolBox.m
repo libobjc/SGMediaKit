@@ -86,15 +86,10 @@ typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
             }
             
             CFMutableDictionaryRef destinationPixelBufferAttributes = CFDictionaryCreateMutable(NULL, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-#if SGPLATFORM_TARGET_OS_MAC
-            cf_dict_set_int32(destinationPixelBufferAttributes, kCVPixelBufferPixelFormatTypeKey, kCVPixelFormatType_32BGRA);
-#elif SGPLATFORM_TARGET_OS_IPHONE
             cf_dict_set_int32(destinationPixelBufferAttributes, kCVPixelBufferPixelFormatTypeKey, kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange);
-#endif
             cf_dict_set_int32(destinationPixelBufferAttributes, kCVPixelBufferWidthKey, _codec_context->width);
             cf_dict_set_int32(destinationPixelBufferAttributes, kCVPixelBufferHeightKey, _codec_context->height);
 
-            
 #if SGPLATFORM_TARGET_OS_MAC
 //            cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLCompatibilityKey, YES);
 //            cf_dict_set_boolean(destinationPixelBufferAttributes, kCVPixelBufferOpenGLTextureCacheCompatibilityKey, YES);
