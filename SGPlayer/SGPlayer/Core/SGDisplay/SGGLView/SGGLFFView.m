@@ -10,12 +10,9 @@
 #import "SGGLFFProgram.h"
 #import "SGGLAVProgram.h"
 #import "SGGLAVTexture.h"
+#import "SGPlayerMacro.h"
 
 @interface SGGLFFView ()
-
-{
-    GLuint _avTexture[3];
-}
 
 @property (nonatomic, strong) SGGLAVTexture * cvTexture;
 
@@ -31,6 +28,8 @@
 @end
 
 @implementation SGGLFFView
+
+static GLuint gl_texture_ids[3];
 
 - (void)renderFrame:(__kindof SGFFVideoFrame *)frame
 {
@@ -76,7 +75,7 @@
         for (SGYUVChannel channel = SGYUVChannelLuma; channel < SGYUVChannelCount; channel++)
         {
             glActiveTexture(GL_TEXTURE0 + channel);
-            glBindTexture(GL_TEXTURE_2D, self->_avTexture[channel]);
+            glBindTexture(GL_TEXTURE_2D, gl_texture_ids[channel]);
             glTexImage2D(GL_TEXTURE_2D,
                          0,
                          GL_LUMINANCE,
@@ -109,7 +108,10 @@
 - (void)setupAVFrame
 {
     if (!self.avSetupToken) {
-        glGenTextures(3, self->_avTexture);
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            glGenTextures(3, gl_texture_ids);
+        });
         self.avProgram = [SGGLFFProgram program];
         self.avSetupToken = YES;
     }
@@ -133,14 +135,6 @@
 - (void)cleanTexture
 {
     self.videoFrame = nil;
-}
-
-- (void)dealloc
-{
-    if (self.avSetupToken) {
-        glDeleteTextures(3, self->_avTexture);
-        self.avSetupToken = NO;
-    }
 }
 
 @end
