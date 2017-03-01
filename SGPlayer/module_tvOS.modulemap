@@ -1,0 +1,5 @@
+framework module SGPlayer_tvOS {
+    umbrella header "SGPlayerHeader_tvOS.h"
+    export *
+    module * { export * }
+}

@@ -44,7 +44,7 @@ static OSStatus renderCallback (void * inRefCon,
 
 #if SGPLATFORM_TARGET_OS_MAC
 @property (nonatomic, strong) SGMacAudioSession * audioSession;
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 @property (nonatomic, strong) AVAudioSession * audioSession;
 #endif
 
@@ -72,7 +72,7 @@ static OSStatus renderCallback (void * inRefCon,
         
 #if SGPLATFORM_TARGET_OS_MAC
         self.audioSession = [SGMacAudioSession sharedInstance];
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
         self.audioSession = [AVAudioSession sharedInstance];
         [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(audioSessionInterruptionHandler:) name:AVAudioSessionInterruptionNotification object:nil];
         [[NSNotificationCenter defaultCenter]  addObserver:self selector:@selector(audioSessionRouteChangeHandler:) name:AVAudioSessionRouteChangeNotification object:nil];
@@ -103,7 +103,7 @@ static OSStatus renderCallback (void * inRefCon,
 
 
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 - (void)audioSessionInterruptionHandler:(NSNotification *)notification
 {
@@ -183,7 +183,7 @@ static OSStatus renderCallback (void * inRefCon,
     
 #if SGPLATFORM_TARGET_OS_MAC
     description.componentSubType = kAudioUnitSubType_DefaultOutput;
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     description.componentSubType = kAudioUnitSubType_RemoteIO;
 #endif
     

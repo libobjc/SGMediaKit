@@ -132,7 +132,7 @@ void convert(UInt8 * src, int linesize, int width, int height, UInt8 * dst, size
 
 @end
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>

@@ -118,7 +118,7 @@
     return quality;
 }
 
-#if SGPLATFORM_TARGET_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC_OR_TV
 - (CGSize)pixelsSize
 {
     CGSize size;

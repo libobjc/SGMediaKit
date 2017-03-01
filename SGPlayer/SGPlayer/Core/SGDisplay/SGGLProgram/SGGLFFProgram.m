@@ -46,7 +46,7 @@ static const char fragmentShaderString[] = SG_GLES_STRINGIZE
      gl_FragColor = vec4(r , g, b, 1.0);
  }
  );
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 static const char fragmentShaderString[] = SG_GLES_STRINGIZE
 (
  uniform sampler2D SamplerY;

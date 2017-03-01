@@ -15,7 +15,7 @@
 
 typedef NSView SGPLFView;
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 #import <UIKit/UIKit.h>
 

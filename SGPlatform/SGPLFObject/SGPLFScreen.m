@@ -15,7 +15,7 @@ CGFloat SGPLFScreenGetScale()
     return [NSScreen mainScreen].backingScaleFactor;
 }
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 CGFloat SGPLFScreenGetScale()
 {

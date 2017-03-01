@@ -298,7 +298,7 @@ NSString * const SGVideoCaptureErrorNameRecordCanceled = @"主动取消";
 
 - (void)setupWriter
 {
-#if SGPLATFORM_TARGET_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC_OR_TV
     CGSize size =[self.videoConfiguration pixelsSize];
 #elif SGPLATFORM_TARGET_OS_IPHONE
     CGSize size =[self.videoConfiguration pixelsSize:self.videoCamera.outputImageOrientation];

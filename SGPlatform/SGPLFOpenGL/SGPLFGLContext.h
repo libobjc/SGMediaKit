@@ -19,7 +19,7 @@ typedef NSOpenGLContext SGPLFGLContext;
 
 NSOpenGLPixelFormat * SGPLFGLContextGetPixelFormat(SGPLFGLContext * context);
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 #import <UIKit/UIKit.h>
 #import <OpenGLES/ES2/gl.h>

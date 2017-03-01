@@ -31,7 +31,7 @@ typedef NS_ENUM(NSUInteger, SGVideoSize) {
 @property (nonatomic, assign, readonly) NSUInteger frameRate;
 @property (nonatomic, assign, readonly) NSUInteger bitRate;
 
-#if SGPLATFORM_TARGET_OS_MAC
+#if SGPLATFORM_TARGET_OS_MAC_OR_TV
 - (CGSize)pixelsSize;
 #elif SGPLATFORM_TARGET_OS_IPHONE
 - (CGSize)pixelsSize:(UIInterfaceOrientation)orientation;

@@ -52,7 +52,7 @@
     [self trySetupAndResize];
 }
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 - (void)layoutSubviews
 {
@@ -93,7 +93,7 @@
 
 - (void)setupGLKView
 {
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     self.contentScaleFactor = [UIScreen mainScreen].scale;
 #endif
@@ -118,7 +118,7 @@
 
 - (void)displayIfApplicationActive
 {
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) return;
 #endif
     SGPLFGLViewPrepareOpenGL(self);

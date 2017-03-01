@@ -36,7 +36,7 @@ void SGPLGLContextSetCurrentContext(SGPLFGLContext * context)
     }
 }
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 SGPLFGLContext * SGPLFGLContextAllocInit()
 {

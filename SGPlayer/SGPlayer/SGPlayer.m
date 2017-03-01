@@ -13,7 +13,7 @@
 #import "SGAVPlayer.h"
 #import "SGFFPlayer.h"
 
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 #import "SGAudioManager.h"
 #endif
 
@@ -38,7 +38,7 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
         [self setupNotification];
 #endif
         self.decoder = [SGPlayerDecoder defaultDecoder];
@@ -97,7 +97,7 @@
 
 - (void)play
 {
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     [UIApplication sharedApplication].idleTimerDisabled = YES;
 #endif
     
@@ -115,7 +115,7 @@
 
 - (void)pause
 {
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     [UIApplication sharedApplication].idleTimerDisabled = NO;
 #endif
     
@@ -350,7 +350,7 @@
     }
     [self cleanPlayerView];
     
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     [UIApplication sharedApplication].idleTimerDisabled = NO;
 #endif
     
@@ -370,7 +370,7 @@
     SGPlayerLog(@"SGPlayer release");
     [self cleanPlayer];
 
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [[SGAudioManager manager] removeHandlerTarget:self];
 #endif
@@ -378,7 +378,7 @@
 
 #pragma mark - background mode
 
-#if SGPLATFORM_TARGET_OS_IPHONE
+#if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 - (void)setupNotification
 {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(applicationDidEnterBackground:) name:UIApplicationDidEnterBackgroundNotification object:nil];

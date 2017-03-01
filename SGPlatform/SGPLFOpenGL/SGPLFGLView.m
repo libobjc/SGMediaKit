@@ -41,7 +41,7 @@ SGPLFImage * SGPLFGLViewGetCurrentSnapshot(SGPLFGLView * view)
     return nil;
 }
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 void SGPLFGLViewBindFrameBuffer(SGPLFGLView * view)
 {

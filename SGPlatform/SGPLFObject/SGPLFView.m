@@ -30,7 +30,7 @@ void SGPLFViewInsertSubview(SGPLFView * superView, SGPLFView * subView, NSIntege
     }
 }
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 void SGPLFViewSetBackgroundColor(SGPLFView * view, SGPLFColor * color)
 {

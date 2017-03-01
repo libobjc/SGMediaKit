@@ -15,7 +15,7 @@ SGPLFImage * SGPLFImageWithCGImage(CGImageRef image)
     return [[NSImage alloc] initWithCGImage:image size:CGSizeMake(CGImageGetWidth(image), CGImageGetHeight(image))];
 }
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 SGPLFImage * SGPLFImageWithCGImage(CGImageRef image)
 {

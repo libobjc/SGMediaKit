@@ -107,7 +107,7 @@
 {
 #if SGPLATFORM_TARGET_OS_MAC
     self.avplayerLayer.player = self.sgavplayer.avPlayer;
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     if (self.sgavplayer.avPlayer && [UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
         self.avplayerLayer.player = self.sgavplayer.avPlayer;
     } else {
@@ -218,7 +218,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(macOS_updateFrameAction:) name:NSViewFrameDidChangeNotification object:self];
     
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iOS_applicationDidEnterBackgroundAction:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(iOS_applicationWillEnterForegroundAction:) name:UIApplicationWillEnterForegroundNotification object:nil];
@@ -276,7 +276,7 @@ static BOOL mouse_dragged = NO;
     [self updateDisplayViewLayout:self.bounds];
 }
 
-#elif SGPLATFORM_TARGET_OS_IPHONE
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
 
 - (void)iOS_applicationDidEnterBackgroundAction:(NSNotification *)notification
 {

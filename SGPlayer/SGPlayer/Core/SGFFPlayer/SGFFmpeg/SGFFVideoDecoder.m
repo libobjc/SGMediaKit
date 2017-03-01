@@ -10,7 +10,10 @@
 #import "SGFFPacketQueue.h"
 #import "SGFFFrameQueue.h"
 #import "SGFFTools.h"
+
+#if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
 #import "SGFFVideoToolBox.h"
+#endif
 
 static AVPacket flush_packet;
 
@@ -29,7 +32,9 @@ static AVPacket flush_packet;
 @property (nonatomic, strong) SGFFPacketQueue * packetQueue;
 @property (nonatomic, strong) SGFFFrameQueue * frameQueue;
 
+#if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
 @property (nonatomic, strong) SGFFVideoToolBox * videoToolBox;
+#endif
 
 @end
 
@@ -66,7 +71,9 @@ static AVPacket flush_packet;
         self.packetQueue = [SGFFPacketQueue packetQueueWithTimebase:timebase];
         self.frameQueue = [SGFFFrameQueue frameQueue];
         self.maxDecodeDuration = 2.f;
+#if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
         self.videoToolBoxEnable = YES;
+#endif
     }
     return self;
 }
@@ -173,12 +180,15 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
         if (packet.data == flush_packet.data) {
             SGFFDecodeLog(@"video codec flush");
             avcodec_flush_buffers(_codec_context);
+#if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
             [self.videoToolBox flush];
+#endif
             continue;
         }
         if (packet.stream_index < 0 || packet.data == NULL) continue;
         
         SGFFVideoFrame * videoFrame = nil;
+#if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
         BOOL vtbEnable = NO;
         if (self.videoToolBoxEnable && _codec_context->codec_id == AV_CODEC_ID_H264) {
             vtbEnable = [self.videoToolBox trySetupVTSession];
@@ -189,6 +199,7 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
                 videoFrame = [self videoFrameFromVideoToolBox:packet];
             }
         } else {
+#endif
             int result = avcodec_send_packet(_codec_context, &packet);
             if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
                 self.error = SGFFCheckError(result);
@@ -207,7 +218,9 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
                 }
                 videoFrame = [self videoFrameFromTempFrame];
             }
+#if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
         }
+#endif
         if (videoFrame) {
             [self.frameQueue putSortFrame:videoFrame];
         }
@@ -239,6 +252,7 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
     return videoFrame;
 }
 
+#if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
 - (SGFFVideoFrame *)videoFrameFromVideoToolBox:(AVPacket)packet
 {
     CVImageBufferRef imageBuffer = [self.videoToolBox imageBuffer];
@@ -261,19 +275,20 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
     return videoFrame;
 }
 
-- (void)delegateErrorCallback
-{
-    if (self.error) {
-        [self.delegate videoDecoder:self didError:self.error];
-    }
-}
-
 - (SGFFVideoToolBox *)videoToolBox
 {
     if (!_videoToolBox) {
         _videoToolBox = [SGFFVideoToolBox videoToolBoxWithCodecContext:self->_codec_context];
     }
     return _videoToolBox;
+}
+#endif
+
+- (void)delegateErrorCallback
+{
+    if (self.error) {
+        [self.delegate videoDecoder:self didError:self.error];
+    }
 }
 
 - (void)dealloc
