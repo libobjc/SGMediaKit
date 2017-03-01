@@ -26,36 +26,36 @@ static GLKVector2 texture_buffer_data[] = {
     {0.0, 1.0},
 };
 
+static GLuint vertex_buffer_id = 0;
+static GLuint index_buffer_id = 0;
+static GLuint texture_buffer_id = 0;
+
+static int const index_count = 6;
+static int const vertex_count = 4;
+
 @implementation SGGLNormalModel
+
+void setup_normal()
+{
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        glGenBuffers(1, &index_buffer_id);
+        glGenBuffers(1, &vertex_buffer_id);
+        glGenBuffers(1, &texture_buffer_id);
+    });
+}
 
 - (void)setupModel
 {
-    self.index_count = 6;
-    self.vertex_count = 4;
-}
-
-- (void)setupBuffer
-{
-    // index
-    GLuint index_id;
-    glGenBuffers(1, &index_id);
-    self.index_id = index_id;
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.index_id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.index_count * sizeof(GLushort), index_buffer_data, GL_STATIC_DRAW);
-    
-    // vertex
-    GLuint vertex_id;
-    glGenBuffers(1, &vertex_id);
-    self.vertex_id = vertex_id;
-    glBindBuffer(GL_ARRAY_BUFFER, self.vertex_id);
-    glBufferData(GL_ARRAY_BUFFER, self.vertex_count * 3 * sizeof(GLfloat), vertex_buffer_data, GL_STATIC_DRAW);
-    
-    // texture coord
-    GLuint texture_id;
-    glGenBuffers(1, &texture_id);
-    self.texture_id = texture_id;
-    glBindBuffer(GL_ARRAY_BUFFER, self.texture_id);
-    glBufferData(GL_ARRAY_BUFFER, self.vertex_count * 2 * sizeof(GLfloat), texture_buffer_data, GL_DYNAMIC_DRAW);
+    setup_normal();
+    self.index_count = index_count;
+    self.vertex_count = vertex_count;
+    self.index_id = index_buffer_id;
+    self.vertex_id = vertex_buffer_id;
+    self.texture_id = texture_buffer_id;
+    self.index_data = index_buffer_data;
+    self.vertex_data = vertex_buffer_data;
+    self.texture_data = texture_buffer_data;
 }
 
 @end

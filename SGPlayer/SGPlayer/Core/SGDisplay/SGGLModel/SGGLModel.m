@@ -20,14 +20,17 @@
 {
     // index
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.index_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.index_count * sizeof(GLushort), self.index_data, GL_STATIC_DRAW);
     
     // vertex
     glBindBuffer(GL_ARRAY_BUFFER, self.vertex_id);
+    glBufferData(GL_ARRAY_BUFFER, self.vertex_count * 3 * sizeof(GLfloat), self.vertex_data, GL_STATIC_DRAW);
     glEnableVertexAttribArray(position_location);
     glVertexAttribPointer(position_location, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), NULL);
     
     // texture coord
     glBindBuffer(GL_ARRAY_BUFFER, self.texture_id);
+    glBufferData(GL_ARRAY_BUFFER, self.vertex_count * 2 * sizeof(GLfloat), self.texture_data, GL_DYNAMIC_DRAW);
     glEnableVertexAttribArray(textureCoordLocation);
     glVertexAttribPointer(textureCoordLocation, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*2, NULL);
 }
@@ -35,36 +38,18 @@
 - (instancetype)init
 {
     if (self = [super init]) {
-        [self setup];
+        [self setupModel];
     }
     return self;
 }
 
-- (void)setup
-{
-    [self setupModel];
-    [self setupBuffer];
-}
-
-- (void)clear
-{
-    glDeleteBuffers(1, &_index_id);
-    glDeleteBuffers(1, &_index_id);
-    glDeleteBuffers(1, &_texture_id);
-    self.index_id = 0;
-    self.vertex_id = 0;
-    self.texture_id = 0;
-}
-
 - (void)dealloc
 {
-    [self clear];
     SGPlayerLog(@"%@ release", self.class);
 }
 
 #pragma mark - subclass override
 
 - (void)setupModel {}
-- (void)setupBuffer {}
 
 @end
