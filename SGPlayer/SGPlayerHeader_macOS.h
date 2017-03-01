@@ -8,8 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-FOUNDATION_EXPORT double SGPlayerVersionNumber;     // version number
-FOUNDATION_EXPORT const unsigned char SGPlayerVersionString[];      // version string
+FOUNDATION_EXPORT double SGPlayer_macOSVersionNumber;     // version number
+FOUNDATION_EXPORT const unsigned char SGPlayer_macOSVersionString[];      // version string
 
 // SGPlatform
 #import <SGPlayer_macOS/SGPLFObject.h>
