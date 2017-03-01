@@ -191,7 +191,7 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
         } else {
             int result = avcodec_send_packet(_codec_context, &packet);
             if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
-                self.error = sg_ff_check_error(result);
+                self.error = SGFFCheckError(result);
                 [self delegateErrorCallback];
                 goto end;
             }
@@ -201,7 +201,7 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
                     if (result == AVERROR(EAGAIN) || result == AVERROR_EOF) {
                         break;
                     } else {
-                        self.error = sg_ff_check_error(result);
+                        self.error = SGFFCheckError(result);
                         goto end;
                     }
                 }

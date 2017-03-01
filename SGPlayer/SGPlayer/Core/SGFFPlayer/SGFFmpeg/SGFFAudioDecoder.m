@@ -66,7 +66,7 @@
     _audio_swr_context = swr_alloc_set_opts(NULL, av_get_default_channel_layout(_channelCount), AV_SAMPLE_FMT_S16, _samplingRate, av_get_default_channel_layout(_codec_context->channels), _codec_context->sample_fmt, _codec_context->sample_rate, 0, NULL);
     
     int result = swr_init(_audio_swr_context);
-    NSError * error = sg_ff_check_error(result);
+    NSError * error = SGFFCheckError(result);
     if (error || !_audio_swr_context) {
         if (_audio_swr_context) {
             swr_free(&_audio_swr_context);
@@ -156,7 +156,7 @@
         
         Byte * outyput_buffer[2] = {_audio_swr_buffer, 0};
         numberOfFrames = swr_convert(_audio_swr_context, outyput_buffer, _temp_frame->nb_samples * ratio, (const uint8_t **)_temp_frame->data, _temp_frame->nb_samples);
-        NSError * error = sg_ff_check_error(numberOfFrames);
+        NSError * error = SGFFCheckError(numberOfFrames);
         if (error) {
             SGFFErrorLog(@"audio codec error : %@", error);
             return nil;

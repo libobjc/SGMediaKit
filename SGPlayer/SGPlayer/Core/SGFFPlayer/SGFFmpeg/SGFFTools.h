@@ -81,14 +81,14 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 
 #pragma mark - Util Function
 
-void sg_ff_log(void * context, int level, const char * format, va_list args);
+void SGFFLog(void * context, int level, const char * format, va_list args);
 
-NSError * sg_ff_check_error(int result);
-NSError * sg_ff_check_error_code(int result, NSUInteger errorCode);
+NSError * SGFFCheckError(int result);
+NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode);
+
+double SGFFStreamGetTimebase(AVStream * stream, double default_timebase);
+double SGFFStreamGetFPS(AVStream * stream, double timebase);
+
+NSDictionary * SGFFFoundationBrigeOfAVDictionary(AVDictionary * avDictionary);
 
 void sg_ff_convert_AVFrame_to_YUV(UInt8 * src, int linesize, int width, int height, UInt8 ** dst, int * lenght);
-
-double sg_ff_get_timebase(AVStream * stream, double default_timebase);
-double sg_ff_get_fps(AVStream * stream, double timebase);
-
-NSDictionary * sg_ff_dict_conver(AVDictionary * avDictionary);

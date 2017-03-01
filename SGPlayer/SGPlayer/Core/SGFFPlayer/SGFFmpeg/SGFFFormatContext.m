@@ -92,7 +92,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     _format_context->interrupt_callback.opaque = (__bridge void *)self;
     
     reslut = avformat_open_input(&_format_context, [self contentURLString].UTF8String, NULL, NULL);
-    error = sg_ff_check_error_code(reslut, SGFFDecoderErrorCodeFormatOpenInput);
+    error = SGFFCheckErrorCode(reslut, SGFFDecoderErrorCodeFormatOpenInput);
     if (error || !_format_context) {
         if (_format_context) {
             avformat_free_context(_format_context);
@@ -101,14 +101,14 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
     
     reslut = avformat_find_stream_info(_format_context, NULL);
-    error = sg_ff_check_error_code(reslut, SGFFDecoderErrorCodeFormatFindStreamInfo);
+    error = SGFFCheckErrorCode(reslut, SGFFDecoderErrorCodeFormatFindStreamInfo);
     if (error || !_format_context) {
         if (_format_context) {
             avformat_close_input(&_format_context);
         }
         return error;
     }
-    self.metadata = sg_ff_dict_conver(_format_context->metadata);
+    self.metadata = SGFFFoundationBrigeOfAVDictionary(_format_context->metadata);
     
     return error;
 }
@@ -127,8 +127,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
                 if (!error) {
                     self.videoStreamIndex = index;
                     self.videoEnable = YES;
-                    self.videoTimebase = sg_ff_get_timebase(_format_context->streams[self.videoStreamIndex], 0.00004);
-                    self.videoFPS = sg_ff_get_fps(_format_context->streams[self.videoStreamIndex], self.videoTimebase);
+                    self.videoTimebase = SGFFStreamGetTimebase(_format_context->streams[self.videoStreamIndex], 0.00004);
+                    self.videoFPS = SGFFStreamGetFPS(_format_context->streams[self.videoStreamIndex], self.videoTimebase);
                     self.videoPresentationSize = CGSizeMake(codec_context->width, codec_context->height);
                     self->_video_codec_context = codec_context;
                     break;
@@ -156,7 +156,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
     
     result = avcodec_parameters_to_context(codec_context, stream->codecpar);
-    error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecContextSetParam);
+    error = SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecContextSetParam);
     if (error) {
         avcodec_free_context(&codec_context);
         return error;
@@ -172,7 +172,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     codec_context->codec_id = codec->id;
     
     result = avcodec_open2(codec_context, codec, NULL);
-    error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecOpen2);
+    error = SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecOpen2);
     if (error) {
         avcodec_free_context(&codec_context);
         return error;
@@ -222,7 +222,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
     
     result = avcodec_parameters_to_context(codec_context, stream->codecpar);
-    error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecContextSetParam);
+    error = SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecContextSetParam);
     if (error) {
         avcodec_free_context(&codec_context);
         return error;
@@ -238,7 +238,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     codec_context->codec_id = codec->id;
     
     result = avcodec_open2(codec_context, codec, NULL);
-    error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecOpen2);
+    error = SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecOpen2);
     if (error) {
         avcodec_free_context(&codec_context);
         return error;

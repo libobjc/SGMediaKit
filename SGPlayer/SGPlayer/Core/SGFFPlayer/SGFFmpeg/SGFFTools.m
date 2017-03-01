@@ -11,7 +11,7 @@
 
 #pragma mark - Util Function
 
-void sg_ff_log(void * context, int level, const char * format, va_list args)
+void SGFFLog(void * context, int level, const char * format, va_list args)
 {
 #if SGFFFFmpegLogEnable
         NSString * message = [[NSString alloc] initWithFormat:[NSString stringWithUTF8String:format] arguments:args];
@@ -19,12 +19,12 @@ void sg_ff_log(void * context, int level, const char * format, va_list args)
 #endif
 }
 
-NSError * sg_ff_check_error(int result)
+NSError * SGFFCheckError(int result)
 {
-    return sg_ff_check_error_code(result, -1);
+    return SGFFCheckErrorCode(result, -1);
 }
 
-NSError * sg_ff_check_error_code(int result, NSUInteger errorCode)
+NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
 {
     if (result < 0) {
         char * error_string_buffer = malloc(256);
@@ -50,7 +50,18 @@ void sg_ff_convert_AVFrame_to_YUV(UInt8 * src, int linesize, int width, int heig
     }
 }
 
-double sg_ff_get_fps(AVStream * stream, double timebase)
+double SGFFStreamGetTimebase(AVStream * stream, double default_timebase)
+{
+    double timebase;
+    if (stream->time_base.den > 0 && stream->time_base.num > 0) {
+        timebase = av_q2d(stream->time_base);
+    } else {
+        timebase = default_timebase;
+    }
+    return timebase;
+}
+
+double SGFFStreamGetFPS(AVStream * stream, double timebase)
 {
     double fps;
     if (stream->avg_frame_rate.den > 0 && stream->avg_frame_rate.num > 0) {
@@ -63,18 +74,7 @@ double sg_ff_get_fps(AVStream * stream, double timebase)
     return fps;
 }
 
-double sg_ff_get_timebase(AVStream * stream, double default_timebase)
-{
-    double timebase;
-    if (stream->time_base.den > 0 && stream->time_base.num > 0) {
-        timebase = av_q2d(stream->time_base);
-    } else {
-        timebase = default_timebase;
-    }
-    return timebase;
-}
-
-NSDictionary * sg_ff_dict_conver(AVDictionary * avDictionary)
+NSDictionary * SGFFFoundationBrigeOfAVDictionary(AVDictionary * avDictionary)
 {
     if (avDictionary == NULL) return nil;
     

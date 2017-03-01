@@ -71,7 +71,7 @@
         
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
-            av_log_set_callback(sg_ff_log);
+            av_log_set_callback(SGFFLog);
             av_register_all();
             avformat_network_init();
         });
@@ -265,7 +265,7 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
             SGFFPacketLog(@"audio : put packet");
             int result = [self.audioDecoder putPacket:packet];
             if (result < 0) {
-                self.error = sg_ff_check_error_code(result, SGFFDecoderErrorCodeCodecAudioSendPacket);
+                self.error = SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecAudioSendPacket);
                 [self delegateErrorCallback];
                 continue;
             }
