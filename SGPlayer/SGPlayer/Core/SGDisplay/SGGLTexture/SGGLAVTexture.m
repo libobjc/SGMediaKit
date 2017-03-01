@@ -16,17 +16,15 @@
 
 @interface SGGLAVTexture ()
 
-{
-    GLuint _texture_y_id;
-    GLuint _texture_uv_id;
-}
-
 @property (nonatomic, assign) CGFloat textureAspect;
 @property (nonatomic, assign) BOOL didBindTexture;
 
 @end
 
 @implementation SGGLAVTexture
+
+static GLuint texture_id_y = 0;
+static GLuint texture_id_uv = 0;
 
 static UInt8 * texture_data_y = NULL;
 static UInt8 * texture_data_uv = NULL;
@@ -40,9 +38,10 @@ static size_t texture_datasize_uv = 2048 * 1080 * 2;
         dispatch_once(&onceToken, ^{
             texture_data_y = malloc(texture_datasize_y);
             texture_data_uv = malloc(texture_datasize_uv);
+            glGenTextures(1, &texture_id_y);
+            glGenTextures(1, &texture_id_uv);
         });
-        glGenTextures(1, &_texture_y_id);
-        glGenTextures(1, &_texture_uv_id);
+        
     }
     return self;
 }
@@ -52,9 +51,9 @@ static size_t texture_datasize_uv = 2048 * 1080 * 2;
     if (pixelBuffer == nil) {
         if (self.didBindTexture) {
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, _texture_y_id);
+            glBindTexture(GL_TEXTURE_2D, texture_id_y);
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, _texture_uv_id);
+            glBindTexture(GL_TEXTURE_2D, texture_id_uv);
             * aspect = self.textureAspect;
         }
         return;
@@ -79,7 +78,7 @@ static size_t texture_datasize_uv = 2048 * 1080 * 2;
     convert(data_uv, linesize_uv, width_uv, height_uv, texture_data_uv, texture_datasize_uv, 2);
     
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _texture_y_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id_y);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width_y, height_y, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, texture_data_y);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -88,7 +87,7 @@ static size_t texture_datasize_uv = 2048 * 1080 * 2;
     glActiveTexture(GL_TEXTURE0);
     
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, _texture_uv_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id_uv);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, width_uv, height_uv, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, texture_data_uv);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -120,15 +119,6 @@ void convert(UInt8 * src, int linesize, int width, int height, UInt8 * dst, size
 
 - (void)cleanTextures
 {
-    if (_texture_y_id) {
-        glDeleteTextures(1, &_texture_y_id);
-        _texture_y_id = 0;
-    }
-    if (_texture_uv_id) {
-        glDeleteTextures(1, &_texture_uv_id);
-        _texture_uv_id = 0;
-    }
-    
     memset(texture_data_y, 0, texture_datasize_y);
     memset(texture_data_uv, 0, texture_datasize_uv);
 }
