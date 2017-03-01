@@ -7,11 +7,13 @@
 //
 
 #import "SGPLFMacro.h"
+#import <GLKit/GLKit.h>
 
 #if SGPLATFORM_TARGET_OS_MAC
 
 #import <Cocoa/Cocoa.h>
 #import <OpenGL/OpenGL.h>
+#import <OpenGL/gl.h>
 
 typedef NSOpenGLContext SGPLFGLContext;
 
@@ -19,7 +21,9 @@ NSOpenGLPixelFormat * SGPLFGLContextGetPixelFormat(SGPLFGLContext * context);
 
 #elif SGPLATFORM_TARGET_OS_IPHONE
 
-#import <GLKit/GLKit.h>
+#import <UIKit/UIKit.h>
+#import <OpenGLES/ES2/gl.h>
+#import <OpenGLES/ES2/glext.h>
 
 typedef EAGLContext SGPLFGLContext;
 
