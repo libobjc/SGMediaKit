@@ -22,10 +22,6 @@
 @property (nonatomic, assign) int index_count;
 @property (nonatomic, assign) int vertex_count;
 
-@property (nonatomic, assign) GLfloat * vertex_data;
-@property (nonatomic, assign) GLushort * index_data;
-@property (nonatomic, assign) GLfloat * texture_data;
-
 - (void)bindPositionLocation:(GLint)position_location textureCoordLocation:(GLint)textureCoordLocation;
 
 #pragma mark - subclass override

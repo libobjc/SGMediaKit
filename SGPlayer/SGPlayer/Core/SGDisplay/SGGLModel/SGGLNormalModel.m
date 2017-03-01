@@ -53,9 +53,25 @@ void setup_normal()
     self.index_id = index_buffer_id;
     self.vertex_id = vertex_buffer_id;
     self.texture_id = texture_buffer_id;
-    self.index_data = index_buffer_data;
-    self.vertex_data = vertex_buffer_data;
-    self.texture_data = texture_buffer_data;
+}
+
+- (void)bindPositionLocation:(GLint)position_location textureCoordLocation:(GLint)textureCoordLocation
+{
+    // index
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.index_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, self.index_count * sizeof(GLushort), index_buffer_data, GL_STATIC_DRAW);
+    
+    // vertex
+    glBindBuffer(GL_ARRAY_BUFFER, self.vertex_id);
+    glBufferData(GL_ARRAY_BUFFER, self.vertex_count * 3 * sizeof(GLfloat), vertex_buffer_data, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(position_location);
+    glVertexAttribPointer(position_location, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), NULL);
+    
+    // texture coord
+    glBindBuffer(GL_ARRAY_BUFFER, self.texture_id);
+    glBufferData(GL_ARRAY_BUFFER, self.vertex_count * 2 * sizeof(GLfloat), texture_buffer_data, GL_DYNAMIC_DRAW);
+    glEnableVertexAttribArray(textureCoordLocation);
+    glVertexAttribPointer(textureCoordLocation, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat)*2, NULL);
 }
 
 @end
