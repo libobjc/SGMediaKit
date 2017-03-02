@@ -29,12 +29,12 @@ typedef NS_ENUM(NSUInteger, SGFFDecoderErrorCode) {
 #pragma mark - Log Config
 
 #define SGFFFFmpegLogEnable     0
-#define SGFFSynLogEnable        1
-#define SGFFThreadLogEnable     1
+#define SGFFSynLogEnable        0
+#define SGFFThreadLogEnable     0
 #define SGFFPacketLogEnable     0
-#define SGFFSleepLogEnable      1
-#define SGFFDecodeLogEnable     1
-#define SGFFErrorLogEnable      1
+#define SGFFSleepLogEnable      0
+#define SGFFDecodeLogEnable     0
+#define SGFFErrorLogEnable      0
 
 #if SGFFFFmpegLogEnable
 #define SGFFFFmpegLog(...)       NSLog(__VA_ARGS__)
