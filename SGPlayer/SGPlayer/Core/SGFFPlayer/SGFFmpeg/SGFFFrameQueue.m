@@ -81,7 +81,7 @@
     [self.condition unlock];
 }
 
-- (__kindof SGFFFrame *)getFrame
+- (__kindof SGFFFrame *)getFrameSync
 {
     [self.condition lock];
     while (!self.frames.firstObject) {
@@ -90,6 +90,27 @@
             return nil;
         }
         [self.condition wait];
+    }
+    SGFFFrame * frame = self.frames.firstObject;
+    [self.frames removeObjectAtIndex:0];
+    self.duration -= frame.duration;
+    if (self.duration < 0 || self.count <= 0) {
+        self.duration = 0;
+    }
+    self.size -= frame.size;
+    if (self.size <= 0 || self.count <= 0) {
+        self.size = 0;
+    }
+    [self.condition unlock];
+    return frame;
+}
+
+- (__kindof SGFFFrame *)getFrameAsync
+{
+    [self.condition lock];
+    if (self.destoryToken || self.frames.count <= 0) {
+        [self.condition unlock];
+        return nil;
     }
     SGFFFrame * frame = self.frames.firstObject;
     [self.frames removeObjectAtIndex:0];
