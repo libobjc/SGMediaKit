@@ -16,6 +16,16 @@
 
 @interface SGGLAVTexture ()
 
+{
+    GLuint _texture_id_y;
+    GLuint _texture_id_uv;
+    
+    UInt8 * _texture_data_y;
+    UInt8 * _texture_data_uv;
+    size_t _texture_datasize_y;
+    size_t _texture_datasize_uv;
+}
+
 @property (nonatomic, assign) CGFloat textureAspect;
 @property (nonatomic, assign) BOOL didBindTexture;
 
@@ -23,25 +33,11 @@
 
 @implementation SGGLAVTexture
 
-static GLuint texture_id_y = 0;
-static GLuint texture_id_uv = 0;
-
-static UInt8 * texture_data_y = NULL;
-static UInt8 * texture_data_uv = NULL;
-static size_t texture_datasize_y = 4096 * 2160;
-static size_t texture_datasize_uv = 2048 * 1080 * 2;
-
 - (instancetype)initWithContext:(SGPLFGLContext *)context
 {
     if (self = [super init]) {
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            texture_data_y = malloc(texture_datasize_y);
-            texture_data_uv = malloc(texture_datasize_uv);
-            glGenTextures(1, &texture_id_y);
-            glGenTextures(1, &texture_id_uv);
-        });
-        
+        glGenTextures(1, &_texture_id_y);
+        glGenTextures(1, &_texture_id_uv);
     }
     return self;
 }
@@ -51,9 +47,9 @@ static size_t texture_datasize_uv = 2048 * 1080 * 2;
     if (pixelBuffer == nil) {
         if (self.didBindTexture) {
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, texture_id_y);
+            glBindTexture(GL_TEXTURE_2D, _texture_id_y);
             glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, texture_id_uv);
+            glBindTexture(GL_TEXTURE_2D, _texture_id_uv);
             * aspect = self.textureAspect;
         }
         return;
@@ -74,12 +70,29 @@ static size_t texture_datasize_uv = 2048 * 1080 * 2;
     int width_uv = (int)CVPixelBufferGetWidthOfPlane(pixelBuffer, 1);
     int height_uv = (int)CVPixelBufferGetHeightOfPlane(pixelBuffer, 1);
     
-    convert(data_y, linesize_y, width_y, height_y, texture_data_y, texture_datasize_y, 1);
-    convert(data_uv, linesize_uv, width_uv, height_uv, texture_data_uv, texture_datasize_uv, 2);
+    size_t size_y = datasize(linesize_y, width_y, height_y, 1);
+    if (_texture_datasize_y < size_y) {
+        if (_texture_datasize_y > 0 && _texture_data_y != NULL) {
+            free(_texture_data_y);
+        }
+        _texture_datasize_y = size_y;
+        _texture_data_y = malloc(_texture_datasize_y);
+    }
+    size_t size_uv = datasize(linesize_uv, width_uv, height_uv, 2);
+    if (_texture_datasize_uv < size_uv) {
+        if (_texture_datasize_uv > 0 && _texture_data_uv != NULL) {
+            free(_texture_data_uv);
+        }
+        _texture_datasize_uv = size_uv;
+        _texture_data_uv = malloc(_texture_datasize_uv);
+    }
+    
+    convert(data_y, linesize_y, width_y, height_y, _texture_data_y, _texture_datasize_y, 1);
+    convert(data_uv, linesize_uv, width_uv, height_uv, _texture_data_uv, _texture_datasize_uv, 2);
     
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture_id_y);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width_y, height_y, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, texture_data_y);
+    glBindTexture(GL_TEXTURE_2D, _texture_id_y);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, width_y, height_y, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, _texture_data_y);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -87,8 +100,8 @@ static size_t texture_datasize_uv = 2048 * 1080 * 2;
     glActiveTexture(GL_TEXTURE0);
     
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture_id_uv);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, width_uv, height_uv, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, texture_data_uv);
+    glBindTexture(GL_TEXTURE_2D, _texture_id_uv);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, width_uv, height_uv, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, _texture_data_uv);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -105,11 +118,17 @@ static size_t texture_datasize_uv = 2048 * 1080 * 2;
     self.didBindTexture = YES;
 }
 
-void convert(UInt8 * src, int linesize, int width, int height, UInt8 * dst, size_t dissize, int planesize)
+size_t datasize(int linesize, int width, int height, int planesize)
+{
+    width = MIN(linesize, width);
+    return width * height * planesize;
+}
+
+void convert(UInt8 * src, int linesize, int width, int height, UInt8 * dst, size_t dstsize, int planesize)
 {
     width = MIN(linesize, width);
     UInt8 * temp = dst;
-    memset(dst, 0, dissize);
+    memset(dst, 0, dstsize);
     for (int i = 0; i < height; i++) {
         memcpy(temp, src, width * planesize);
         temp += (width * planesize);
@@ -119,8 +138,24 @@ void convert(UInt8 * src, int linesize, int width, int height, UInt8 * dst, size
 
 - (void)cleanTextures
 {
-    memset(texture_data_y, 0, texture_datasize_y);
-    memset(texture_data_uv, 0, texture_datasize_uv);
+    if (_texture_id_y > 0) {
+        glDeleteTextures(1, &_texture_id_y);
+    }
+    if (_texture_id_uv > 0) {
+        glDeleteTextures(1, &_texture_id_uv);
+    }
+    if (_texture_datasize_y > 0 && _texture_data_y != NULL) {
+        free(_texture_data_y);
+    }
+    if (_texture_datasize_uv > 0 && _texture_data_uv != NULL) {
+        free(_texture_data_uv);
+    }
+    _texture_id_y = 0;
+    _texture_id_uv = 0;
+    _texture_data_y = NULL;
+    _texture_data_uv = NULL;
+    _texture_datasize_y = 0;
+    _texture_datasize_uv = 0;
 }
 
 - (void)dealloc
