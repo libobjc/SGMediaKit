@@ -6,8 +6,8 @@
 //  Copyright © 2017年 single. All rights reserved.
 //
 
-#import "SGFFVideoToolBox.h"
 #import "SGPLFMacro.h"
+#import "SGFFVideoToolBox.h"
 
 typedef NS_ENUM(NSUInteger, SGFFVideoToolBoxErrorCode) {
     SGFFVideoToolBoxErrorCodeExtradataSize,

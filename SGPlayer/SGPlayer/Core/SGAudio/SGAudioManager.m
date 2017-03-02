@@ -6,12 +6,12 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
+#import "SGPLFMacro.h"
 #import "SGAudioManager.h"
 #import <AudioToolbox/AudioToolbox.h>
 #import <AVFoundation/AVFoundation.h>
 #import <Accelerate/Accelerate.h>
 #import "SGPlayerMacro.h"
-#import "SGPLFMacro.h"
 
 #if SGPLATFORM_TARGET_OS_MAC
 #import "SGMacAudioSession.h"

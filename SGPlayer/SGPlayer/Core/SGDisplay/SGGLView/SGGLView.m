@@ -6,6 +6,7 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
+#import "SGPLFMacro.h"
 #import "SGGLView.h"
 #import "SGPlayerMacro.h"
 #import "SGPlayer.h"
