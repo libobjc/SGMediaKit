@@ -134,14 +134,22 @@ static AVPacket flush_packet;
 - (void)flush
 {
     [self.packetQueue flush];
+    [self.frameQueue flush];
+    if (self->_framePool) {
+        [self.framePool flush];
+    }
     [self putPacket:flush_packet];
 }
 
 - (void)destroy
 {
     self.canceled = YES;
+    
     [self.frameQueue destroy];
     [self.packetQueue destroy];
+    if (self->_framePool) {
+        [self.framePool flush];
+    }
 }
 
 static NSTimeInterval max_video_frame_sleep_full_time_interval = 0.1;
@@ -183,10 +191,6 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
         if (packet.data == flush_packet.data) {
             SGFFDecodeLog(@"video codec flush");
             avcodec_flush_buffers(_codec_context);
-            [self.frameQueue flush];
-            if (self->_framePool) {
-                [self.framePool flush];
-            }
 #if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
             [self.videoToolBox flush];
 #endif
