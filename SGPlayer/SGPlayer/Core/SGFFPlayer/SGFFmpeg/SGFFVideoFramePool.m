@@ -142,6 +142,11 @@
     [self setFrameStopDrawing:videoFrame];
 }
 
+- (void)videoFrameDidCancel:(SGFFVideoFrame *)videoFrame
+{
+    [self setFrameUnuse:videoFrame];
+}
+
 - (void)dealloc
 {
     SGPlayerLog(@"SGFFVideoFramePool release");

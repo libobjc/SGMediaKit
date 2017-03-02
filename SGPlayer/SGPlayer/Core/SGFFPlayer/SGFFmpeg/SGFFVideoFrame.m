@@ -33,6 +33,13 @@
     }
 }
 
+- (void)cancel
+{
+    if ([self.delegate respondsToSelector:@selector(videoFrameDidCancel:)]) {
+        [self.delegate videoFrameDidCancel:self];
+    }
+}
+
 @end
 
 

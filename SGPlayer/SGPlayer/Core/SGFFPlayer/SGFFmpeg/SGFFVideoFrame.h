@@ -23,6 +23,7 @@ typedef NS_ENUM(int, SGYUVChannel) {
 
 - (void)videoFrameDidStartDrawing:(SGFFVideoFrame *)videoFrame;
 - (void)videoFrameDidStopDrawing:(SGFFVideoFrame *)videoFrame;
+- (void)videoFrameDidCancel:(SGFFVideoFrame *)videoFrame;
 
 @end
 
@@ -33,6 +34,7 @@ typedef NS_ENUM(int, SGYUVChannel) {
 
 - (void)startDrawing;
 - (void)stopDrawing;
+- (void)cancel;
 
 @end
 
