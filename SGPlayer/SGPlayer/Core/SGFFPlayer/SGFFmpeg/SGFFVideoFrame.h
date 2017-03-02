@@ -17,7 +17,22 @@ typedef NS_ENUM(int, SGYUVChannel) {
     SGYUVChannelCount = 3,
 };
 
+@class SGFFVideoFrame;
+
+@protocol SGFFVideoFrameDelegate <NSObject>
+
+- (void)videoFrameDidStartDrawing:(SGFFVideoFrame *)videoFrame;
+- (void)videoFrameDidStopDrawing:(SGFFVideoFrame *)videoFrame;
+
+@end
+
 @interface SGFFVideoFrame : SGFFFrame
+
+@property (nonatomic, weak) id <SGFFVideoFrameDelegate> delegate;
+@property (nonatomic, assign, readonly) BOOL drawing;
+
+- (void)startDrawing;
+- (void)stopDrawing;
 
 @end
 
@@ -28,13 +43,13 @@ typedef NS_ENUM(int, SGYUVChannel) {
 {
 @public
     UInt8 * channel_pixels[SGYUVChannelCount];
-    int channel_lenghts[SGYUVChannelCount];
 }
 
 @property (nonatomic, assign, readonly) int width;
 @property (nonatomic, assign, readonly) int height;
 
-- (instancetype)initWithAVFrame:(AVFrame *)frame width:(int)width height:(int)height;
++ (instancetype)videoFrame;
+- (void)setFrameData:(AVFrame *)frame width:(int)width height:(int)height;
 
 @end
 

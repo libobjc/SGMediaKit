@@ -90,5 +90,3 @@ double SGFFStreamGetTimebase(AVStream * stream, double default_timebase);
 double SGFFStreamGetFPS(AVStream * stream, double timebase);
 
 NSDictionary * SGFFFoundationBrigeOfAVDictionary(AVDictionary * avDictionary);
-
-void sg_ff_convert_AVFrame_to_YUV(UInt8 * src, int linesize, int width, int height, UInt8 ** dst, int * lenght);

@@ -6,9 +6,11 @@
 //  Copyright © 2017年 single. All rights reserved.
 //
 
+#import "SGPLFMacro.h"
 #import "SGFFVideoDecoder.h"
 #import "SGFFPacketQueue.h"
 #import "SGFFFrameQueue.h"
+#import "SGFFVideoFramePool.h"
 #import "SGFFTools.h"
 
 #if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
@@ -31,6 +33,8 @@ static AVPacket flush_packet;
 
 @property (nonatomic, strong) SGFFPacketQueue * packetQueue;
 @property (nonatomic, strong) SGFFFrameQueue * frameQueue;
+
+@property (nonatomic, strong) SGFFVideoFramePool * framePool;
 
 #if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
 @property (nonatomic, strong) SGFFVideoToolBox * videoToolBox;
@@ -129,7 +133,6 @@ static AVPacket flush_packet;
 
 - (void)flush
 {
-    [self.frameQueue flush];
     [self.packetQueue flush];
     [self putPacket:flush_packet];
 }
@@ -180,6 +183,10 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
         if (packet.data == flush_packet.data) {
             SGFFDecodeLog(@"video codec flush");
             avcodec_flush_buffers(_codec_context);
+            [self.frameQueue flush];
+            if (self->_framePool) {
+                [self.framePool flush];
+            }
 #if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
             [self.videoToolBox flush];
 #endif
@@ -236,10 +243,9 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
 {
     if (!_temp_frame->data[0] || !_temp_frame->data[1] || !_temp_frame->data[2]) return nil;
     
-    SGFFAVYUVVideoFrame * videoFrame = [[SGFFAVYUVVideoFrame alloc] initWithAVFrame:_temp_frame
-                                                                         width:_codec_context->width
-                                                                        height:_codec_context->height];
+    SGFFAVYUVVideoFrame * videoFrame = [self.framePool getUnuseFrame];
     
+    [videoFrame setFrameData:_temp_frame width:_codec_context->width height:_codec_context->height];
     videoFrame.position = av_frame_get_best_effort_timestamp(_temp_frame) * self.timebase;
     
     const int64_t frame_duration = av_frame_get_pkt_duration(_temp_frame);
@@ -250,6 +256,14 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
         videoFrame.duration = 1.0 / self.fps;
     }
     return videoFrame;
+}
+
+- (SGFFVideoFramePool *)framePool
+{
+    if (!_framePool) {
+        _framePool = [SGFFVideoFramePool pool];
+    }
+    return _framePool;
 }
 
 #if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE

@@ -34,7 +34,13 @@
 
 - (void)renderFrame:(__kindof SGFFVideoFrame *)frame
 {
+    if (self.videoFrame) {
+        [self.videoFrame stopDrawing];
+    }
     self.videoFrame = frame;
+    if (self.videoFrame) {
+        [self.videoFrame startDrawing];
+    }
     [self displayAsyncOnMainThread];
 }
 
@@ -132,6 +138,9 @@
 
 - (void)cleanTexture
 {
+    if (self.videoFrame) {
+        [self.videoFrame stopDrawing];
+    }
     self.videoFrame = nil;
 }
 

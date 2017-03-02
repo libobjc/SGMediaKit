@@ -36,20 +36,6 @@ NSError * SGFFCheckErrorCode(int result, NSUInteger errorCode)
     return nil;
 }
 
-void sg_ff_convert_AVFrame_to_YUV(UInt8 * src, int linesize, int width, int height, UInt8 ** dst, int * lenght)
-{
-    width = MIN(linesize, width);
-    * dst = malloc(width * height);
-    UInt8 * temp = * dst;
-    memset(* dst, 0, width * height);
-    * lenght = width * height;
-    for (int i = 0; i < height; i++) {
-        memcpy(temp, src, width);
-        temp += width;
-        src += linesize;
-    }
-}
-
 double SGFFStreamGetTimebase(AVStream * stream, double default_timebase)
 {
     double timebase;

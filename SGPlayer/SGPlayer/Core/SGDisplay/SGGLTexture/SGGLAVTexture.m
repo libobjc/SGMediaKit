@@ -6,8 +6,10 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
+#import "SGPLFMacro.h"
 #import "SGGLAVTexture.h"
 #import "SGPlayerMacro.h"
+#import "SGYUVTools.h"
 
 #if SGPLATFORM_TARGET_OS_MAC
 
@@ -70,7 +72,7 @@
     int width_uv = (int)CVPixelBufferGetWidthOfPlane(pixelBuffer, 1);
     int height_uv = (int)CVPixelBufferGetHeightOfPlane(pixelBuffer, 1);
     
-    size_t size_y = datasize(linesize_y, width_y, height_y, 1);
+    size_t size_y = SGYUVChannelFilterNeedSize(linesize_y, width_y, height_y, 1);
     if (_texture_datasize_y < size_y) {
         if (_texture_datasize_y > 0 && _texture_data_y != NULL) {
             free(_texture_data_y);
@@ -78,7 +80,7 @@
         _texture_datasize_y = size_y;
         _texture_data_y = malloc(_texture_datasize_y);
     }
-    size_t size_uv = datasize(linesize_uv, width_uv, height_uv, 2);
+    size_t size_uv = SGYUVChannelFilterNeedSize(linesize_uv, width_uv, height_uv, 2);
     if (_texture_datasize_uv < size_uv) {
         if (_texture_datasize_uv > 0 && _texture_data_uv != NULL) {
             free(_texture_data_uv);
@@ -87,8 +89,8 @@
         _texture_data_uv = malloc(_texture_datasize_uv);
     }
     
-    convert(data_y, linesize_y, width_y, height_y, _texture_data_y, _texture_datasize_y, 1);
-    convert(data_uv, linesize_uv, width_uv, height_uv, _texture_data_uv, _texture_datasize_uv, 2);
+    SGYUVChannelFilter(data_y, linesize_y, width_y, height_y, _texture_data_y, _texture_datasize_y, 1);
+    SGYUVChannelFilter(data_uv, linesize_uv, width_uv, height_uv, _texture_data_uv, _texture_datasize_uv, 2);
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, _texture_id_y);
@@ -116,24 +118,6 @@
     
     _hasTexture = YES;
     self.didBindTexture = YES;
-}
-
-size_t datasize(int linesize, int width, int height, int planesize)
-{
-    width = MIN(linesize, width);
-    return width * height * planesize;
-}
-
-void convert(UInt8 * src, int linesize, int width, int height, UInt8 * dst, size_t dstsize, int planesize)
-{
-    width = MIN(linesize, width);
-    UInt8 * temp = dst;
-    memset(dst, 0, dstsize);
-    for (int i = 0; i < height; i++) {
-        memcpy(temp, src, width * planesize);
-        temp += (width * planesize);
-        src += linesize;
-    }
 }
 
 - (void)cleanTextures
