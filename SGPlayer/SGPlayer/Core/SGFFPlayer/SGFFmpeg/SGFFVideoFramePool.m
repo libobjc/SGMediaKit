@@ -64,7 +64,6 @@
         videoFrame.delegate = self;
         [self.usedFrames  addObject:videoFrame];
     }
-    [self countLogWithDomain:@"getUnuseFrame"];
     [self.lock unlock];
     return videoFrame;
 }
@@ -102,7 +101,6 @@
     }
     self.drawingFrame = frame;
     [self.usedFrames removeObject:self.drawingFrame];
-    [self countLogWithDomain:@"setFrameStartDrawing"];
     [self.lock unlock];
 }
 
@@ -115,7 +113,6 @@
         [self.unuseFrames addObject:self.drawingFrame];
         self.drawingFrame = nil;
     }
-    [self countLogWithDomain:@"setFrameStopDrawing"];
     [self.lock unlock];
 }
 
@@ -126,7 +123,6 @@
         [self.unuseFrames addObject:obj];
     }];
     [self.usedFrames removeAllObjects];
-    [self countLogWithDomain:@"flush"];
     [self.lock unlock];
 }
 
@@ -150,11 +146,6 @@
 - (void)dealloc
 {
     SGPlayerLog(@"SGFFVideoFramePool release");
-}
-
-- (void)countLogWithDomain:(NSString *)domain
-{
-    NSLog(@"%@, count : %ld, unuse : %ld, used : %ld", domain, [self count], [self unuseCount], [self usedCount]);
 }
 
 @end
