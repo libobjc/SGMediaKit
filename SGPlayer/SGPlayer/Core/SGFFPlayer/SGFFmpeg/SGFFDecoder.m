@@ -345,7 +345,7 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
                 }
                 NSTimeInterval sleepTime = self.currentVideoFrame.duration;
                 if (sleepTime < 0.0001) {
-                    sleepTime == (1.0 / self.videoDecoder.fps);
+                    sleepTime = (1.0 / self.videoDecoder.fps);
                 }
                 [NSThread sleepForTimeInterval:sleepTime];
             } else {
