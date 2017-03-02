@@ -52,6 +52,8 @@
 - (NSTimeInterval)frameDuration;
 
 - (SGFFVideoFrame *)getFrameSync;
+- (SGFFVideoFrame *)getFrameAsync;
+
 - (void)putPacket:(AVPacket)packet;
 
 - (void)flush;

@@ -104,7 +104,7 @@
 
 - (SGFFAudioFrame *)getFrameSync
 {
-    return [self.frameQueue getFrame];
+    return [self.frameQueue getFrameSync];
 }
 
 - (int)putPacket:(AVPacket)packet

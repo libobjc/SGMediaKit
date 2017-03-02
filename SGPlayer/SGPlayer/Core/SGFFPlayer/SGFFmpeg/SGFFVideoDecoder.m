@@ -119,7 +119,12 @@ static AVPacket flush_packet;
 
 - (SGFFVideoFrame *)getFrameSync
 {
-    return [self.frameQueue getFrame];
+    return [self.frameQueue getFrameSync];
+}
+
+- (SGFFVideoFrame *)getFrameAsync
+{
+    return [self.frameQueue getFrameAsync];
 }
 
 - (void)putPacket:(AVPacket)packet
