@@ -131,12 +131,6 @@ static GLuint gl_texture_ids[3];
     }
 }
 
-- (void)setupSubClass
-{
-    [self setupAVFrame];
-    [self setupCVPixelBuffer];
-}
-
 - (void)cleanTexture
 {
     if (self.videoFrame) {
