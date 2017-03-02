@@ -21,7 +21,6 @@
 @property (nonatomic, weak, readonly) SGDisplayView * displayView;
 
 - (void)displayAsyncOnMainThread;
-- (void)displayIfApplicationActive;
 - (void)cleanEmptyBuffer;
 
 #pragma mark - subclass override

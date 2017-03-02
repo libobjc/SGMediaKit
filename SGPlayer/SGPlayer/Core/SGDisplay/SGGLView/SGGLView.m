@@ -111,9 +111,13 @@
 
 - (void)displayAsyncOnMainThread
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
+    if ([NSThread isMainThread]) {
         [self displayIfApplicationActive];
-    });
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self displayIfApplicationActive];
+        });
+    }
 }
 
 - (void)displayIfApplicationActive
@@ -121,6 +125,7 @@
 #if SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) return;
 #endif
+    if (!self.displayView.abstractPlayer.contentURL) return;
     SGPLFGLViewPrepareOpenGL(self);
     [self drawOpenGL];
     SGPLFGLViewFlushBuffer(self);
@@ -130,12 +135,19 @@
 {
     [self cleanTexture];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
+    if ([NSThread isMainThread]) {
         SGPLFGLViewPrepareOpenGL(self);
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT);
         SGPLFGLViewFlushBuffer(self);
-    });
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            SGPLFGLViewPrepareOpenGL(self);
+            glClearColor(0, 0, 0, 1);
+            glClear(GL_COLOR_BUFFER_BIT);
+            SGPLFGLViewFlushBuffer(self);
+        });
+    }
 }
 
 - (void)drawOpenGL

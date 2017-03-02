@@ -44,7 +44,7 @@
 
 - (void)displayLinkAction
 {
-    [self displayIfApplicationActive];
+    [self displayAsyncOnMainThread];
 }
 
 - (void)setPaused:(BOOL)paused
