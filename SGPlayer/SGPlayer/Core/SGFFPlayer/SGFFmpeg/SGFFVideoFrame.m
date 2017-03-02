@@ -72,9 +72,6 @@
         channel_pixels[SGYUVChannelLuma] = NULL;
         channel_pixels[SGYUVChannelChromaB] = NULL;
         channel_pixels[SGYUVChannelChromaR] = NULL;
-        static int count = 0;
-        count++;
-        NSLog(@"SGFFAVYUVVideoFrame 新建, count : %d", count);
     }
     return self;
 }
@@ -178,9 +175,6 @@
     if (channel_pixels[SGYUVChannelChromaR] != NULL && channel_pixels_buffer_size[SGYUVChannelChromaR] > 0) {
         free(channel_pixels[SGYUVChannelChromaR]);
     }
-    static int count = 0;
-    count++;
-    NSLog(@"SGFFAVYUVVideoFrame 释放, count : %d", count);
 }
 
 @end
