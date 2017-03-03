@@ -8,8 +8,25 @@
 
 #import "SGFFFrame.h"
 
+@class SGFFAudioFrame;
+
+@protocol SGFFAudioFrameDelegate <NSObject>
+
+- (void)audioFrameDidStartPlaying:(SGFFAudioFrame *)audioFrame;
+- (void)audioFrameDidStopPlaying:(SGFFAudioFrame *)audioFrame;
+- (void)audioFrameDidCancel:(SGFFAudioFrame *)audioFrame;
+
+@end
+
 @interface SGFFAudioFrame : SGFFFrame
 
++ (instancetype)audioFrame;
+
+@property (nonatomic, weak) id <SGFFAudioFrameDelegate> delegate;
 @property (nonatomic, strong) NSData * samples;
+
+- (void)startPlaying;
+- (void)stopPlaying;
+- (void)cancel;
 
 @end

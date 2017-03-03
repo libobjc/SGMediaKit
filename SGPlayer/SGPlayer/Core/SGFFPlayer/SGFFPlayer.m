@@ -358,8 +358,10 @@
                     return;
                 }
                 
+                [frame startPlaying];
                 self.currentAudioFramePosition = 0;
                 self.currentAudioFrameSamples = frame.samples;
+                [frame stopPlaying];
             }
             if (self.currentAudioFrameSamples) {
                 const void *bytes = (Byte *)self.currentAudioFrameSamples.bytes + self.currentAudioFramePosition;

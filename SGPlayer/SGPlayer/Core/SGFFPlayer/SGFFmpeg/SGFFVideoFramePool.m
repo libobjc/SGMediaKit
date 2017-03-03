@@ -29,8 +29,8 @@
 {
     if (self = [super init]) {
         self.lock = [[NSLock alloc] init];
-        self.unuseFrames = [NSMutableSet setWithCapacity:50];
-        self.usedFrames = [NSMutableSet setWithCapacity:50];
+        self.unuseFrames = [NSMutableSet setWithCapacity:60];
+        self.usedFrames = [NSMutableSet setWithCapacity:60];
     }
     return self;
 }
