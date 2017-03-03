@@ -33,11 +33,11 @@ static GLuint gl_texture_ids[3];
 - (void)renderFrame:(__kindof SGFFVideoFrame *)frame
 {
     if (self.videoFrame) {
-        [self.videoFrame stopDrawing];
+        [self.videoFrame stopPlaying];
     }
     self.videoFrame = frame;
     if (self.videoFrame) {
-        [self.videoFrame startDrawing];
+        [self.videoFrame startPlaying];
     }
     [self displayAsyncOnMainThread];
 }
@@ -134,7 +134,7 @@ static GLuint gl_texture_ids[3];
 - (void)cleanTexture
 {
     if (self.videoFrame) {
-        [self.videoFrame stopDrawing];
+        [self.videoFrame stopPlaying];
     }
     self.videoFrame = nil;
 }

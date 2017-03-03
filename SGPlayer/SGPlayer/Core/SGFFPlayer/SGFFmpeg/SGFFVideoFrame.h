@@ -17,24 +17,7 @@ typedef NS_ENUM(int, SGYUVChannel) {
     SGYUVChannelCount = 3,
 };
 
-@class SGFFVideoFrame;
-
-@protocol SGFFVideoFrameDelegate <NSObject>
-
-- (void)videoFrameDidStartDrawing:(SGFFVideoFrame *)videoFrame;
-- (void)videoFrameDidStopDrawing:(SGFFVideoFrame *)videoFrame;
-- (void)videoFrameDidCancel:(SGFFVideoFrame *)videoFrame;
-
-@end
-
 @interface SGFFVideoFrame : SGFFFrame
-
-@property (nonatomic, weak) id <SGFFVideoFrameDelegate> delegate;
-@property (nonatomic, assign, readonly) BOOL drawing;
-
-- (void)startDrawing;
-- (void)stopDrawing;
-- (void)cancel;
 
 @end
 

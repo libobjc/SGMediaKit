@@ -8,7 +8,7 @@
 
 #import "SGFFAudioDecoder.h"
 #import "SGFFFrameQueue.h"
-#import "SGFFAudioFramePool.h"
+#import "SGFFFramePool.h"
 #import "SGFFTools.h"
 #import "SGPlayerMacro.h"
 #import <Accelerate/Accelerate.h>
@@ -32,7 +32,7 @@
 }
 
 @property (nonatomic, strong) SGFFFrameQueue * frameQueue;
-@property (nonatomic, strong) SGFFAudioFramePool * framePool;
+@property (nonatomic, strong) SGFFFramePool * framePool;
 
 @end
 
@@ -58,7 +58,7 @@
 - (void)setup
 {
     self.frameQueue = [SGFFFrameQueue frameQueue];
-    self.framePool = [SGFFAudioFramePool pool];
+    self.framePool = [SGFFFramePool audioPool];
     [self setupSwsContext];
 }
 
@@ -116,7 +116,6 @@
 {
     if (packet.data == NULL) return 0;
     
-    NSTimeInterval time1 = [NSDate date].timeIntervalSince1970;
     int result = avcodec_send_packet(_codec_context, &packet);
     if (result < 0 && result != AVERROR(EAGAIN) && result != AVERROR_EOF) {
         return -1;
@@ -132,10 +131,7 @@
         }
         @autoreleasepool
         {
-            NSTimeInterval time2 = [NSDate date].timeIntervalSince1970;
             SGFFAudioFrame * frame = [self decode];
-            NSTimeInterval time3 = [NSDate date].timeIntervalSince1970;
-//            NSLog(@"音频解码时间 : %f, %f", time2 - time1, time3 - time2);
             if (frame) {
                 [self.frameQueue putFrame:frame];
             }

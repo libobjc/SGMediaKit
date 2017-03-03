@@ -10,7 +10,7 @@
 #import "SGFFVideoDecoder.h"
 #import "SGFFPacketQueue.h"
 #import "SGFFFrameQueue.h"
-#import "SGFFVideoFramePool.h"
+#import "SGFFFramePool.h"
 #import "SGFFTools.h"
 
 #if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
@@ -34,7 +34,7 @@ static AVPacket flush_packet;
 @property (nonatomic, strong) SGFFPacketQueue * packetQueue;
 @property (nonatomic, strong) SGFFFrameQueue * frameQueue;
 
-@property (nonatomic, strong) SGFFVideoFramePool * framePool;
+@property (nonatomic, strong) SGFFFramePool * framePool;
 
 #if SGPLATFORM_TARGET_OS_MAC_OR_IPHONE
 @property (nonatomic, strong) SGFFVideoToolBox * videoToolBox;
@@ -267,10 +267,10 @@ static NSTimeInterval max_video_frame_sleep_full_and_pause_time_interval = 0.5;
     return videoFrame;
 }
 
-- (SGFFVideoFramePool *)framePool
+- (SGFFFramePool *)framePool
 {
     if (!_framePool) {
-        _framePool = [SGFFVideoFramePool pool];
+        _framePool = [SGFFFramePool videoPool];
     }
     return _framePool;
 }

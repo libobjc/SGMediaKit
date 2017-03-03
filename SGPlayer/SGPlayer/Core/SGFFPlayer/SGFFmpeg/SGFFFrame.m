@@ -11,6 +11,30 @@
 
 @implementation SGFFFrame
 
+- (void)startPlaying
+{
+    self->_playing = YES;
+    if ([self.delegate respondsToSelector:@selector(frameDidStartPlaying:)]) {
+        [self.delegate frameDidStartPlaying:self];
+    }
+}
+
+- (void)stopPlaying
+{
+    self->_playing = NO;
+    if ([self.delegate respondsToSelector:@selector(frameDidStopPlaying:)]) {
+        [self.delegate frameDidStopPlaying:self];
+    }
+}
+
+- (void)cancel
+{
+    self->_playing = NO;
+    if ([self.delegate respondsToSelector:@selector(frameDidCancel:)]) {
+        [self.delegate frameDidCancel:self];
+    }
+}
+
 @end
 
 

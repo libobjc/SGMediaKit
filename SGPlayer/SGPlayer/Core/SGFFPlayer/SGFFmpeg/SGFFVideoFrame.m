@@ -17,29 +17,6 @@
     return SGFFFrameTypeVideo;
 }
 
-- (void)startDrawing
-{
-    self->_drawing = YES;
-    if ([self.delegate respondsToSelector:@selector(videoFrameDidStartDrawing:)]) {
-        [self.delegate videoFrameDidStartDrawing:self];
-    }
-}
-
-- (void)stopDrawing
-{
-    self->_drawing = NO;
-    if ([self.delegate respondsToSelector:@selector(videoFrameDidStopDrawing:)]) {
-        [self.delegate videoFrameDidStopDrawing:self];
-    }
-}
-
-- (void)cancel
-{
-    if ([self.delegate respondsToSelector:@selector(videoFrameDidCancel:)]) {
-        [self.delegate videoFrameDidCancel:self];
-    }
-}
-
 @end
 
 
