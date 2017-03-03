@@ -83,7 +83,7 @@ CGImageRef SGPLFImageCGImageWithCVPexelBuffer(CVPixelBufferRef pixelBuffer)
 
 SGPLFImage * SGPLFImageWithRGBData(UInt8 * rgb_data, int linesize, int width, int height)
 {
-    CGImageRef * imageRef = SGPLFImageCGImageWithRGBData(rgb_data, linesize, width, height);
+    CGImageRef imageRef = SGPLFImageCGImageWithRGBData(rgb_data, linesize, width, height);
     if (!imageRef) return nil;
     return SGPLFImageWithCGImage(imageRef);
 }

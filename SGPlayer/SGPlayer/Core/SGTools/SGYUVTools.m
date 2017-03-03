@@ -9,7 +9,7 @@
 #import "SGYUVTools.h"
 #import "swscale.h"
 
-size_t SGYUVChannelFilterNeedSize(int linesize, int width, int height, int channel_count)
+int SGYUVChannelFilterNeedSize(int linesize, int width, int height, int channel_count)
 {
     width = MIN(linesize, width);
     return width * height * channel_count;
@@ -44,7 +44,7 @@ SGPLFImage * SGYUVConvertToImage(UInt8 * src_data[], int src_linesize[], int wid
     uint8_t * data[1];
     int linesize[1];
     
-    int result = sws_scale(sws_context, src_data, src_linesize, 0, height, data, linesize);
+    int result = sws_scale(sws_context, (const uint8_t **)src_data, src_linesize, 0, height, data, linesize);
     if (sws_context) {
         sws_freeContext(sws_context);
     }
