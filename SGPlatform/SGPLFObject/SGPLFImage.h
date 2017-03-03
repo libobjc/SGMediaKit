@@ -8,6 +8,7 @@
 
 #import "SGPLFMacro.h"
 #import <CoreVideo/CoreVideo.h>
+#import <CoreImage/CoreImage.h>
 
 #if SGPLATFORM_TARGET_OS_MAC
 
@@ -26,4 +27,5 @@ typedef UIImage SGPLFImage;
 SGPLFImage * SGPLFImageWithCGImage(CGImageRef image);
 
 SGPLFImage * SGPLFImageWithCVPixelBuffer(CVPixelBufferRef pixelBuffer);
+CIImage * SGPLFImageCIImageWithCVPexelBuffer(CVPixelBufferRef pixelBuffer);
 CGImageRef SGPLFImageCGImageWithCVPexelBuffer(CVPixelBufferRef pixelBuffer);

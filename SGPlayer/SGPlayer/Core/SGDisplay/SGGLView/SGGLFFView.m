@@ -44,11 +44,16 @@ static GLuint gl_texture_ids[3];
 
 - (SGPLFImage *)imageFromPixelBuffer
 {
-    if (self.videoFrame) {
-        return nil;
-    } else {
-        return SGPLFGLViewGetCurrentSnapshot(self);
+    if ([self.videoFrame isKindOfClass:[SGFFAVYUVVideoFrame class]]) {
+        
+    } else if ([self.videoFrame isKindOfClass:[SGFFCVYUVVideoFrame class]]) {
+        SGFFCVYUVVideoFrame * frame = (SGFFCVYUVVideoFrame *)self.videoFrame;
+        if (frame.pixelBuffer) {
+            SGPLFImage * image = SGPLFImageWithCVPixelBuffer(frame.pixelBuffer);
+            if (image) return image;
+        }
     }
+    return SGPLFGLViewGetCurrentSnapshot(self);
 }
 
 - (BOOL)updateTextureAspect:(CGFloat *)aspect
