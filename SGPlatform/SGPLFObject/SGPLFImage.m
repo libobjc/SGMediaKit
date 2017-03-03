@@ -85,15 +85,14 @@ SGPLFImage * SGPLFImageWithRGBData(UInt8 * rgb_data, int linesize, int width, in
 {
     CGImageRef imageRef = SGPLFImageCGImageWithRGBData(rgb_data, linesize, width, height);
     if (!imageRef) return nil;
-    return SGPLFImageWithCGImage(imageRef);
+    SGPLFImage * image = SGPLFImageWithCGImage(imageRef);
+    CGImageRelease(imageRef);
+    return image;
 }
 
 CGImageRef SGPLFImageCGImageWithRGBData(UInt8 * rgb_data, int linesize, int width, int height)
 {
-    CFDataRef data = CFDataCreateWithBytesNoCopy(kCFAllocatorDefault,
-                                                 rgb_data,
-                                                 linesize * height,
-                                                 kCFAllocatorNull);
+    CFDataRef data = CFDataCreate(kCFAllocatorDefault, rgb_data, linesize * height);
     CGDataProviderRef provider = CGDataProviderCreateWithCFData(data);
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGImageRef imageRef = CGImageCreate(width,

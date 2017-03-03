@@ -8,6 +8,8 @@
 
 #import "SGYUVTools.h"
 #import "swscale.h"
+#import "imgutils.h"
+#import "avformat.h"
 
 int SGYUVChannelFilterNeedSize(int linesize, int width, int height, int channel_count)
 {
@@ -41,14 +43,26 @@ SGPLFImage * SGYUVConvertToImage(UInt8 * src_data[], int src_linesize[], int wid
                                        NULL, NULL, NULL);
     if (!sws_context) return nil;
     
-    uint8_t * data[1] = {NULL};
-    int linesize[1] = {0};
+    uint8_t * data[AV_NUM_DATA_POINTERS];
+    int linesize[AV_NUM_DATA_POINTERS];
     
-    int result = sws_scale(sws_context, (const uint8_t **)src_data, src_linesize, 0, height, data, linesize);
+    int result = av_image_alloc(data, linesize, width, height, AV_PIX_FMT_RGB24, 1);
+    if (result < 0) {
+        if (sws_context) {
+            sws_freeContext(sws_context);
+        }
+        return nil;
+    }
+    
+    result = sws_scale(sws_context, (const uint8_t **)src_data, src_linesize, 0, height, data, linesize);
     if (sws_context) {
         sws_freeContext(sws_context);
     }
     if (result < 0) return nil;
     if (linesize[0] <= 0 || data[0] == NULL) return nil;
-    return SGPLFImageWithRGBData(data[0], linesize[0], width, height);
+    
+    SGPLFImage * image = SGPLFImageWithRGBData(data[0], linesize[0], width, height);
+    av_freep(&data[0]);
+    
+    return image;
 }
