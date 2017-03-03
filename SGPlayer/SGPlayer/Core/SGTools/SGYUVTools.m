@@ -41,8 +41,8 @@ SGPLFImage * SGYUVConvertToImage(UInt8 * src_data[], int src_linesize[], int wid
                                        NULL, NULL, NULL);
     if (!sws_context) return nil;
     
-    uint8_t * data[1];
-    int linesize[1];
+    uint8_t * data[1] = {NULL};
+    int linesize[1] = {0};
     
     int result = sws_scale(sws_context, (const uint8_t **)src_data, src_linesize, 0, height, data, linesize);
     if (sws_context) {
