@@ -23,7 +23,7 @@
 - (void)displayAsyncOnMainThread;
 - (void)cleanEmptyBuffer;
 
-- (SGPLFImage *)snapshot;
+- (SGPLFImage *)customSnapshot;
 
 #pragma mark - subclass override
 

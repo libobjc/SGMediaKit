@@ -151,7 +151,7 @@
     }
 }
 
-- (SGPLFImage *)snapshot
+- (SGPLFImage *)customSnapshot
 {
     if (self.displayView.abstractPlayer.videoType == SGVideoTypeVR) {
         return SGPLFGLViewGetCurrentSnapshot(self);
