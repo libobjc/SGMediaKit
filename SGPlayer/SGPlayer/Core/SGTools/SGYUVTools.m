@@ -7,6 +7,7 @@
 //
 
 #import "SGYUVTools.h"
+#import "swscale.h"
 
 size_t SGYUVChannelFilterNeedSize(int linesize, int width, int height, int channel_count)
 {
@@ -24,4 +25,29 @@ void SGYUVChannelFilter(UInt8 * src, int linesize, int width, int height, UInt8 
         temp += (width * channel_count);
         src += linesize;
     }
+}
+
+SGPLFImage * SGYUVConvertToImage(UInt8 * src_data[], int src_linesize[], int width, int height, enum AVPixelFormat pixelFormat)
+{
+    struct SwsContext * sws_context = NULL;
+    sws_context = sws_getCachedContext(sws_context,
+                                       width,
+                                       height,
+                                       pixelFormat,
+                                       width,
+                                       height,
+                                       AV_PIX_FMT_RGB24,
+                                       SWS_FAST_BILINEAR,
+                                       NULL, NULL, NULL);
+    if (!sws_context) return nil;
+    
+    uint8_t * data[1];
+    int linesize[1];
+    
+    int result = sws_scale(sws_context, src_data, src_linesize, 0, height, data, linesize);
+    if (sws_context) {
+        sws_freeContext(sws_context);
+    }
+    if (result < 0) return nil;
+    return SGPLFImageWithRGBData(data[0], linesize[0], width, height);
 }

@@ -23,8 +23,11 @@
 @implementation SGFFAVYUVVideoFrame
 
 {
+    enum AVPixelFormat pixelFormat;
+    
     size_t channel_pixels_buffer_size[SGYUVChannelCount];
     size_t channel_lenghts[SGYUVChannelCount];
+    size_t channel_linesize[SGYUVChannelCount];
 }
 
 - (SGFFFrameType)type
@@ -46,6 +49,9 @@
         channel_pixels_buffer_size[SGYUVChannelLuma] = 0;
         channel_pixels_buffer_size[SGYUVChannelChromaB] = 0;
         channel_pixels_buffer_size[SGYUVChannelChromaR] = 0;
+        channel_linesize[SGYUVChannelLuma] = 0;
+        channel_linesize[SGYUVChannelChromaB] = 0;
+        channel_linesize[SGYUVChannelChromaR] = 0;
         channel_pixels[SGYUVChannelLuma] = NULL;
         channel_pixels[SGYUVChannelChromaB] = NULL;
         channel_pixels[SGYUVChannelChromaR] = NULL;
@@ -55,12 +61,18 @@
 
 - (void)setFrameData:(AVFrame *)frame width:(int)width height:(int)height
 {
+    pixelFormat = frame->format;
+    
     self->_width = width;
     self->_height = height;
     
     int linesize_y = frame->linesize[SGYUVChannelLuma];
     int linesize_u = frame->linesize[SGYUVChannelChromaB];
     int linesize_v = frame->linesize[SGYUVChannelChromaR];
+    
+    channel_linesize[SGYUVChannelLuma] = linesize_y;
+    channel_linesize[SGYUVChannelChromaB] = linesize_u;
+    channel_linesize[SGYUVChannelChromaR] = linesize_v;
     
     UInt8 * buffer_y = channel_pixels[SGYUVChannelLuma];
     UInt8 * buffer_u = channel_pixels[SGYUVChannelChromaB];
@@ -71,6 +83,7 @@
     size_t buffer_size_v = channel_pixels_buffer_size[SGYUVChannelChromaR];
     
     size_t need_size_y = SGYUVChannelFilterNeedSize(linesize_y, width, height, 1);
+    channel_lenghts[SGYUVChannelLuma] = need_size_y;
     if (buffer_size_y < need_size_y) {
         if (buffer_size_y > 0 && buffer_y != NULL) {
             free(buffer_y);
@@ -79,6 +92,7 @@
         channel_pixels[SGYUVChannelLuma] = malloc(need_size_y);
     }
     size_t need_size_u = SGYUVChannelFilterNeedSize(linesize_u, width / 2, height / 2, 1);
+    channel_lenghts[SGYUVChannelChromaB] = need_size_u;
     if (buffer_size_u < need_size_u) {
         if (buffer_size_u > 0 && buffer_u != NULL) {
             free(buffer_u);
@@ -87,6 +101,7 @@
         channel_pixels[SGYUVChannelChromaB] = malloc(need_size_u);
     }
     size_t need_size_v = SGYUVChannelFilterNeedSize(linesize_v, width / 2, height / 2, 1);
+    channel_lenghts[SGYUVChannelChromaR] = need_size_v;
     if (buffer_size_v < need_size_v) {
         if (buffer_size_v > 0 && buffer_v != NULL) {
             free(buffer_v);
@@ -125,6 +140,9 @@
     channel_lenghts[SGYUVChannelLuma] = 0;
     channel_lenghts[SGYUVChannelChromaB] = 0;
     channel_lenghts[SGYUVChannelChromaR] = 0;
+    channel_linesize[SGYUVChannelLuma] = 0;
+    channel_linesize[SGYUVChannelChromaB] = 0;
+    channel_linesize[SGYUVChannelChromaR] = 0;
     if (channel_pixels[SGYUVChannelLuma] != NULL && channel_pixels_buffer_size[SGYUVChannelLuma] > 0) {
         memset(channel_pixels[SGYUVChannelLuma], 0, channel_pixels_buffer_size[SGYUVChannelLuma]);
     }
@@ -134,6 +152,11 @@
     if (channel_pixels[SGYUVChannelChromaR] != NULL && channel_pixels_buffer_size[SGYUVChannelChromaR] > 0) {
         memset(channel_pixels[SGYUVChannelChromaR], 0, channel_pixels_buffer_size[SGYUVChannelChromaR]);
     }
+}
+
+- (SGPLFImage *)image
+{
+    return SGYUVConvertToImage(channel_pixels, channel_linesize, self.width, self.height, pixelFormat);
 }
 
 - (int)size

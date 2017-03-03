@@ -8,7 +8,9 @@
 
 #import "SGFFFrame.h"
 #import <AVFoundation/AVFoundation.h>
+#import "SGPLFObject.h"
 #import "avformat.h"
+#import "pixfmt.h"
 
 typedef NS_ENUM(int, SGYUVChannel) {
     SGYUVChannelLuma = 0,
@@ -35,6 +37,8 @@ typedef NS_ENUM(int, SGYUVChannel) {
 
 + (instancetype)videoFrame;
 - (void)setFrameData:(AVFrame *)frame width:(int)width height:(int)height;
+
+- (SGPLFImage *)image;
 
 @end
 

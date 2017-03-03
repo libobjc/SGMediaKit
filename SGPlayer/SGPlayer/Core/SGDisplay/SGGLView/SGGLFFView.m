@@ -45,7 +45,9 @@ static GLuint gl_texture_ids[3];
 - (SGPLFImage *)imageFromPixelBuffer
 {
     if ([self.videoFrame isKindOfClass:[SGFFAVYUVVideoFrame class]]) {
-        
+        SGFFAVYUVVideoFrame * frame = (SGFFAVYUVVideoFrame *)self.videoFrame;
+        SGPLFImage * image = frame.image;
+        if (image) return image;
     } else if ([self.videoFrame isKindOfClass:[SGFFCVYUVVideoFrame class]]) {
         SGFFCVYUVVideoFrame * frame = (SGFFCVYUVVideoFrame *)self.videoFrame;
         if (frame.pixelBuffer) {
