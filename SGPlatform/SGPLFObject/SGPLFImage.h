@@ -25,7 +25,9 @@ typedef UIImage SGPLFImage;
 #endif
 
 SGPLFImage * SGPLFImageWithCGImage(CGImageRef image);
-
 SGPLFImage * SGPLFImageWithCVPixelBuffer(CVPixelBufferRef pixelBuffer);
 CIImage * SGPLFImageCIImageWithCVPexelBuffer(CVPixelBufferRef pixelBuffer);
 CGImageRef SGPLFImageCGImageWithCVPexelBuffer(CVPixelBufferRef pixelBuffer);
+
+SGPLFImage * SGPLFImageWithRGBData(UInt8 * rgb_data, int linesize, int width, int height);
+CGImageRef SGPLFImageCGImageWithRGBData(UInt8 * rgb_data, int linesize, int width, int height);
