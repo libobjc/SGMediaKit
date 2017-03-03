@@ -20,7 +20,7 @@
 @end
 
 
-@implementation SGFFAVYUVVideoFrame
+@interface SGFFAVYUVVideoFrame ()
 
 {
     enum AVPixelFormat pixelFormat;
@@ -29,6 +29,12 @@
     int channel_lenghts[SGYUVChannelCount];
     int channel_linesize[SGYUVChannelCount];
 }
+
+@property (nonatomic, strong) NSLock * lock;
+
+@end
+
+@implementation SGFFAVYUVVideoFrame
 
 - (SGFFFrameType)type
 {
@@ -154,9 +160,19 @@
     }
 }
 
+- (void)stopPlaying
+{
+    [self.lock lock];
+    [super stopPlaying];
+    [self.lock unlock];
+}
+
 - (SGPLFImage *)image
 {
-    return SGYUVConvertToImage(channel_pixels, channel_linesize, self.width, self.height, pixelFormat);
+    [self.lock lock];
+    SGPLFImage * image = SGYUVConvertToImage(channel_pixels, channel_linesize, self.width, self.height, pixelFormat);
+    [self.lock unlock];
+    return image;
 }
 
 - (int)size
