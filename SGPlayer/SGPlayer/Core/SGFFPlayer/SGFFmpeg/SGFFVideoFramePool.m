@@ -130,17 +130,17 @@
 
 - (void)videoFrameDidStartDrawing:(SGFFVideoFrame *)videoFrame
 {
-    [self setFrameStartDrawing:videoFrame];
+    [self setFrameStartDrawing:(SGFFAVYUVVideoFrame *)videoFrame];
 }
 
 - (void)videoFrameDidStopDrawing:(SGFFVideoFrame *)videoFrame
 {
-    [self setFrameStopDrawing:videoFrame];
+    [self setFrameStopDrawing:(SGFFAVYUVVideoFrame *)videoFrame];
 }
 
 - (void)videoFrameDidCancel:(SGFFVideoFrame *)videoFrame
 {
-    [self setFrameUnuse:videoFrame];
+    [self setFrameUnuse:(SGFFAVYUVVideoFrame *)videoFrame];
 }
 
 - (void)dealloc
