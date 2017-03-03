@@ -7,6 +7,8 @@
 //
 
 #import "SGPLFGLView.h"
+#import "SGPLFView.h"
+#import "SGPLFScreen.h"
 
 #if SGPLATFORM_TARGET_OS_MAC
 
@@ -38,7 +40,7 @@ SGPLFGLContext * SGPLFGLViewGetContext(SGPLFGLView * view)
 
 SGPLFImage * SGPLFGLViewGetCurrentSnapshot(SGPLFGLView * view)
 {
-    return nil;
+    return SGPLFViewGetCurrentSnapshot(view);
 }
 
 #elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
