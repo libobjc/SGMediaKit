@@ -7,6 +7,7 @@
 //
 
 #import "SGPLFMacro.h"
+#import "SGPLFImage.h"
 #import "SGPLFColor.h"
 
 #if SGPLATFORM_TARGET_OS_MAC
@@ -25,3 +26,5 @@ typedef UIView SGPLFView;
 
 void SGPLFViewSetBackgroundColor(SGPLFView * view, SGPLFColor * color);
 void SGPLFViewInsertSubview(SGPLFView * superView, SGPLFView * subView, NSInteger index);
+
+SGPLFImage * SGPLFViewGetCurrentSnapshot(SGPLFView * view);
