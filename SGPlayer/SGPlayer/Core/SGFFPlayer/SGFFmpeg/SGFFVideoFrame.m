@@ -61,6 +61,7 @@
         channel_pixels[SGYUVChannelLuma] = NULL;
         channel_pixels[SGYUVChannelChromaB] = NULL;
         channel_pixels[SGYUVChannelChromaR] = NULL;
+        self.lock = [[NSLock alloc] init];
     }
     return self;
 }
