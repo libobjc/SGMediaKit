@@ -176,21 +176,20 @@
         numberOfFrames = _temp_frame->nb_samples;
     }
     
-    const NSUInteger numberOfElements = numberOfFrames * self->_channelCount;
-    NSMutableData *data = [NSMutableData dataWithLength:numberOfElements * sizeof(float)];
-    
-    float scale = 1.0 / (float)INT16_MAX ;
-    vDSP_vflt16((SInt16 *)audioDataBuffer, 1, data.mutableBytes, 1, numberOfElements);
-    vDSP_vsmul(data.mutableBytes, 1, &scale, data.mutableBytes, 1, numberOfElements);
-    
     SGFFAudioFrame * audioFrame = [self.framePool getUnuseFrame];
     audioFrame.position = av_frame_get_best_effort_timestamp(_temp_frame) * _timebase;
     audioFrame.duration = av_frame_get_pkt_duration(_temp_frame) * _timebase;
-    audioFrame.samples = data;
     
     if (audioFrame.duration == 0) {
-        audioFrame.duration = audioFrame.samples.length / (sizeof(float) * _channelCount * _samplingRate);
+        audioFrame.duration = audioFrame->length / (sizeof(float) * _channelCount * _samplingRate);
     }
+    
+    const NSUInteger numberOfElements = numberOfFrames * self->_channelCount;
+    [audioFrame setSamplesLength:numberOfElements * sizeof(float)];
+    
+    float scale = 1.0 / (float)INT16_MAX ;
+    vDSP_vflt16((SInt16 *)audioDataBuffer, 1, audioFrame->samples, 1, numberOfElements);
+    vDSP_vsmul(audioFrame->samples, 1, &scale, audioFrame->samples, 1, numberOfElements);
     
     return audioFrame;
 }

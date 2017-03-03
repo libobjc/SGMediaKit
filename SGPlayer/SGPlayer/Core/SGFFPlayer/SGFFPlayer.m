@@ -22,9 +22,6 @@
 @property (nonatomic, strong) SGFFDecoder * decoder;
 @property (nonatomic, strong) SGAudioManager * audioManager;
 
-@property (nonatomic, strong) NSData * currentAudioFrameSamples;
-@property (nonatomic, assign) NSUInteger currentAudioFramePosition;
-
 @property (nonatomic, assign) SGPlayerState state;
 @property (nonatomic, assign) NSTimeInterval progress;
 
@@ -32,6 +29,8 @@
 @property (nonatomic, assign) NSTimeInterval lastPostPlayableTime;
 
 @property (nonatomic, assign) BOOL playing;
+
+@property (nonatomic, strong) SGFFAudioFrame * currentAudioFrame;
 
 @end
 
@@ -291,7 +290,7 @@
 - (void)clean
 {
     [self cleanDecoder];
-    [self cleanFrames];
+    [self cleanFrame];
     [self cleanPlayer];
 }
 
@@ -306,10 +305,10 @@
     [self.abstractPlayer.displayView cleanEmptyBuffer];
 }
 
-- (void)cleanFrames
+- (void)cleanFrame
 {
-    self.currentAudioFrameSamples = nil;
-    self.currentAudioFramePosition = 0;
+    [self.currentAudioFrame stopPlaying];
+    self.currentAudioFrame = nil;
 }
 
 - (void)cleanDecoder
@@ -345,43 +344,34 @@
         memset(outputData, 0, numberOfFrames * numberOfChannels * sizeof(float));
         return;
     }
-    
-    while (numberOfFrames > 0)
+    @autoreleasepool
     {
-        @autoreleasepool
+        while (numberOfFrames > 0)
         {
-            if (!self.currentAudioFrameSamples) {
-                SGFFAudioFrame * frame = [self.decoder fetchAudioFrame];
-                
-                if (!frame) {
-                    memset(outputData, 0, numberOfFrames * numberOfChannels * sizeof(float));
-                    return;
-                }
-                
-                [frame startPlaying];
-                self.currentAudioFramePosition = 0;
-                self.currentAudioFrameSamples = frame.samples;
-                [frame stopPlaying];
+            if (!self.currentAudioFrame) {
+                self.currentAudioFrame = [self.decoder fetchAudioFrame];
+                [self.currentAudioFrame startPlaying];
             }
-            if (self.currentAudioFrameSamples) {
-                const void *bytes = (Byte *)self.currentAudioFrameSamples.bytes + self.currentAudioFramePosition;
-                const NSUInteger bytesLeft = (self.currentAudioFrameSamples.length - self.currentAudioFramePosition);
-                const NSUInteger frameSizeOf = numberOfChannels * sizeof(float);
-                const NSUInteger bytesToCopy = MIN(numberOfFrames * frameSizeOf, bytesLeft);
-                const NSUInteger framesToCopy = bytesToCopy / frameSizeOf;
-                
-                memcpy(outputData, bytes, bytesToCopy);
-                numberOfFrames -= framesToCopy;
-                outputData += framesToCopy * numberOfChannels;
-                
-                if (bytesToCopy < bytesLeft) {
-                    self.currentAudioFramePosition += bytesToCopy;
-                } else {
-                    self.currentAudioFrameSamples = nil;
-                }
-            } else {
+            if (!self.currentAudioFrame) {
                 memset(outputData, 0, numberOfFrames * numberOfChannels * sizeof(float));
-                break;
+                return;
+            }
+            
+            const Byte * bytes = (Byte *)self.currentAudioFrame->samples + self.currentAudioFrame->output_offset;
+            const NSUInteger bytesLeft = self.currentAudioFrame->length - self.currentAudioFrame->output_offset;
+            const NSUInteger frameSizeOf = numberOfChannels * sizeof(float);
+            const NSUInteger bytesToCopy = MIN(numberOfFrames * frameSizeOf, bytesLeft);
+            const NSUInteger framesToCopy = bytesToCopy / frameSizeOf;
+            
+            memcpy(outputData, bytes, bytesToCopy);
+            numberOfFrames -= framesToCopy;
+            outputData += framesToCopy * numberOfChannels;
+            
+            if (bytesToCopy < bytesLeft) {
+                self.currentAudioFrame->output_offset += bytesToCopy;
+            } else {
+                [self.currentAudioFrame stopPlaying];
+                self.currentAudioFrame = nil;
             }
         }
     }

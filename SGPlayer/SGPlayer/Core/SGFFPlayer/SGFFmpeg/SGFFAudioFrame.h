@@ -10,6 +10,13 @@
 
 @interface SGFFAudioFrame : SGFFFrame
 
-@property (nonatomic, strong) NSData * samples;
+{
+@public
+    float * samples;
+    int length;
+    int output_offset;
+}
+
+- (void)setSamplesLength:(NSUInteger)samplesLength;
 
 @end
