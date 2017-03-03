@@ -42,6 +42,15 @@ static GLuint gl_texture_ids[3];
     [self displayAsyncOnMainThread];
 }
 
+- (SGPLFImage *)imageFromPixelBuffer
+{
+    if (self.videoFrame) {
+        return nil;
+    } else {
+        return SGPLFGLViewGetCurrentSnapshot(self);
+    }
+}
+
 - (BOOL)updateTextureAspect:(CGFloat *)aspect
 {
     if (!self.videoFrame) return NO;

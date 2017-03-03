@@ -151,6 +151,14 @@
     }
 }
 
+- (SGPLFImage *)snapshot
+{
+    if (self.displayView.abstractPlayer.videoType == SGVideoTypeVR) {
+        return SGPLFGLViewGetCurrentSnapshot(self);
+    }
+    return [self imageFromPixelBuffer];
+}
+
 - (void)drawOpenGL
 {
     glClearColor(0, 0, 0, 1);
@@ -278,10 +286,12 @@
     SGPlayerLog(@"%@ release", self.class);
 }
 
+- (SGGLProgram *)program {return nil;}
+
 - (void)setupProgram {}
 - (void)setupSubClass {}
 - (BOOL)updateTextureAspect:(CGFloat *)aspect {return NO;}
 - (void)cleanTexture {}
-- (SGGLProgram *)program {return nil;}
+- (SGPLFImage *)imageFromPixelBuffer {return nil;}
 
 @end

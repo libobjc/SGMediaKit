@@ -23,6 +23,8 @@
 - (void)displayAsyncOnMainThread;
 - (void)cleanEmptyBuffer;
 
+- (SGPLFImage *)snapshot;
+
 #pragma mark - subclass override
 
 - (SGGLProgram *)program;
@@ -31,5 +33,6 @@
 - (void)setupSubClass;
 - (BOOL)updateTextureAspect:(CGFloat *)aspect;
 - (void)cleanTexture;
+- (SGPLFImage *)imageFromPixelBuffer;
 
 @end

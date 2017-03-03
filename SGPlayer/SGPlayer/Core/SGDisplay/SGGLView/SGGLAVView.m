@@ -21,6 +21,11 @@
 
 @implementation SGGLAVView
 
+- (SGPLFImage *)imageFromPixelBuffer
+{
+    return SGPLFGLViewGetCurrentSnapshot(self);
+}
+
 - (BOOL)updateTextureAspect:(CGFloat *)aspect
 {
     CVPixelBufferRef pixelBuffer = [self.displayView.sgavplayer pixelBufferAtCurrentTime];

@@ -187,10 +187,10 @@
         case SGDisplayRendererTypeAVPlayerLayer:
             return self.sgavplayer.snapshotAtCurrentTime;
         case SGDisplayRendererTypeAVPlayerPixelBufferVR:
-            return SGPLFGLViewGetCurrentSnapshot(self.avplayerView);
+            return self.avplayerView.snapshot;
         case SGDisplayRendererTypeFFmpegPexelBuffer:
         case SGDisplayRendererTypeFFmpegPexelBufferVR:
-            return SGPLFGLViewGetCurrentSnapshot(self.ffplayerView);
+            return self.ffplayerView.snapshot;
     }
 }
 
