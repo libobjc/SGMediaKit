@@ -49,5 +49,6 @@ SGPLFImage * SGYUVConvertToImage(UInt8 * src_data[], int src_linesize[], int wid
         sws_freeContext(sws_context);
     }
     if (result < 0) return nil;
+    if (linesize[0] <= 0 || data[0] == NULL) return nil;
     return SGPLFImageWithRGBData(data[0], linesize[0], width, height);
 }
