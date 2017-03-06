@@ -55,6 +55,7 @@
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 
 @property (nonatomic, assign, readonly) CGSize presentationSize;
+@property (nonatomic, assign, readonly) CGFloat aspect;
 @property (nonatomic, assign, readonly) NSTimeInterval bitrate;
 @property (nonatomic, assign, readonly) NSTimeInterval progress;
 @property (nonatomic, assign, readonly) NSTimeInterval duration;

@@ -554,6 +554,10 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
     return self.formatContext.videoPresentationSize;
 }
 
+- (CGFloat)aspect
+{
+    return self.formatContext.videoAspect;
+}
 
 #pragma mark - delegate callback
 
