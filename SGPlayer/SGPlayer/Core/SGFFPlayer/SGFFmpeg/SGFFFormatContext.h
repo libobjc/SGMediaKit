@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
 #import "SGFFMetadata.h"
+#import "SGFFTrack.h"
 
 @class SGFFFormatContext;
 
@@ -40,14 +41,17 @@
 @property (nonatomic, assign, readonly) BOOL videoEnable;
 @property (nonatomic, assign, readonly) BOOL audioEnable;
 
-@property (nonatomic, assign, readonly) int videoStreamIndex;
-@property (nonatomic, assign, readonly) int audioStreamIndex;
+@property (nonatomic, assign, readonly) int videoTrackIndex;
+@property (nonatomic, assign, readonly) int audioTrackIndex;
 
-@property (nonatomic, copy, readonly) NSArray <NSNumber *> * videoStreamIndexs;
-@property (nonatomic, copy, readonly) NSArray <NSNumber *> * audioStreamIndexs;
+@property (nonatomic, copy, readonly) NSArray <SGFFTrack *> * videoTrackIndexs;
+@property (nonatomic, copy, readonly) NSArray <SGFFTrack *> * audioTrackIndexs;
 
-@property (nonatomic, strong, readonly) SGFFMetadata * videoMetadata;
-@property (nonatomic, strong, readonly) SGFFMetadata * audioMetadata;
+@property (nonatomic, strong, readonly) SGFFMetadata * videoTrackMetadata;
+@property (nonatomic, strong, readonly) SGFFMetadata * audioTrackMetadata;
+
+@property (nonatomic, strong, readonly) NSArray <SGFFMetadata *> * videoTrackMetadatas;
+@property (nonatomic, strong, readonly) NSArray <SGFFMetadata *> * audioTrackMetadatas;
 
 @property (nonatomic, assign, readonly) NSTimeInterval videoTimebase;
 @property (nonatomic, assign, readonly) NSTimeInterval videoFPS;
