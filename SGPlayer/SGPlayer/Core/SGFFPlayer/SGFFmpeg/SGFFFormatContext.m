@@ -7,6 +7,7 @@
 //
 
 #import "SGFFFormatContext.h"
+#import "SGFFMetadata.h"
 #import "SGFFTools.h"
 
 static int ffmpeg_interrupt_callback(void *ctx)
@@ -30,6 +31,9 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 @property (nonatomic, copy) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy) NSArray <NSNumber *> * audioStreamIndexs;
+
+@property (nonatomic, strong) SGFFMetadata * videoMetadata;
+@property (nonatomic, strong) SGFFMetadata * audioMetadata;
 
 @property (nonatomic, assign) NSTimeInterval videoTimebase;
 @property (nonatomic, assign) NSTimeInterval videoFPS;
@@ -150,7 +154,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
     int result = 0;
     NSError * error = nil;
     AVStream * stream = _format_context->streams[videoStreamIndex];
-    
     AVCodecContext * codec_context = avcodec_alloc_context3(NULL);
     if (!codec_context) {
         error = [NSError errorWithDomain:@"video codec context create error" code:SGFFDecoderErrorCodeCodecContextCreate userInfo:nil];
@@ -181,6 +184,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
     
     * codecContext = codec_context;
+    self.videoMetadata = [SGFFMetadata metadataWithAVDictionary:stream->metadata];
     
     return error;
 }
@@ -215,8 +219,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
 {
     int result = 0;
     NSError * error = nil;
-    AVStream * stream = _format_context->streams[audioStreamIndex];
-    
+    AVStream * stream = _format_context->streams[2];
+    NSDictionary * metadata = SGFFFoundationBrigeOfAVDictionary(stream->metadata);
     AVCodecContext * codec_context = avcodec_alloc_context3(NULL);
     if (!codec_context) {
         error = [NSError errorWithDomain:@"audio codec context create error" code:SGFFDecoderErrorCodeCodecContextCreate userInfo:nil];
@@ -247,6 +251,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
     
     * codecContext = codec_context;
+    self.audioMetadata = [SGFFMetadata metadataWithAVDictionary:stream->metadata];
     
     return error;
 }
@@ -276,6 +281,9 @@ static int ffmpeg_interrupt_callback(void *ctx)
     
     self.audioStreamIndexs = nil;
     self.videoStreamIndexs = nil;
+    
+    self.audioMetadata = nil;
+    self.videoMetadata = nil;
     
     if (_video_codec_context) {
         avcodec_close(_video_codec_context);
