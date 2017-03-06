@@ -184,6 +184,8 @@
             } else if (superviewAspect > self.aspect) {
                 CGFloat width = superviewFrame.size.height * self.aspect;
                 self.frame = CGRectMake((superviewFrame.size.width - width) / 2, 0, width, superviewFrame.size.height);
+            } else {
+                self.frame = superviewFrame;
             }
             break;
         case SGGravityModeResizeAspectFill:
@@ -193,6 +195,8 @@
             } else if (superviewAspect > self.aspect) {
                 CGFloat height = superviewFrame.size.width / self.aspect;
                 self.frame = CGRectMake(0, -(height - superviewFrame.size.height) / 2, superviewFrame.size.width, height);
+            } else {
+                self.frame = superviewFrame;
             }
             break;
         default:
