@@ -49,6 +49,7 @@
 @property (nonatomic, assign, readonly) NSTimeInterval videoTimebase;
 @property (nonatomic, assign, readonly) NSTimeInterval videoFPS;
 @property (nonatomic, assign, readonly) CGSize videoPresentationSize;
+@property (nonatomic, assign, readonly) CGFloat videoAspect;
 
 @property (nonatomic, assign, readonly) NSTimeInterval audioTimebase;
 

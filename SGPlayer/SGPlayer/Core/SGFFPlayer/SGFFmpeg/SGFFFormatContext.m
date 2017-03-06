@@ -34,6 +34,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (nonatomic, assign) NSTimeInterval videoTimebase;
 @property (nonatomic, assign) NSTimeInterval videoFPS;
 @property (nonatomic, assign) CGSize videoPresentationSize;
+@property (nonatomic, assign) CGFloat videoAspect;
 
 @property (nonatomic, assign) NSTimeInterval audioTimebase;
 
@@ -130,6 +131,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
                     self.videoTimebase = SGFFStreamGetTimebase(_format_context->streams[self.videoStreamIndex], 0.00004);
                     self.videoFPS = SGFFStreamGetFPS(_format_context->streams[self.videoStreamIndex], self.videoTimebase);
                     self.videoPresentationSize = CGSizeMake(codec_context->width, codec_context->height);
+                    self.videoAspect = (CGFloat)codec_context->width / (CGFloat)codec_context->height;
                     self->_video_codec_context = codec_context;
                     break;
                 }
