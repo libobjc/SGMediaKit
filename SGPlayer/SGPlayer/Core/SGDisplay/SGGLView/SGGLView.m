@@ -43,6 +43,7 @@
 {
     if (self = [super initWithFrame:CGRectZero]) {
         self.displayView = displayView;
+        self.aspect = 16.0 / 9.0;
     }
     return self;
 }
@@ -238,7 +239,7 @@
     
     // update frame
     if (videoType == SGVideoTypeVR) {
-        self.aspect = 16.0/9.0;
+        self.aspect = 16.0 / 9.0;
     } else {
         self.aspect = aspect;
     }
