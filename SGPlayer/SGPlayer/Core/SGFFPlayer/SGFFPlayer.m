@@ -22,6 +22,7 @@
 @property (nonatomic, strong) SGFFDecoder * decoder;
 @property (nonatomic, strong) SGAudioManager * audioManager;
 
+@property (nonatomic, assign) BOOL prepareToken;
 @property (nonatomic, assign) SGPlayerState state;
 @property (nonatomic, assign) NSTimeInterval progress;
 
@@ -235,7 +236,7 @@
 
 - (void)decoderDidPrepareToDecodeFrames:(SGFFDecoder *)decoder
 {
-    self.state = SGPlayerStateReadyToPlay;
+//    self.state = SGPlayerStateReadyToPlay;
 }
 
 - (void)decoderDidEndOfFile:(SGFFDecoder *)decoder
@@ -255,6 +256,9 @@
     } else {
         if (self.playing) {
             self.state = SGPlayerStatePlaying;
+        } else if (!self.prepareToken) {
+            self.state = SGPlayerStateReadyToPlay;
+            self.prepareToken = YES;
         } else {
             self.state = SGPlayerStateSuspend;
         }
@@ -300,6 +304,7 @@
     self.state = SGPlayerStateNone;
     self.progress = 0;
     self.playableTime = 0;
+    self.prepareToken = NO;
     self.lastPostProgressTime = 0;
     self.lastPostPlayableTime = 0;
     [self.abstractPlayer.displayView cleanEmptyBuffer];
