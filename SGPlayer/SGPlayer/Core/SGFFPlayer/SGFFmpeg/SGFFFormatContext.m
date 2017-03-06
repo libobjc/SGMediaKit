@@ -7,7 +7,6 @@
 //
 
 #import "SGFFFormatContext.h"
-#import "SGFFMetadata.h"
 #import "SGFFTools.h"
 
 static int ffmpeg_interrupt_callback(void *ctx)

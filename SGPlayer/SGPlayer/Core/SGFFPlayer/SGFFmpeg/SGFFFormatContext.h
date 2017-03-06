@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreGraphics/CoreGraphics.h>
-#import "avformat.h"
+#import "SGFFMetadata.h"
 
 @class SGFFFormatContext;
 
@@ -45,6 +45,9 @@
 
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * videoStreamIndexs;
 @property (nonatomic, copy, readonly) NSArray <NSNumber *> * audioStreamIndexs;
+
+@property (nonatomic, strong, readonly) SGFFMetadata * videoMetadata;
+@property (nonatomic, strong, readonly) SGFFMetadata * audioMetadata;
 
 @property (nonatomic, assign, readonly) NSTimeInterval videoTimebase;
 @property (nonatomic, assign, readonly) NSTimeInterval videoFPS;
