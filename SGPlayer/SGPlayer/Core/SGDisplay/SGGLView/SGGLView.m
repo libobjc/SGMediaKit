@@ -26,6 +26,7 @@
 
 @property (nonatomic, assign) BOOL clearToken;
 @property (nonatomic, assign) CGFloat aspect;
+@property (nonatomic, assign) CGRect viewport;
 
 #if SGPLATFORM_TARGET_OS_IPHONE
 @property (nonatomic, strong) SGDistortionRenderer * distorionRenderer;
@@ -147,6 +148,7 @@
         glClearColor(0, 0, 0, 1);
         glClear(GL_COLOR_BUFFER_BIT);
     } else {
+        self.viewport = self.bounds;
         [self drawOpenGL];
     }
 }
@@ -259,7 +261,7 @@
     }
     
     CGFloat scale = SGPLFScreenGetScale();
-    CGRect rect = CGRectMake(0, 0, self.bounds.size.width * scale, self.bounds.size.height * scale);
+    CGRect rect = CGRectMake(0, 0, self.viewport.size.width * scale, self.viewport.size.height * scale);
     switch (videoType) {
         case SGVideoTypeNormal:
         {
