@@ -378,8 +378,11 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
         else if ([keyPath isEqualToString:@"loadedTimeRanges"])
         {
             [self reloadPlayableTime];
-            if ((self.playableTime - self.progress) > self.abstractPlayer.playableBufferInterval) {
+            NSTimeInterval interval = self.playableTime - self.progress;
+            if (interval > self.abstractPlayer.playableBufferInterval) {
                 [self playIfNeed];
+            } else if (interval < 0.3) {
+                [self setPlayIfNeed];
             }
         }
     }
