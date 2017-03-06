@@ -24,6 +24,8 @@
 @property (nonatomic, strong) SGGLVRModel * vrModel;
 @property (nonatomic, strong) SGMatrix * matrix;
 
+@property (nonatomic, assign) CGFloat aspect;
+
 #if SGPLATFORM_TARGET_OS_IPHONE
 @property (nonatomic, strong) SGDistortionRenderer * distorionRenderer;
 #endif
@@ -159,6 +161,60 @@
     return [self imageFromPixelBuffer];
 }
 
+- (void)reloadViewport
+{
+    CGRect superviewFrame = self.superview.bounds;
+    CGFloat superviewAspect = superviewFrame.size.width / superviewFrame.size.height;
+    
+    if (self.aspect <= 0) {
+        self.frame = superviewFrame;
+        return;
+    }
+    
+    SGGravityMode gravityMode = self.displayView.abstractPlayer.viewGravityMode;
+    switch (gravityMode) {
+        case SGGravityModeResize:
+            self.frame = superviewFrame;
+            break;
+        case SGGravityModeResizeAspect:
+            if (superviewAspect < self.aspect) {
+                CGFloat height = superviewFrame.size.width / self.aspect;
+                self.frame = CGRectMake(0, (superviewFrame.size.height - height) / 2, superviewFrame.size.width, height);
+            } else if (superviewAspect > self.aspect) {
+                CGFloat width = superviewFrame.size.height * self.aspect;
+                self.frame = CGRectMake((superviewFrame.size.width - width) / 2, 0, width, superviewFrame.size.height);
+            }
+            break;
+        case SGGravityModeResizeAspectFill:
+            if (superviewAspect < self.aspect) {
+                CGFloat width = superviewFrame.size.height * self.aspect;
+                self.frame = CGRectMake(-(width - superviewFrame.size.width) / 2, 0, width, superviewFrame.size.height);
+            } else if (superviewAspect > self.aspect) {
+                CGFloat height = superviewFrame.size.width / self.aspect;
+                self.frame = CGRectMake(0, -(height - superviewFrame.size.height) / 2, superviewFrame.size.width, height);
+            }
+            break;
+        default:
+            self.frame = superviewFrame;
+            break;
+    }
+}
+
+- (void)setAspect:(CGFloat)aspect
+{
+    if (_aspect != aspect) {
+        _aspect = aspect;
+        [self reloadViewport];
+    }
+}
+
+- (void)setFrame:(CGRect)frame
+{
+    if (!CGRectEqualToRect(self.frame, frame)) {
+        [super setFrame:frame];
+    }
+}
+
 - (void)drawOpenGL
 {
     glClearColor(0, 0, 0, 1);
@@ -166,7 +222,6 @@
     
     SGVideoType videoType = self.displayView.abstractPlayer.videoType;
     SGDisplayMode displayMode = self.displayView.abstractPlayer.displayMode;
-    SGGravityMode gravityMode = self.displayView.abstractPlayer.viewGravityMode;
     
 #if SGPLATFORM_TARGET_OS_IPHONE
     if (videoType == SGVideoTypeVR && displayMode == SGDisplayModeBox) {
@@ -174,41 +229,22 @@
     }
 #endif
 
-    CGFloat aspect = 16.0/9.0;
+    CGFloat aspect;
     BOOL success = [self updateTextureAspect:&aspect];
     if (!success) return;
     
     [self.program use];
     [self.program bindVariable];
     
-    CGFloat scale = SGPLFScreenGetScale();
-    CGRect rect = self.bounds;
-    CGFloat rectAspect = rect.size.width / rect.size.height;
-    if (videoType == SGVideoTypeVR) aspect = 16.0/9.0;
-    switch (gravityMode) {
-        case SGGravityModeResize:
-            break;
-        case SGGravityModeResizeAspect:
-            if (rectAspect < aspect) {
-                CGFloat height = rect.size.width / aspect;
-                rect = CGRectMake(0, (rect.size.height - height) / 2, rect.size.width, height);
-            } else if (rectAspect > aspect) {
-                CGFloat width = rect.size.height * aspect;
-                rect = CGRectMake((rect.size.width - width) / 2, 0, width, rect.size.height);
-            }
-            break;
-        case SGGravityModeResizeAspectFill:
-            if (rectAspect < aspect) {
-                CGFloat width = rect.size.height * aspect;
-                rect = CGRectMake(-(width - rect.size.width) / 2, 0, width, rect.size.height);
-            } else if (rectAspect > aspect) {
-                CGFloat height = rect.size.width / aspect;
-                rect = CGRectMake(0, -(height - rect.size.height) / 2, rect.size.width, height);
-            }
-            break;
+    // update frame
+    if (videoType == SGVideoTypeVR) {
+        self.aspect = 16.0/9.0;
+    } else {
+        self.aspect = aspect;
     }
-    rect = CGRectMake(CGRectGetMinX(rect) * scale, CGRectGetMinY(rect) * scale, CGRectGetWidth(rect) * scale, CGRectGetHeight(rect) * scale);
     
+    CGFloat scale = SGPLFScreenGetScale();
+    CGRect rect = CGRectMake(0, 0, self.bounds.size.width * scale, self.bounds.size.height * scale);
     switch (videoType) {
         case SGVideoTypeNormal:
         {

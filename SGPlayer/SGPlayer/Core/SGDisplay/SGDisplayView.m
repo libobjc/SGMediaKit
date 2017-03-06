@@ -204,10 +204,10 @@
         }
     }
     if (self.avplayerView) {
-        self.avplayerView.frame = frame;
+        [self.avplayerView reloadViewport];
     }
     if (self.ffplayerView) {
-        self.ffplayerView.frame = frame;
+        [self.ffplayerView reloadViewport];
     }
 }
 

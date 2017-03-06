@@ -20,6 +20,8 @@
 
 @property (nonatomic, weak, readonly) SGDisplayView * displayView;
 
+- (void)reloadViewport;
+
 - (void)displayAsyncOnMainThread;
 - (void)cleanEmptyBuffer;
 
