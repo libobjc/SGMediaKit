@@ -15,7 +15,7 @@
 #import "SGMatrix.h"
 #import "SGDistortionRenderer.h"
 
-@interface SGGLView ()
+@interface SGGLView () <SGPLFGLViewDelegate>
 
 @property (nonatomic, assign) BOOL setupToken;
 @property (nonatomic, weak) SGDisplayView * displayView;
@@ -24,6 +24,7 @@
 @property (nonatomic, strong) SGGLVRModel * vrModel;
 @property (nonatomic, strong) SGMatrix * matrix;
 
+@property (nonatomic, assign) BOOL clearToken;
 @property (nonatomic, assign) CGFloat aspect;
 
 #if SGPLATFORM_TARGET_OS_IPHONE
@@ -101,6 +102,7 @@
     self.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     self.contentScaleFactor = [UIScreen mainScreen].scale;
 #endif
+    SGPLFGLViewSetDrawDelegate(self, self);
     SGPLFGLContext * context = SGPLFGLContextAllocInit();
     SGPLFGLViewSetContext(self, context);
     SGPLGLContextSetCurrentContext(context);
@@ -130,9 +132,23 @@
     if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) return;
 #endif
     if (!self.displayView.abstractPlayer.contentURL) return;
-    SGPLFGLViewPrepareOpenGL(self);
-    [self drawOpenGL];
-    SGPLFGLViewFlushBuffer(self);
+    [self displayAndClear:NO];
+}
+
+- (void)displayAndClear:(BOOL)clear
+{
+    self.clearToken = clear;
+    SGPLFGLViewDisplay(self);
+}
+
+- (void)glkView:(SGPLFGLView *)view drawInRect:(CGRect)rect
+{
+    if (self.clearToken) {
+        glClearColor(0, 0, 0, 1);
+        glClear(GL_COLOR_BUFFER_BIT);
+    } else {
+        [self drawOpenGL];
+    }
 }
 
 - (void)cleanEmptyBuffer
@@ -140,16 +156,10 @@
     [self cleanTexture];
     
     if ([NSThread isMainThread]) {
-        SGPLFGLViewPrepareOpenGL(self);
-        glClearColor(0, 0, 0, 1);
-        glClear(GL_COLOR_BUFFER_BIT);
-        SGPLFGLViewFlushBuffer(self);
+        [self displayAndClear:YES];
     } else {
         dispatch_sync(dispatch_get_main_queue(), ^{
-            SGPLFGLViewPrepareOpenGL(self);
-            glClearColor(0, 0, 0, 1);
-            glClear(GL_COLOR_BUFFER_BIT);
-            SGPLFGLViewFlushBuffer(self);
+            [self displayAndClear:YES];
         });
     }
 }
