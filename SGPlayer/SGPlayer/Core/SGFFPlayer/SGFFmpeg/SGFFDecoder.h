@@ -10,6 +10,7 @@
 #import <CoreGraphics/CoreGraphics.h>
 #import "SGFFAudioFrame.h"
 #import "SGFFVideoFrame.h"
+#import "SGFFTrack.h"
 
 @class SGFFDecoder;
 
@@ -54,6 +55,7 @@
 
 @property (nonatomic, copy, readonly) NSURL * contentURL;
 
+@property (nonatomic, copy, readonly) NSDictionary * metadata;
 @property (nonatomic, assign, readonly) CGSize presentationSize;
 @property (nonatomic, assign, readonly) CGFloat aspect;
 @property (nonatomic, assign, readonly) NSTimeInterval bitrate;
@@ -85,5 +87,17 @@
 
 - (void)open;
 - (void)closeFile;      // when release of active calls, or when called in dealloc might block the thread
+
+
+#pragma mark - track info
+
+@property (nonatomic, assign, readonly) BOOL videoEnable;
+@property (nonatomic, assign, readonly) BOOL audioEnable;
+
+@property (nonatomic, strong, readonly) SGFFTrack * videoTrack;
+@property (nonatomic, strong, readonly) SGFFTrack * audioTrack;
+
+@property (nonatomic, strong, readonly) NSArray <SGFFTrack *> * videoTracks;
+@property (nonatomic, strong, readonly) NSArray <SGFFTrack *> * audioTracks;
 
 @end

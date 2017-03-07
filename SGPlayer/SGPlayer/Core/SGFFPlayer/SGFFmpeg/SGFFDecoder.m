@@ -534,6 +534,11 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
     }
 }
 
+- (NSDictionary *)metadata
+{
+    return self.formatContext.metadata;
+}
+
 - (NSTimeInterval)duration
 {
     return self.formatContext.duration;
@@ -557,6 +562,36 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
 - (CGFloat)aspect
 {
     return self.formatContext.videoAspect;
+}
+
+- (BOOL)videoEnable
+{
+    return self.formatContext.videoEnable;
+}
+
+- (BOOL)audioEnable
+{
+    return self.formatContext.audioEnable;
+}
+
+- (SGFFTrack *)videoTrack
+{
+    return self.formatContext.videoTrack;
+}
+
+- (SGFFTrack *)audioTrack
+{
+    return self.formatContext.audioTrack;
+}
+
+- (NSArray<SGFFTrack *> *)videoTracks
+{
+    return self.formatContext.videoTracks;
+}
+
+- (NSArray<SGFFTrack *> *)audioTracks
+{
+    return self.formatContext.audioTracks;
 }
 
 #pragma mark - delegate callback
