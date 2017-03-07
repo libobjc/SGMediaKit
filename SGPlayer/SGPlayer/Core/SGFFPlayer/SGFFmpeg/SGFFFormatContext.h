@@ -41,17 +41,11 @@
 @property (nonatomic, assign, readonly) BOOL videoEnable;
 @property (nonatomic, assign, readonly) BOOL audioEnable;
 
-@property (nonatomic, assign, readonly) int videoTrackIndex;
-@property (nonatomic, assign, readonly) int audioTrackIndex;
+@property (nonatomic, strong, readonly) SGFFTrack * videoTrack;
+@property (nonatomic, strong, readonly) SGFFTrack * audioTrack;
 
-@property (nonatomic, copy, readonly) NSArray <SGFFTrack *> * videoTrackIndexs;
-@property (nonatomic, copy, readonly) NSArray <SGFFTrack *> * audioTrackIndexs;
-
-@property (nonatomic, strong, readonly) SGFFMetadata * videoTrackMetadata;
-@property (nonatomic, strong, readonly) SGFFMetadata * audioTrackMetadata;
-
-@property (nonatomic, strong, readonly) NSArray <SGFFMetadata *> * videoTrackMetadatas;
-@property (nonatomic, strong, readonly) NSArray <SGFFMetadata *> * audioTrackMetadatas;
+@property (nonatomic, strong, readonly) NSArray <SGFFTrack *> * videoTracks;
+@property (nonatomic, strong, readonly) NSArray <SGFFTrack *> * audioTracks;
 
 @property (nonatomic, assign, readonly) NSTimeInterval videoTimebase;
 @property (nonatomic, assign, readonly) NSTimeInterval videoFPS;

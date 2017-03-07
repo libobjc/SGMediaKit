@@ -7,7 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "SGFFMetadata.h"
 
 @interface SGFFTrack : NSObject
+
+@property (nonatomic, assign) int index;
+
+@property (nonatomic, strong) SGFFMetadata * metadata;
 
 @end

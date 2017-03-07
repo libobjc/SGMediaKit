@@ -25,17 +25,11 @@ static int ffmpeg_interrupt_callback(void *ctx)
 @property (nonatomic, assign) BOOL videoEnable;
 @property (nonatomic, assign) BOOL audioEnable;
 
-@property (nonatomic, assign) int videoTrackIndex;
-@property (nonatomic, assign) int audioTrackIndex;
+@property (nonatomic, strong) SGFFTrack * videoTrack;
+@property (nonatomic, strong) SGFFTrack * audioTrack;
 
-@property (nonatomic, copy) NSArray <SGFFTrack *> * videoTrackIndexs;
-@property (nonatomic, copy) NSArray <SGFFTrack *> * audioTrackIndexs;
-
-@property (nonatomic, strong) SGFFMetadata * videoTrackMetadata;
-@property (nonatomic, strong) SGFFMetadata * audioTrackMetadata;
-
-@property (nonatomic, strong) NSArray <SGFFMetadata *> * videoTrackMetadatas;
-@property (nonatomic, strong) NSArray <SGFFMetadata *> * audioTrackMetadatas;
+@property (nonatomic, strong) NSArray <SGFFTrack *> * videoTracks;
+@property (nonatomic, strong) NSArray <SGFFTrack *> * audioTracks;
 
 @property (nonatomic, assign) NSTimeInterval videoTimebase;
 @property (nonatomic, assign) NSTimeInterval videoFPS;
@@ -59,8 +53,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
         self.contentURL = contentURL;
         self.delegate = delegate;
         
-        self.videoTrackIndex = -1;
-        self.audioTrackIndex = -1;
+        self.videoTrack = nil;
+        self.audioTrack = nil;
     }
     return self;
 }
@@ -123,19 +117,19 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (NSError *)openVideoStreams
 {
     NSError * error = nil;
-    self.videoTrackIndexs = [self fetchStreamsForMediaType:AVMEDIA_TYPE_VIDEO];
+    self.videoTracks = [self fetchStreamsForMediaType:AVMEDIA_TYPE_VIDEO];
     
-    if (self.videoTrackIndexs.count > 0) {
-        for (NSNumber * number in self.videoTrackIndexs) {
-            int index = number.intValue;
+    if (self.videoTracks.count > 0) {
+        for (SGFFTrack * obj in self.videoTracks) {
+            int index = obj.index;
             if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0) {
                 AVCodecContext * codec_context;
                 error = [self openVideoStream:index codecContext:&codec_context];
                 if (!error) {
-                    self.videoTrackIndex = index;
+                    self.videoTrack = obj;
                     self.videoEnable = YES;
-                    self.videoTimebase = SGFFStreamGetTimebase(_format_context->streams[self.videoTrackIndex], 0.00004);
-                    self.videoFPS = SGFFStreamGetFPS(_format_context->streams[self.videoTrackIndex], self.videoTimebase);
+                    self.videoTimebase = SGFFStreamGetTimebase(_format_context->streams[index], 0.00004);
+                    self.videoFPS = SGFFStreamGetFPS(_format_context->streams[index], self.videoTimebase);
                     self.videoPresentationSize = CGSizeMake(codec_context->width, codec_context->height);
                     self.videoAspect = (CGFloat)codec_context->width / (CGFloat)codec_context->height;
                     self->_video_codec_context = codec_context;
@@ -186,7 +180,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
     
     * codecContext = codec_context;
-    self.videoTrackMetadata = [SGFFMetadata metadataWithAVDictionary:stream->metadata];
     
     return error;
 }
@@ -194,17 +187,17 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (NSError *)openAutioStreams
 {
     NSError * error = nil;
-    self.audioTrackIndexs = [self fetchStreamsForMediaType:AVMEDIA_TYPE_AUDIO];
+    self.audioTracks = [self fetchStreamsForMediaType:AVMEDIA_TYPE_AUDIO];
     
-    if (self.audioTrackIndexs.count > 0) {
-        for (NSNumber * number in self.audioTrackIndexs) {
-            int index = number.intValue;
+    if (self.audioTracks.count > 0) {
+        for (SGFFTrack * obj in self.audioTracks) {
+            int index = obj.index;
             AVCodecContext * codec_context;
             error = [self openAudioStream:index codecContext:&codec_context];
             if (!error) {
-                self.audioTrackIndex = index;
+                self.audioTrack = obj;
                 self.audioEnable = YES;
-                self.audioTimebase = SGFFStreamGetTimebase(_format_context->streams[self.audioTrackIndex], 0.000025);
+                self.audioTimebase = SGFFStreamGetTimebase(_format_context->streams[index], 0.000025);
                 self->_audio_codec_context = codec_context;
                 break;
             }
@@ -252,22 +245,23 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
     
     * codecContext = codec_context;
-    self.audioTrackMetadata = [SGFFMetadata metadataWithAVDictionary:stream->metadata];
     
     return error;
 }
 
-- (NSArray *)fetchStreamsForMediaType:(enum AVMediaType)mediaType
+- (NSArray <SGFFTrack *> *)fetchStreamsForMediaType:(enum AVMediaType)mediaType
 {
-    NSMutableArray * array = [NSMutableArray array];
+    NSMutableArray <SGFFTrack *> * tracks = [NSMutableArray array];
     for (NSInteger i = 0; i < _format_context->nb_streams; i++) {
         AVStream * stream = _format_context->streams[i];
         if (stream->codecpar->codec_type == mediaType) {
-            [array addObject:[NSNumber numberWithInteger:i]];
+            SGFFTrack * track = [[SGFFTrack alloc] init];
+            track.index = (int)i;
+            [tracks addObject:track];
         }
     }
-    if (array.count > 0) {
-        return array;
+    if (tracks.count > 0) {
+        return tracks;
     }
     return nil;
 }
@@ -275,19 +269,13 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (void)destroy
 {
     self.videoEnable = NO;
-    self.videoTrackIndex = -1;
+    self.videoTrack = nil;
     
     self.audioEnable = NO;
-    self.audioTrackIndex = -1;
+    self.audioTrack = nil;
     
-    self.audioTrackIndexs = nil;
-    self.videoTrackIndexs = nil;
-    
-    self.audioTrackMetadata = nil;
-    self.videoTrackMetadata = nil;
-    
-    self.audioTrackMetadatas = nil;
-    self.videoTrackMetadatas = nil;
+    self.audioTracks = nil;
+    self.videoTracks = nil;
     
     if (_video_codec_context) {
         avcodec_close(_video_codec_context);
