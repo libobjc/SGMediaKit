@@ -478,7 +478,7 @@
 {
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
-            return NO;
+            return self.avPlayer.videoEnable;
         case SGDecoderTypeFFmpeg:
             return self.ffPlayer.videoEnable;
         case SGDecoderTypeError:
@@ -490,7 +490,7 @@
 {
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
-            return NO;
+            return self.avPlayer.audioEnable;
         case SGDecoderTypeFFmpeg:
             return self.ffPlayer.audioEnable;
         case SGDecoderTypeError:
@@ -502,7 +502,7 @@
 {
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
-            return nil;
+            return self.avPlayer.videoTrack;
         case SGDecoderTypeFFmpeg:
             return self.ffPlayer.videoTrack;
         case SGDecoderTypeError:
@@ -514,7 +514,7 @@
 {
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
-            return nil;
+            return self.avPlayer.audioTrack;
         case SGDecoderTypeFFmpeg:
             return self.ffPlayer.audioTrack;
         case SGDecoderTypeError:
@@ -526,7 +526,7 @@
 {
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
-            return nil;
+            return self.avPlayer.videoTracks;
         case SGDecoderTypeFFmpeg:
             return self.ffPlayer.videoTracks;
         case SGDecoderTypeError:
@@ -538,7 +538,7 @@
 {
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
-            return nil;
+            return self.avPlayer.audioTracks;
         case SGDecoderTypeFFmpeg:
             return self.ffPlayer.audioTracks;
         case SGDecoderTypeError:
@@ -555,7 +555,7 @@
 {
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
-            break;
+            [self.avPlayer selectAudioTrackIndex:audioTrackIndex];
         case SGDecoderTypeFFmpeg:
             [self.ffPlayer selectAudioTrackIndex:audioTrackIndex];
             break;

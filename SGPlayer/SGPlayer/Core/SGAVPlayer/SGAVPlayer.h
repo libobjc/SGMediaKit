@@ -39,4 +39,18 @@
 - (SGPLFImage *)snapshotAtCurrentTime;
 - (CVPixelBufferRef)pixelBufferAtCurrentTime;
 
+
+#pragma mark - track info
+
+@property (nonatomic, assign, readonly) BOOL videoEnable;
+@property (nonatomic, assign, readonly) BOOL audioEnable;
+
+@property (nonatomic, strong, readonly) SGPlayerTrack * videoTrack;
+@property (nonatomic, strong, readonly) SGPlayerTrack * audioTrack;
+
+@property (nonatomic, strong, readonly) NSArray <SGPlayerTrack *> * videoTracks;
+@property (nonatomic, strong, readonly) NSArray <SGPlayerTrack *> * audioTracks;
+
+- (void)selectAudioTrackIndex:(int)audioTrackIndex;
+
 @end

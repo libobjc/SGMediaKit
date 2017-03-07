@@ -13,6 +13,7 @@
 #import <AVFoundation/AVFoundation.h>
 
 static CGFloat const PixelBufferRequestInterval = 0.03f;
+static NSString * const AVMediaSelectionOptionTrackIDKey = @"MediaSelectionOptionsPersistentID";
 
 @interface SGAVPlayer ()
 
@@ -32,6 +33,18 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 @property (atomic, assign) BOOL needPlay;        // seek and buffering use
 @property (atomic, assign) BOOL autoNeedPlay;    // background use
 @property (atomic, assign) BOOL hasPixelBuffer;
+
+
+#pragma mark - track info
+
+@property (nonatomic, assign) BOOL videoEnable;
+@property (nonatomic, assign) BOOL audioEnable;
+
+@property (nonatomic, strong) SGPlayerTrack * videoTrack;
+@property (nonatomic, strong) SGPlayerTrack * audioTrack;
+
+@property (nonatomic, strong) NSArray <SGPlayerTrack *> * videoTracks;
+@property (nonatomic, strong) NSArray <SGPlayerTrack *> * audioTracks;
 
 @end
 
@@ -195,11 +208,6 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
 
 - (NSTimeInterval)bitrate
 {
-/*
-    if (self.avPlayerItem.status == AVPlayerItemStatusReadyToPlay) {
-        return (self.avPlayerItem.accessLog.events.lastObject.observedBitrate / 1000.0f);
-    }
- */
     return 0;
 }
 
@@ -313,6 +321,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
                     break;
                 case AVPlayerItemStatusReadyToPlay:
                 {
+                    [self setupTrackInfo];
                     SGPlayerLog(@"SGAVPlayer item status ready to play");
                     self.readyToPlayTime = [NSDate date].timeIntervalSince1970;
                     switch (self.state) {
@@ -553,6 +562,7 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     [self cleanOutput];
     [self cleanAVPlayerItem];
     [self cleanAVPlayer];
+    [self cleanTrackInfo];
     self.state = SGPlayerStateNone;
     self.needPlay = NO;
     self.seeking = NO;
@@ -577,6 +587,105 @@ static CGFloat const PixelBufferRequestInterval = 0.03f;
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [self replaceEmpty];
     [self cleanAVPlayer];
+}
+
+
+#pragma mark - track info
+
+- (void)setupTrackInfo
+{
+    if (self.videoEnable || self.audioEnable) return;
+    
+    NSMutableArray <SGPlayerTrack *> * videoTracks = [NSMutableArray array];
+    NSMutableArray <SGPlayerTrack *> * audioTracks = [NSMutableArray array];
+    
+    for (AVAssetTrack * obj in self.avAsset.tracks) {
+        if ([obj.mediaType isEqualToString:AVMediaTypeVideo]) {
+            self.videoEnable = YES;
+            [videoTracks addObject:[self playerTrackFromAVTrack:obj]];
+        } else if ([obj.mediaType isEqualToString:AVMediaTypeAudio]) {
+            self.audioEnable = YES;
+            [audioTracks addObject:[self playerTrackFromAVTrack:obj]];
+        }
+    }
+    
+    if (videoTracks.count > 0) {
+        self.videoTracks = videoTracks;
+        AVMediaSelectionGroup * videoGroup = [self.avAsset mediaSelectionGroupForMediaCharacteristic:AVMediaCharacteristicVisual];
+        if (videoGroup) {
+            int trackID = [[videoGroup.defaultOption.propertyList objectForKey:AVMediaSelectionOptionTrackIDKey] intValue];
+            for (SGPlayerTrack * obj in self.audioTracks) {
+                if (obj.index == (int)trackID) {
+                    self.videoTrack = obj;
+                }
+            }
+            if (!self.videoTrack) {
+                self.videoTrack = self.videoTracks.firstObject;
+            }
+        } else {
+            self.videoTrack = self.videoTracks.firstObject;
+        }
+    }
+    if (audioTracks.count > 0) {
+        self.audioTracks = audioTracks;
+        AVMediaSelectionGroup * audioGroup = [self.avAsset mediaSelectionGroupForMediaCharacteristic:AVMediaCharacteristicAudible];
+        if (audioGroup) {
+            int trackID = [[audioGroup.defaultOption.propertyList objectForKey:AVMediaSelectionOptionTrackIDKey] intValue];
+            for (SGPlayerTrack * obj in self.audioTracks) {
+                if (obj.index == (int)trackID) {
+                    self.audioTrack = obj;
+                }
+            }
+            if (!self.audioTrack) {
+                self.audioTrack = self.audioTracks.firstObject;
+            }
+        } else {
+            self.audioTrack = self.audioTracks.firstObject;
+        }
+    }
+}
+
+- (void)cleanTrackInfo
+{
+    self.videoEnable = NO;
+    self.videoTrack = nil;
+    self.videoTracks = nil;
+    
+    self.audioEnable = NO;
+    self.audioTrack = nil;
+    self.audioTracks = nil;
+}
+
+- (void)selectAudioTrackIndex:(int)audioTrackIndex
+{
+    if (self.audioTrack.index == audioTrackIndex) return;
+    AVMediaSelectionGroup * group = [self.avAsset mediaSelectionGroupForMediaCharacteristic:AVMediaCharacteristicAudible];
+    if (group) {
+        for (AVMediaSelectionOption * option in group.options) {
+            int trackID = [[option.propertyList objectForKey:AVMediaSelectionOptionTrackIDKey] intValue];
+            if (audioTrackIndex == trackID) {
+                [self.avPlayerItem selectMediaOption:option inMediaSelectionGroup:group];
+                for (SGPlayerTrack * track in self.audioTracks) {
+                    if (track.index == audioTrackIndex) {
+                        self.audioTrack = track;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+}
+
+- (SGPlayerTrack *)playerTrackFromAVTrack:(AVAssetTrack *)track
+{
+    if (track) {
+        SGPlayerTrack * obj = [[SGPlayerTrack alloc] init];
+        obj.index = (int)track.trackID;
+        obj.name = track.languageCode;
+        return obj;
+    }
+    return nil;
 }
 
 @end
