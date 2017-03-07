@@ -334,7 +334,11 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
                 [self updateBufferedDurationByVideo];
             }
 
-            self.currentVideoFrame = [self.videoDecoder getFrameSync];
+            SGFFVideoFrame * newFrame = [self.videoDecoder getFrameSync];
+            if (self.currentVideoFrame.position > newFrame.position) {
+                continue;
+            }
+            self.currentVideoFrame = newFrame;
             if (self.currentVideoFrame) {
                 if ([self.videoOutput respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
                     [self.videoOutput decoder:self renderVideoFrame:self.currentVideoFrame];
@@ -352,7 +356,11 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
             if (self.videoDecoder.frameEmpty) {
                 [self updateBufferedDurationByVideo];
             }
-            self.currentVideoFrame = [self.videoDecoder getFrameSync];
+            SGFFVideoFrame * newFrame = [self.videoDecoder getFrameSync];
+            if (self.currentVideoFrame.position > newFrame.position) {
+                continue;
+            }
+            self.currentVideoFrame = newFrame;
             if (self.currentVideoFrame) {
                 if ([self.videoOutput respondsToSelector:@selector(decoder:renderVideoFrame:)]) {
                     [self.videoOutput decoder:self renderVideoFrame:self.currentVideoFrame];
