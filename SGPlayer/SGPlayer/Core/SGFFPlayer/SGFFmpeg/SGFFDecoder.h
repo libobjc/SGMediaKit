@@ -100,6 +100,6 @@
 @property (nonatomic, strong, readonly) NSArray <SGFFTrack *> * videoTracks;
 @property (nonatomic, strong, readonly) NSArray <SGFFTrack *> * audioTracks;
 
-- (void)selectAudioTrackWithTrackIndex:(int)audioTrackIndex;
+- (void)selectAudioTrackIndex:(int)audioTrackIndex;
 
 @end

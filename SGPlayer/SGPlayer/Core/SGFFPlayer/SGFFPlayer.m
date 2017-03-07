@@ -415,9 +415,9 @@
     return [self playerTracksFromFFTracks:self.decoder.audioTracks];;
 }
 
-- (void)selectAudioTrack:(SGPlayerTrack *)audioTrack
+- (void)selectAudioTrackIndex:(int)audioTrackIndex
 {
-    [self.decoder selectAudioTrackWithTrackIndex:audioTrack.index];
+    [self.decoder selectAudioTrackIndex:audioTrackIndex];
 }
 
 - (SGPlayerTrack *)playerTrackFromFFTrack:(SGFFTrack *)track

@@ -242,9 +242,9 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return av_read_frame(self->_format_context, packet);
 }
 
-- (void)selectAudioTrackWithTrackIndex:(int)audioTrackIndex
+- (void)selectAudioTrackIndex:(int)audioTrackIndex
 {
-    
+    NSLog(@"选择音轨 : %d", audioTrackIndex);
 }
 
 - (NSTimeInterval)duration

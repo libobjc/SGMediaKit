@@ -548,11 +548,16 @@
 
 - (void)selectAudioTrack:(SGPlayerTrack *)audioTrack
 {
+    [self selectAudioTrackIndex:audioTrack.index];
+}
+
+- (void)selectAudioTrackIndex:(int)audioTrackIndex
+{
     switch (self.decoderType) {
         case SGDecoderTypeAVPlayer:
             break;
         case SGDecoderTypeFFmpeg:
-            [self.ffPlayer selectAudioTrack:audioTrack];
+            [self.ffPlayer selectAudioTrackIndex:audioTrackIndex];
             break;
         case SGDecoderTypeError:
             break;

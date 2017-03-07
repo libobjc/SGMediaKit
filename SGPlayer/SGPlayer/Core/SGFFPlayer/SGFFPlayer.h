@@ -48,6 +48,6 @@
 @property (nonatomic, strong, readonly) NSArray <SGPlayerTrack *> * videoTracks;
 @property (nonatomic, strong, readonly) NSArray <SGPlayerTrack *> * audioTracks;
 
-- (void)selectAudioTrack:(SGPlayerTrack *)audioTrack;
+- (void)selectAudioTrackIndex:(int)audioTrackIndex;
 
 @end

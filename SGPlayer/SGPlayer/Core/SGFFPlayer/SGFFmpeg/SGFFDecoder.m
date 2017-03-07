@@ -689,9 +689,9 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
     return self.formatContext.audioTracks;
 }
 
-- (void)selectAudioTrackWithTrackIndex:(int)audioTrackIndex
+- (void)selectAudioTrackIndex:(int)audioTrackIndex
 {
-    [self.formatContext selectAudioTrackWithTrackIndex:audioTrackIndex];
+    [self.formatContext selectAudioTrackIndex:audioTrackIndex];
 }
 
 @end
