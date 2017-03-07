@@ -282,7 +282,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (void)seekFileWithFFTimebase:(NSTimeInterval)time
 {
     int64_t ts = time * AV_TIME_BASE;
-    avformat_seek_file(self->_format_context, -1, ts, ts, ts, 0);
+    av_seek_frame(self->_format_context, -1, ts, AVSEEK_FLAG_BACKWARD);
 }
 
 - (void)seekFileWithVideo:(NSTimeInterval)time
@@ -290,7 +290,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     if (self.videoEnable)
     {
         int64_t ts = time * 1000.0 / self.videoTimebase;
-        avformat_seek_file(self->_format_context, -1, ts, ts, ts, 0);
+        av_seek_frame(self->_format_context, -1, ts, AVSEEK_FLAG_BACKWARD);
     }
     else
     {
@@ -303,7 +303,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     if (self.audioTimebase)
     {
         int64_t ts = time * 1000 / self.audioTimebase;
-        avformat_seek_file(self->_format_context, -1, ts, ts, ts, 0);
+        av_seek_frame(self->_format_context, -1, ts, AVSEEK_FLAG_BACKWARD);
     }
     else
     {
