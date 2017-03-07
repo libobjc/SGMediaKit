@@ -207,7 +207,7 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
             self.endOfFile = NO;
             self.playbackFinished = NO;
 
-            [self.formatContext seekFile:self.seekToTime];
+            [self.formatContext seekFileWithFFTimebase:self.seekToTime];
             
             self.buffering = YES;
             [self.audioDecoder flush];

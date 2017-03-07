@@ -279,10 +279,36 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-- (void)seekFile:(NSTimeInterval)time
+- (void)seekFileWithFFTimebase:(NSTimeInterval)time
 {
-    int64_t ts = av_rescale(time * 1000, AV_TIME_BASE, 1000);
-    avformat_seek_file(self->_format_context, -1, ts, ts, ts, AVSEEK_FLAG_BACKWARD);
+    int64_t ts = time * AV_TIME_BASE;
+    avformat_seek_file(self->_format_context, -1, ts, ts, ts, 0);
+}
+
+- (void)seekFileWithVideo:(NSTimeInterval)time
+{
+    if (self.videoEnable)
+    {
+        int64_t ts = time * 1000.0 / self.videoTimebase;
+        avformat_seek_file(self->_format_context, -1, ts, ts, ts, 0);
+    }
+    else
+    {
+        [self seekFileWithFFTimebase:time];
+    }
+}
+
+- (void)seekFileWithAudio:(NSTimeInterval)time
+{
+    if (self.audioTimebase)
+    {
+        int64_t ts = time * 1000 / self.audioTimebase;
+        avformat_seek_file(self->_format_context, -1, ts, ts, ts, 0);
+    }
+    else
+    {
+        [self seekFileWithFFTimebase:time];
+    }
 }
 
 - (int)readFrame:(AVPacket *)packet
