@@ -214,7 +214,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 {
     int result = 0;
     NSError * error = nil;
-    AVStream * stream = _format_context->streams[2];
+    AVStream * stream = _format_context->streams[audioStreamIndex];
     AVCodecContext * codec_context = avcodec_alloc_context3(NULL);
     if (!codec_context) {
         error = [NSError errorWithDomain:@"audio codec context create error" code:SGFFDecoderErrorCodeCodecContextCreate userInfo:nil];
