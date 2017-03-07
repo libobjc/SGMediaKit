@@ -124,7 +124,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
             int index = obj.index;
             if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0) {
                 AVCodecContext * codec_context;
-                error = [self openVideoStream:index codecContext:&codec_context];
+                error = [self openStreamWithTrackIndex:index codecContext:&codec_context domain:@"video"];
                 if (!error) {
                     self.videoTrack = obj;
                     self.videoEnable = YES;
@@ -145,45 +145,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-- (NSError *)openVideoStream:(NSInteger)videoStreamIndex codecContext:(AVCodecContext **)codecContext
-{
-    int result = 0;
-    NSError * error = nil;
-    AVStream * stream = _format_context->streams[videoStreamIndex];
-    AVCodecContext * codec_context = avcodec_alloc_context3(NULL);
-    if (!codec_context) {
-        error = [NSError errorWithDomain:@"video codec context create error" code:SGFFDecoderErrorCodeCodecContextCreate userInfo:nil];
-        return error;
-    }
-    
-    result = avcodec_parameters_to_context(codec_context, stream->codecpar);
-    error = SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecContextSetParam);
-    if (error) {
-        avcodec_free_context(&codec_context);
-        return error;
-    }
-    av_codec_set_pkt_timebase(codec_context, stream->time_base);
-    
-    AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
-    if (!codec) {
-        avcodec_free_context(&codec_context);
-        error = [NSError errorWithDomain:@"video codec not found decoder" code:SGFFDecoderErrorCodeCodecFindDecoder userInfo:nil];
-        return error;
-    }
-    codec_context->codec_id = codec->id;
-    
-    result = avcodec_open2(codec_context, codec, NULL);
-    error = SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecOpen2);
-    if (error) {
-        avcodec_free_context(&codec_context);
-        return error;
-    }
-    
-    * codecContext = codec_context;
-    
-    return error;
-}
-
 - (NSError *)openAutioStreams
 {
     NSError * error = nil;
@@ -193,7 +154,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
         for (SGFFTrack * obj in self.audioTracks) {
             int index = obj.index;
             AVCodecContext * codec_context;
-            error = [self openAudioStream:index codecContext:&codec_context];
+            error = [self openStreamWithTrackIndex:index codecContext:&codec_context domain:@"audio"];
             if (!error) {
                 self.audioTrack = obj;
                 self.audioEnable = YES;
@@ -210,14 +171,17 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-- (NSError *)openAudioStream:(NSInteger)audioStreamIndex codecContext:(AVCodecContext **)codecContext
+- (NSError *)openStreamWithTrackIndex:(int)trackIndex codecContext:(AVCodecContext **)codecContext domain:(NSString *)domain
 {
     int result = 0;
     NSError * error = nil;
-    AVStream * stream = _format_context->streams[audioStreamIndex];
+    
+    AVStream * stream = _format_context->streams[trackIndex];
     AVCodecContext * codec_context = avcodec_alloc_context3(NULL);
     if (!codec_context) {
-        error = [NSError errorWithDomain:@"audio codec context create error" code:SGFFDecoderErrorCodeCodecContextCreate userInfo:nil];
+        error = [NSError errorWithDomain:[NSString stringWithFormat:@"%@ codec context create error", domain]
+                                    code:SGFFDecoderErrorCodeCodecContextCreate
+                                userInfo:nil];
         return error;
     }
     
@@ -232,7 +196,9 @@ static int ffmpeg_interrupt_callback(void *ctx)
     AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
     if (!codec) {
         avcodec_free_context(&codec_context);
-        error = [NSError errorWithDomain:@"audio codec not found decoder" code:SGFFDecoderErrorCodeCodecFindDecoder userInfo:nil];
+        error = [NSError errorWithDomain:[NSString stringWithFormat:@"%@ codec not found decoder", domain]
+                                    code:SGFFDecoderErrorCodeCodecFindDecoder
+                                userInfo:nil];
         return error;
     }
     codec_context->codec_id = codec->id;
@@ -245,7 +211,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
     }
     
     * codecContext = codec_context;
-    
     return error;
 }
 

@@ -9,10 +9,16 @@
 #import <Foundation/Foundation.h>
 #import "SGFFMetadata.h"
 
+typedef NS_ENUM(NSUInteger, SGFFTrackType) {
+    SGFFTrackTypeVideo,
+    SGFFTrackTypeAudio,
+    SGFFTrackTypeSubtitle,
+};
+
 @interface SGFFTrack : NSObject
 
 @property (nonatomic, assign) int index;
-
+@property (nonatomic, assign) SGFFTrackType type;
 @property (nonatomic, strong) SGFFMetadata * metadata;
 
 @end
