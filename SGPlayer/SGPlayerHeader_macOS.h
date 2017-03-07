@@ -16,5 +16,6 @@ FOUNDATION_EXPORT const unsigned char SGPlayer_macOSVersionString[];      // ver
 
 // SGPlayer
 #import <SGPlayer_macOS/SGPlayer.h>
+#import <SGPlayer_macOS/SGPlayerTrack.h>
 #import <SGPlayer_macOS/SGPlayerAction.h>
 #import <SGPlayer_macOS/SGPlayerDecoder.h>

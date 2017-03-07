@@ -36,4 +36,18 @@
 - (void)seekToTime:(NSTimeInterval)time;
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(void(^)(BOOL finished))completeHandler;
 
+
+#pragma mark - track info
+
+@property (nonatomic, assign, readonly) BOOL videoEnable;
+@property (nonatomic, assign, readonly) BOOL audioEnable;
+
+@property (nonatomic, strong, readonly) SGPlayerTrack * videoTrack;
+@property (nonatomic, strong, readonly) SGPlayerTrack * audioTrack;
+
+@property (nonatomic, strong, readonly) NSArray <SGPlayerTrack *> * videoTracks;
+@property (nonatomic, strong, readonly) NSArray <SGPlayerTrack *> * audioTracks;
+
+- (void)selectAudioTrack:(SGPlayerTrack *)audioTrack;
+
 @end

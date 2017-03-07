@@ -7,6 +7,7 @@
 //
 
 #import "SGPLFObject.h"
+#import "SGPlayerTrack.h"
 #import "SGPlayerDecoder.h"
 
 // video type
@@ -95,6 +96,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)pause;
 - (void)seekToTime:(NSTimeInterval)time;
 - (void)seekToTime:(NSTimeInterval)time completeHandler:(nullable void(^)(BOOL finished))completeHandler;
+
+@end
+
+
+#pragma mark - Tracks Category
+
+@interface SGPlayer (Tracks)
+
+@property (nonatomic, assign, readonly) BOOL videoEnable;
+@property (nonatomic, assign, readonly) BOOL audioEnable;
+
+@property (nonatomic, strong, readonly) SGPlayerTrack * videoTrack;
+@property (nonatomic, strong, readonly) SGPlayerTrack * audioTrack;
+
+@property (nonatomic, strong, readonly) NSArray <SGPlayerTrack *> * videoTracks;
+@property (nonatomic, strong, readonly) NSArray <SGPlayerTrack *> * audioTracks;
+
+- (void)selectAudioTrack:(SGPlayerTrack *)audioTrack;
 
 @end
 

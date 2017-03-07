@@ -564,36 +564,6 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
     return self.formatContext.videoAspect;
 }
 
-- (BOOL)videoEnable
-{
-    return self.formatContext.videoEnable;
-}
-
-- (BOOL)audioEnable
-{
-    return self.formatContext.audioEnable;
-}
-
-- (SGFFTrack *)videoTrack
-{
-    return self.formatContext.videoTrack;
-}
-
-- (SGFFTrack *)audioTrack
-{
-    return self.formatContext.audioTrack;
-}
-
-- (NSArray<SGFFTrack *> *)videoTracks
-{
-    return self.formatContext.videoTracks;
-}
-
-- (NSArray<SGFFTrack *> *)audioTracks
-{
-    return self.formatContext.audioTracks;
-}
-
 #pragma mark - delegate callback
 
 - (void)checkBufferingStatus
@@ -652,6 +622,7 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
     SGPlayerLog(@"SGFFDecoder release");
 }
 
+
 #pragma delegate callback
 
 - (BOOL)formatContextNeedInterrupt:(SGFFFormatContext *)formatContext
@@ -683,6 +654,44 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
 {
     self.error = error;
     [self delegateErrorCallback];
+}
+
+
+#pragma mark - track info
+
+- (BOOL)videoEnable
+{
+    return self.formatContext.videoEnable;
+}
+
+- (BOOL)audioEnable
+{
+    return self.formatContext.audioEnable;
+}
+
+- (SGFFTrack *)videoTrack
+{
+    return self.formatContext.videoTrack;
+}
+
+- (SGFFTrack *)audioTrack
+{
+    return self.formatContext.audioTrack;
+}
+
+- (NSArray<SGFFTrack *> *)videoTracks
+{
+    return self.formatContext.videoTracks;
+}
+
+- (NSArray<SGFFTrack *> *)audioTracks
+{
+    return self.formatContext.audioTracks;
+}
+
+- (void)selectAudioTrackWithTrackIndex:(int)audioTrackIndex
+{
+    [self.formatContext selectAudioTrackWithTrackIndex:audioTrackIndex];
 }
 
 @end

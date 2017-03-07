@@ -468,3 +468,95 @@
 #endif
 
 @end
+
+
+#pragma mark - Tracks Category
+
+@implementation SGPlayer (Tracks)
+
+- (BOOL)videoEnable
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return NO;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.videoEnable;
+        case SGDecoderTypeError:
+            return NO;
+    }
+}
+
+- (BOOL)audioEnable
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return NO;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.audioEnable;
+        case SGDecoderTypeError:
+            return NO;
+    }
+}
+
+- (SGPlayerTrack *)videoTrack
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return nil;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.videoTrack;
+        case SGDecoderTypeError:
+            return nil;
+    }
+}
+
+- (SGPlayerTrack *)audioTrack
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return nil;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.audioTrack;
+        case SGDecoderTypeError:
+            return nil;
+    }
+}
+
+- (NSArray<SGPlayerTrack *> *)videoTracks
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return nil;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.videoTracks;
+        case SGDecoderTypeError:
+            return nil;
+    }
+}
+
+- (NSArray<SGPlayerTrack *> *)audioTracks
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            return nil;
+        case SGDecoderTypeFFmpeg:
+            return self.ffPlayer.audioTracks;
+        case SGDecoderTypeError:
+            return nil;
+    }
+}
+
+- (void)selectAudioTrack:(SGPlayerTrack *)audioTrack
+{
+    switch (self.decoderType) {
+        case SGDecoderTypeAVPlayer:
+            break;
+        case SGDecoderTypeFFmpeg:
+            [self.ffPlayer selectAudioTrack:audioTrack];
+            break;
+        case SGDecoderTypeError:
+            break;
+    }
+}
+
+@end

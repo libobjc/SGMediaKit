@@ -382,4 +382,66 @@
     }
 }
 
+
+#pragma mark - track info
+
+- (BOOL)videoEnable
+{
+    return self.decoder.videoEnable;
+}
+
+- (BOOL)audioEnable
+{
+    return self.decoder.audioEnable;
+}
+
+- (SGPlayerTrack *)videoTrack
+{
+    return [self playerTrackFromFFTrack:self.decoder.videoTrack];
+}
+
+- (SGPlayerTrack *)audioTrack
+{
+    return [self playerTrackFromFFTrack:self.decoder.audioTrack];
+}
+
+- (NSArray <SGPlayerTrack *> *)videoTracks
+{
+    return [self playerTracksFromFFTracks:self.decoder.videoTracks];
+}
+
+- (NSArray <SGPlayerTrack *> *)audioTracks
+{
+    return [self playerTracksFromFFTracks:self.decoder.audioTracks];;
+}
+
+- (void)selectAudioTrack:(SGPlayerTrack *)audioTrack
+{
+    [self.decoder selectAudioTrackWithTrackIndex:audioTrack.index];
+}
+
+- (SGPlayerTrack *)playerTrackFromFFTrack:(SGFFTrack *)track
+{
+    if (track) {
+        SGPlayerTrack * obj = [[SGPlayerTrack alloc] init];
+        obj.index = track.index;
+        obj.name = track.metadata.language;
+        return obj;
+    }
+    return nil;
+}
+
+- (NSArray <SGPlayerTrack *> *)playerTracksFromFFTracks:(NSArray <SGFFTrack *> *)tracks
+{
+    NSMutableArray <SGPlayerTrack *> * array = [NSMutableArray array];
+    for (SGFFTrack * obj in tracks) {
+        SGPlayerTrack * track = [self playerTrackFromFFTrack:obj];
+        [array addObject:track];
+    }
+    if (array.count > 0) {
+        return array;
+    }
+    return nil;
+}
+
 @end

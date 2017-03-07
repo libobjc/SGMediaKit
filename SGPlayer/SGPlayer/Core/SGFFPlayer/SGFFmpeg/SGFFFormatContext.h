@@ -60,4 +60,6 @@
 - (void)seekFile:(NSTimeInterval)time;
 - (int)readFrame:(AVPacket *)packet;
 
+- (void)selectAudioTrackWithTrackIndex:(int)audioTrackIndex;
+
 @end

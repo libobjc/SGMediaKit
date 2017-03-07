@@ -16,5 +16,6 @@ FOUNDATION_EXPORT const unsigned char SGPlayer_tvOSVersionString[];      // vers
 
 // SGPlayer
 #import <SGPlayer_tvOS/SGPlayer.h>
+#import <SGPlayer_tvOS/SGPlayerTrack.h>
 #import <SGPlayer_tvOS/SGPlayerAction.h>
 #import <SGPlayer_tvOS/SGPlayerDecoder.h>
