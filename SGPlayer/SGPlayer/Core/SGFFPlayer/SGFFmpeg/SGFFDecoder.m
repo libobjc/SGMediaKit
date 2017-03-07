@@ -49,6 +49,9 @@
 @property (nonatomic, assign) NSTimeInterval seekMinTime;       // default is 0
 @property (nonatomic, copy) void (^seekCompleteHandler)(BOOL finished);
 
+@property (nonatomic, assign) BOOL selectAudioTrack;
+@property (nonatomic, assign) BOOL selectAudioTrackIndex;
+
 @property (nonatomic, strong) SGFFVideoFrame * currentVideoFrame;
 @property (nonatomic, strong) SGFFAudioFrame * currentAudioFrame;
 
@@ -222,6 +225,21 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
             self.currentAudioFrame = nil;
             [self updateBufferedDurationByVideo];
             [self updateBufferedDurationByAudio];
+            continue;
+        }
+        if (self.selectAudioTrack) {
+            NSError * selectResult = [self.formatContext selectAudioTrackIndex:self.selectAudioTrackIndex];
+            if (!selectResult) {
+                [self.audioDecoder destroy];
+                self.audioDecoder = [SGFFAudioDecoder decoderWithCodecContext:self.formatContext->_audio_codec_context
+                                                                     timebase:self.formatContext.audioTimebase
+                                                                     delegate:self];
+                if (!self.playbackFinished) {
+                    [self seekToTime:self.audioTimeClock];
+                }
+            }
+            self.selectAudioTrack = NO;
+            self.selectAudioTrackIndex = 0;
             continue;
         }
         if (self.audioDecoder.size + self.videoDecoder.packetSize >= max_packet_buffer_size) {
@@ -471,6 +489,8 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
     self.currentAudioFrame = nil;
     self.videoDecoder.paused = NO;
     self.videoDecoder.endOfFile = NO;
+    self.selectAudioTrack = NO;
+    self.selectAudioTrackIndex = 0;
 }
 
 - (void)closeOperation
@@ -691,7 +711,12 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
 
 - (void)selectAudioTrackIndex:(int)audioTrackIndex
 {
-    [self.formatContext selectAudioTrackIndex:audioTrackIndex];
+    if (self.formatContext.audioTrack.index == audioTrackIndex) return;
+    self.selectAudioTrack = YES;
+    self.selectAudioTrackIndex = audioTrackIndex;
+    if (self.endOfFile) {
+        [self setupReadPacketOperation];
+    }
 }
 
 @end

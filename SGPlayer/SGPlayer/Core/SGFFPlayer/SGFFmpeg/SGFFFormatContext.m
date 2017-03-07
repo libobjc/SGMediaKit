@@ -49,12 +49,10 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 - (instancetype)initWithContentURL:(NSURL *)contentURL delegate:(id<SGFFFormatContextDelegate>)delegate
 {
-    if (self = [super init]) {
+    if (self = [super init])
+    {
         self.contentURL = contentURL;
         self.delegate = delegate;
-        
-        self.videoTrack = nil;
-        self.audioTrack = nil;
     }
     return self;
 }
@@ -62,15 +60,23 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (void)setupSync
 {
     self.error = [self openStream];
-    if (self.error) return;
+    if (self.error)
+    {
+        return;
+    }
     
-    NSError * videoError = [self openVideoStreams];
-    NSError * audioError = [self openAutioStreams];
+    [self openTracks];
+    NSError * videoError = [self openVideoTrack];
+    NSError * audioError = [self openAutioTrack];
     
-    if (videoError && audioError) {
-        if (videoError.code == SGFFDecoderErrorCodeStreamNotFound && audioError.code != SGFFDecoderErrorCodeStreamNotFound) {
+    if (videoError && audioError)
+    {
+        if (videoError.code == SGFFDecoderErrorCodeStreamNotFound && audioError.code != SGFFDecoderErrorCodeStreamNotFound)
+        {
             self.error = audioError;
-        } else {
+        }
+        else
+        {
             self.error = videoError;
         }
         return;
@@ -83,7 +89,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
     NSError * error = nil;
     
     self->_format_context = avformat_alloc_context();
-    if (!_format_context) {
+    if (!_format_context)
+    {
         reslut = -1;
         error = [NSError errorWithDomain:@"SGFFDecoderErrorCodeFormatCreate error" code:SGFFDecoderErrorCodeFormatCreate userInfo:nil];
         return error;
@@ -94,8 +101,10 @@ static int ffmpeg_interrupt_callback(void *ctx)
     
     reslut = avformat_open_input(&_format_context, [self contentURLString].UTF8String, NULL, NULL);
     error = SGFFCheckErrorCode(reslut, SGFFDecoderErrorCodeFormatOpenInput);
-    if (error || !_format_context) {
-        if (_format_context) {
+    if (error || !_format_context)
+    {
+        if (_format_context)
+        {
             avformat_free_context(_format_context);
         }
         return error;
@@ -103,8 +112,10 @@ static int ffmpeg_interrupt_callback(void *ctx)
     
     reslut = avformat_find_stream_info(_format_context, NULL);
     error = SGFFCheckErrorCode(reslut, SGFFDecoderErrorCodeFormatFindStreamInfo);
-    if (error || !_format_context) {
-        if (_format_context) {
+    if (error || !_format_context)
+    {
+        if (_format_context)
+        {
             avformat_close_input(&_format_context);
         }
         return error;
@@ -114,18 +125,62 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-- (NSError *)openVideoStreams
+- (void)openTracks
+{
+    NSMutableArray <SGFFTrack *> * videoTracks = [NSMutableArray array];
+    NSMutableArray <SGFFTrack *> * audioTracks = [NSMutableArray array];
+    
+    for (int i = 0; i < _format_context->nb_streams; i++)
+    {
+        AVStream * stream = _format_context->streams[i];
+        switch (stream->codecpar->codec_type)
+        {
+            case AVMEDIA_TYPE_VIDEO:
+            {
+                SGFFTrack * track = [[SGFFTrack alloc] init];
+                track.type = SGFFTrackTypeVideo;
+                track.index = i;
+                [videoTracks addObject:track];
+            }
+                break;
+            case AVMEDIA_TYPE_AUDIO:
+            {
+                SGFFTrack * track = [[SGFFTrack alloc] init];
+                track.type = SGFFTrackTypeAudio;
+                track.index = i;
+                [audioTracks addObject:track];
+            }
+                break;
+            default:
+                break;
+        }
+    }
+    
+    if (videoTracks.count > 0)
+    {
+        self.videoTracks = videoTracks;
+    }
+    if (audioTracks.count > 0)
+    {
+        self.audioTracks = audioTracks;
+    }
+}
+
+- (NSError *)openVideoTrack
 {
     NSError * error = nil;
-    self.videoTracks = [self loadTracksWithMediaType:AVMEDIA_TYPE_VIDEO];
     
-    if (self.videoTracks.count > 0) {
-        for (SGFFTrack * obj in self.videoTracks) {
+    if (self.videoTracks.count > 0)
+    {
+        for (SGFFTrack * obj in self.videoTracks)
+        {
             int index = obj.index;
-            if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0) {
+            if ((_format_context->streams[index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0)
+            {
                 AVCodecContext * codec_context;
                 error = [self openStreamWithTrackIndex:index codecContext:&codec_context domain:@"video"];
-                if (!error) {
+                if (!error)
+                {
                     self.videoTrack = obj;
                     self.videoEnable = YES;
                     self.videoTimebase = SGFFStreamGetTimebase(_format_context->streams[index], 0.00004);
@@ -137,7 +192,9 @@ static int ffmpeg_interrupt_callback(void *ctx)
                 }
             }
         }
-    } else {
+    }
+    else
+    {
         error = [NSError errorWithDomain:@"video stream not found" code:SGFFDecoderErrorCodeStreamNotFound userInfo:nil];
         return error;
     }
@@ -145,17 +202,19 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-- (NSError *)openAutioStreams
+- (NSError *)openAutioTrack
 {
     NSError * error = nil;
-    self.audioTracks = [self loadTracksWithMediaType:AVMEDIA_TYPE_AUDIO];
     
-    if (self.audioTracks.count > 0) {
-        for (SGFFTrack * obj in self.audioTracks) {
+    if (self.audioTracks.count > 0)
+    {
+        for (SGFFTrack * obj in self.audioTracks)
+        {
             int index = obj.index;
             AVCodecContext * codec_context;
             error = [self openStreamWithTrackIndex:index codecContext:&codec_context domain:@"audio"];
-            if (!error) {
+            if (!error)
+            {
                 self.audioTrack = obj;
                 self.audioEnable = YES;
                 self.audioTimebase = SGFFStreamGetTimebase(_format_context->streams[index], 0.000025);
@@ -163,7 +222,9 @@ static int ffmpeg_interrupt_callback(void *ctx)
                 break;
             }
         }
-    } else {
+    }
+    else
+    {
         error = [NSError errorWithDomain:@"audio stream not found" code:SGFFDecoderErrorCodeStreamNotFound userInfo:nil];
         return error;
     }
@@ -178,7 +239,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
     
     AVStream * stream = _format_context->streams[trackIndex];
     AVCodecContext * codec_context = avcodec_alloc_context3(NULL);
-    if (!codec_context) {
+    if (!codec_context)
+    {
         error = [NSError errorWithDomain:[NSString stringWithFormat:@"%@ codec context create error", domain]
                                     code:SGFFDecoderErrorCodeCodecContextCreate
                                 userInfo:nil];
@@ -187,14 +249,16 @@ static int ffmpeg_interrupt_callback(void *ctx)
     
     result = avcodec_parameters_to_context(codec_context, stream->codecpar);
     error = SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecContextSetParam);
-    if (error) {
+    if (error)
+    {
         avcodec_free_context(&codec_context);
         return error;
     }
     av_codec_set_pkt_timebase(codec_context, stream->time_base);
     
     AVCodec * codec = avcodec_find_decoder(codec_context->codec_id);
-    if (!codec) {
+    if (!codec)
+    {
         avcodec_free_context(&codec_context);
         error = [NSError errorWithDomain:[NSString stringWithFormat:@"%@ codec not found decoder", domain]
                                     code:SGFFDecoderErrorCodeCodecFindDecoder
@@ -205,7 +269,8 @@ static int ffmpeg_interrupt_callback(void *ctx)
     
     result = avcodec_open2(codec_context, codec, NULL);
     error = SGFFCheckErrorCode(result, SGFFDecoderErrorCodeCodecOpen2);
-    if (error) {
+    if (error)
+    {
         avcodec_free_context(&codec_context);
         return error;
     }
@@ -214,27 +279,10 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-- (NSArray <SGFFTrack *> *)loadTracksWithMediaType:(enum AVMediaType)mediaType
-{
-    NSMutableArray <SGFFTrack *> * tracks = [NSMutableArray array];
-    for (NSInteger i = 0; i < _format_context->nb_streams; i++) {
-        AVStream * stream = _format_context->streams[i];
-        if (stream->codecpar->codec_type == mediaType) {
-            SGFFTrack * track = [[SGFFTrack alloc] init];
-            track.index = (int)i;
-            [tracks addObject:track];
-        }
-    }
-    if (tracks.count > 0) {
-        return tracks;
-    }
-    return nil;
-}
-
 - (void)seekFile:(NSTimeInterval)time
 {
     int64_t ts = av_rescale(time * 1000, AV_TIME_BASE, 1000);
-    avformat_seek_file(self->_format_context, -1, ts, ts, ts, 0);
+    avformat_seek_file(self->_format_context, -1, ts, ts, ts, AVSEEK_FLAG_BACKWARD);
 }
 
 - (int)readFrame:(AVPacket *)packet
@@ -242,9 +290,33 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return av_read_frame(self->_format_context, packet);
 }
 
-- (void)selectAudioTrackIndex:(int)audioTrackIndex
+- (NSError * )selectAudioTrackIndex:(int)audioTrackIndex
 {
-    NSLog(@"选择音轨 : %d", audioTrackIndex);
+    AVCodecContext * codec_context;
+    NSError * error = [self openStreamWithTrackIndex:audioTrackIndex codecContext:&codec_context domain:@"audio select"];
+    if (!error)
+    {
+        if (_audio_codec_context)
+        {
+            avcodec_close(_audio_codec_context);
+            _audio_codec_context = NULL;
+        }
+        for (SGFFTrack * obj in self.audioTracks)
+        {
+            if (obj.index == audioTrackIndex)
+            {
+                self.audioTrack = obj;
+            }
+        }
+        self.audioEnable = YES;
+        self.audioTimebase = SGFFStreamGetTimebase(_format_context->streams[audioTrackIndex], 0.000025);
+        self->_audio_codec_context = codec_context;
+    }
+    else
+    {
+        SGPlayerLog(@"select audio track error : %@", error);
+    }
+    return error;
 }
 
 - (NSTimeInterval)duration
@@ -262,33 +334,48 @@ static int ffmpeg_interrupt_callback(void *ctx)
 
 - (NSString *)contentURLString
 {
-    if ([self.contentURL isFileURL]) {
+    if ([self.contentURL isFileURL])
+    {
         return [self.contentURL path];
-    } else {
+    }
+    else
+    {
         return [self.contentURL absoluteString];
+    }
+}
+
+- (void)destroyAudioTrack
+{
+    self.audioEnable = NO;
+    self.audioTrack = nil;
+    self.audioTracks = nil;
+    
+    if (_audio_codec_context)
+    {
+        avcodec_close(_audio_codec_context);
+        _audio_codec_context = NULL;
+    }
+}
+
+- (void)destroyVideoTrack
+{
+    self.videoEnable = NO;
+    self.videoTrack = nil;
+    self.videoTracks = nil;
+    
+    if (_video_codec_context)
+    {
+        avcodec_close(_video_codec_context);
+        _video_codec_context = NULL;
     }
 }
 
 - (void)destroy
 {
-    self.videoEnable = NO;
-    self.videoTrack = nil;
-    
-    self.audioEnable = NO;
-    self.audioTrack = nil;
-    
-    self.audioTracks = nil;
-    self.videoTracks = nil;
-    
-    if (_video_codec_context) {
-        avcodec_close(_video_codec_context);
-        _video_codec_context = NULL;
-    }
-    if (_audio_codec_context) {
-        avcodec_close(_audio_codec_context);
-        _audio_codec_context = NULL;
-    }
-    if (_format_context) {
+    [self destroyVideoTrack];
+    [self destroyAudioTrack];
+    if (_format_context)
+    {
         avformat_close_input(&_format_context);
         _format_context = NULL;
     }
