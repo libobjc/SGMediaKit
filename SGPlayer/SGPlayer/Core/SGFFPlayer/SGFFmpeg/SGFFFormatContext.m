@@ -117,7 +117,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (NSError *)openVideoStreams
 {
     NSError * error = nil;
-    self.videoTracks = [self fetchStreamsForMediaType:AVMEDIA_TYPE_VIDEO];
+    self.videoTracks = [self loadTracksWithMediaType:AVMEDIA_TYPE_VIDEO];
     
     if (self.videoTracks.count > 0) {
         for (SGFFTrack * obj in self.videoTracks) {
@@ -148,7 +148,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
 - (NSError *)openAutioStreams
 {
     NSError * error = nil;
-    self.audioTracks = [self fetchStreamsForMediaType:AVMEDIA_TYPE_AUDIO];
+    self.audioTracks = [self loadTracksWithMediaType:AVMEDIA_TYPE_AUDIO];
     
     if (self.audioTracks.count > 0) {
         for (SGFFTrack * obj in self.audioTracks) {
@@ -214,7 +214,7 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return error;
 }
 
-- (NSArray <SGFFTrack *> *)fetchStreamsForMediaType:(enum AVMediaType)mediaType
+- (NSArray <SGFFTrack *> *)loadTracksWithMediaType:(enum AVMediaType)mediaType
 {
     NSMutableArray <SGFFTrack *> * tracks = [NSMutableArray array];
     for (NSInteger i = 0; i < _format_context->nb_streams; i++) {
@@ -229,31 +229,6 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return tracks;
     }
     return nil;
-}
-
-- (void)destroy
-{
-    self.videoEnable = NO;
-    self.videoTrack = nil;
-    
-    self.audioEnable = NO;
-    self.audioTrack = nil;
-    
-    self.audioTracks = nil;
-    self.videoTracks = nil;
-    
-    if (_video_codec_context) {
-        avcodec_close(_video_codec_context);
-        _video_codec_context = NULL;
-    }
-    if (_audio_codec_context) {
-        avcodec_close(_audio_codec_context);
-        _audio_codec_context = NULL;
-    }
-    if (_format_context) {
-        avformat_close_input(&_format_context);
-        _format_context = NULL;
-    }
 }
 
 - (void)seekFile:(NSTimeInterval)time
@@ -286,6 +261,31 @@ static int ffmpeg_interrupt_callback(void *ctx)
         return [self.contentURL path];
     } else {
         return [self.contentURL absoluteString];
+    }
+}
+
+- (void)destroy
+{
+    self.videoEnable = NO;
+    self.videoTrack = nil;
+    
+    self.audioEnable = NO;
+    self.audioTrack = nil;
+    
+    self.audioTracks = nil;
+    self.videoTracks = nil;
+    
+    if (_video_codec_context) {
+        avcodec_close(_video_codec_context);
+        _video_codec_context = NULL;
+    }
+    if (_audio_codec_context) {
+        avcodec_close(_audio_codec_context);
+        _audio_codec_context = NULL;
+    }
+    if (_format_context) {
+        avformat_close_input(&_format_context);
+        _format_context = NULL;
     }
 }
 
