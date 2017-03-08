@@ -720,6 +720,7 @@ static NSTimeInterval max_packet_sleep_full_and_pause_time_interval = 0.5;
 - (void)selectAudioTrackIndex:(int)audioTrackIndex
 {
     if (self.formatContext.audioTrack.index == audioTrackIndex) return;
+    if (![self.formatContext containAudioTrack:audioTrackIndex]) return;
     self.selectAudioTrack = YES;
     self.selectAudioTrackIndex = audioTrackIndex;
     if (self.endOfFile) {

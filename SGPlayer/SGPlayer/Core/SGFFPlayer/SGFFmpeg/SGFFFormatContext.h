@@ -60,6 +60,7 @@
 - (void)seekFileWithFFTimebase:(NSTimeInterval)time;
 - (int)readFrame:(AVPacket *)packet;
 
+- (BOOL)containAudioTrack:(int)audioTrackIndex;
 - (NSError *)selectAudioTrackIndex:(int)audioTrackIndex;
 
 @end

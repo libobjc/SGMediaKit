@@ -316,8 +316,21 @@ static int ffmpeg_interrupt_callback(void *ctx)
     return av_read_frame(self->_format_context, packet);
 }
 
+- (BOOL)containAudioTrack:(int)audioTrackIndex
+{
+    for (SGFFTrack * obj in self.audioTracks) {
+        if (obj.index == audioTrackIndex) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
 - (NSError * )selectAudioTrackIndex:(int)audioTrackIndex
 {
+    if (audioTrackIndex == self.audioTrack.index) return nil;
+    if (![self containAudioTrack:audioTrackIndex]) return nil;
+    
     AVCodecContext * codec_context;
     NSError * error = [self openStreamWithTrackIndex:audioTrackIndex codecContext:&codec_context domain:@"audio select"];
     if (!error)
