@@ -218,7 +218,11 @@ SGAudioOutputContext;
     
     AudioComponentDescription mixerDescription;
     mixerDescription.componentType = kAudioUnitType_Mixer;
+#if SGPLATFORM_TARGET_OS_MAC
+    mixerDescription.componentSubType = kAudioUnitSubType_StereoMixer;
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     mixerDescription.componentSubType = kAudioUnitSubType_MultiChannelMixer;
+#endif
     mixerDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
     result = AUGraphAddNode(self.outputContext->graph, &mixerDescription, &self.outputContext->mixerNodeContext.node);
     self.error = checkError(result, @"graph add mixer node error");
@@ -230,7 +234,7 @@ SGAudioOutputContext;
     AudioComponentDescription outputDescription;
     outputDescription.componentType = kAudioUnitType_Output;
 #if SGPLATFORM_TARGET_OS_MAC 
-    outputDescription.componentSubType = kAudioUnitSubType_HALOutput;
+    outputDescription.componentSubType = kAudioUnitSubType_DefaultOutput;
 #elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
     outputDescription.componentSubType = kAudioUnitSubType_RemoteIO;
 #endif
@@ -489,9 +493,15 @@ SGAudioOutputContext;
 - (float)volume
 {
     if (self.registered) {
+        AudioUnitParameterID param;
+#if SGPLATFORM_TARGET_OS_MAC
+        param = kStereoMixerParam_Volume;
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
+        param = kMultiChannelMixerParam_Volume;
+#endif
         AudioUnitParameterValue volume;
         OSStatus result = AudioUnitGetParameter(self.outputContext->mixerNodeContext.audioUnit,
-                                                kMultiChannelMixerParam_Volume,
+                                                param,
                                                 kAudioUnitScope_Input,
                                                 0,
                                                 &volume);
@@ -508,8 +518,14 @@ SGAudioOutputContext;
 - (void)setVolume:(float)volume
 {
     if (self.registered) {
+        AudioUnitParameterID param;
+#if SGPLATFORM_TARGET_OS_MAC
+        param = kStereoMixerParam_Volume;
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
+        param = kMultiChannelMixerParam_Volume;
+#endif
         OSStatus result = AudioUnitSetParameter(self.outputContext->mixerNodeContext.audioUnit,
-                                                kMultiChannelMixerParam_Volume,
+                                                param,
                                                 kAudioUnitScope_Input,
                                                 0,
                                                 volume,
