@@ -88,7 +88,7 @@ static CVReturn QCDisplayLinkCallback(CVDisplayLinkRef displayLinkRef,
     if ([displayLink.target respondsToSelector:displayLink.selector]) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        [displayLink.target performSelector:displayLink.selector];
+        [displayLink.target performSelectorOnMainThread:displayLink.selector withObject:nil waitUntilDone:NO];
 #pragma clang diagnostic pop
     }
     return kCVReturnSuccess;

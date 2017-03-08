@@ -121,7 +121,7 @@
     if ([NSThread isMainThread]) {
         [self displayIfApplicationActive];
     } else {
-        dispatch_sync(dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self displayIfApplicationActive];
         });
     }
@@ -160,7 +160,7 @@
     if ([NSThread isMainThread]) {
         [self displayAndClear:YES];
     } else {
-        dispatch_sync(dispatch_get_main_queue(), ^{
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self displayAndClear:YES];
         });
     }
