@@ -20,21 +20,30 @@
 static int const max_frame_size = 4096;
 static int const max_chan = 2;
 
-static NSError * checkError(OSStatus result, NSString * domain);
-static OSStatus renderCallback (void * inRefCon,
-                                AudioUnitRenderActionFlags * ioActionFlags,
-                                const AudioTimeStamp * inTimeStamp,
-                                UInt32 inOutputBusNumber,
-                                UInt32 inNumberFrames,
-                                AudioBufferList * ioData);
+typedef struct
+{
+    AUNode node;
+    AudioUnit audioUnit;
+}
+SGAudioNodeContext;
+
+typedef struct
+{
+    AUGraph graph;
+    SGAudioNodeContext converterNodeContext;
+    SGAudioNodeContext mixerNodeContext;
+    SGAudioNodeContext outputNodeContext;
+    AudioStreamBasicDescription commonFormat;
+}
+SGAudioOutputContext;
 
 @interface SGAudioManager ()
 
 {
     float * _outData;
-    AudioUnit _audioUnit;
-    AudioStreamBasicDescription _audioOutputFormat;
 }
+
+@property (nonatomic, assign) SGAudioOutputContext * outputContext;
 
 @property (nonatomic, weak) id handlerTarget;
 @property (nonatomic, copy) SGAudioManagerInterruptionHandler interruptionHandler;
@@ -67,7 +76,8 @@ static OSStatus renderCallback (void * inRefCon,
 
 - (instancetype)init
 {
-    if (self = [super init]) {
+    if (self = [super init])
+    {
         self->_outData = (float *)calloc(max_frame_size * max_chan, sizeof(float));
         
 #if SGPLATFORM_TARGET_OS_MAC
@@ -157,16 +167,24 @@ static OSStatus renderCallback (void * inRefCon,
 - (void)unregisterAudioSession
 {
     if (self.registered) {
-        OSStatus result = AudioUnitUninitialize(self->_audioUnit);
-        self.warning = checkError(result, @"uninitialize the audio unit error");
+        OSStatus result = AUGraphUninitialize(self.outputContext->graph);
+        self.warning = checkError(result, @"graph uninitialize error");
         if (self.warning) {
             [self delegateWarningCallback];
         }
-        
-        result = AudioComponentInstanceDispose(self->_audioUnit);
-        self.warning = checkError(result, @"dispose the output audio unit error");
+        result = AUGraphClose(self.outputContext->graph);
+        self.warning = checkError(result, @"graph close error");
         if (self.warning) {
             [self delegateWarningCallback];
+        }
+        result = DisposeAUGraph(self.outputContext->graph);
+        self.warning = checkError(result, @"graph dispose error");
+        if (self.warning) {
+            [self delegateWarningCallback];
+        }
+        if (self.outputContext) {
+            free(self.outputContext);
+            self.outputContext = NULL;
         }
         self.registered = NO;
     }
@@ -175,44 +193,144 @@ static OSStatus renderCallback (void * inRefCon,
 - (BOOL)setupAudioUnit
 {
     OSStatus result;
-    UInt32 size;
+    UInt32 audioStreamBasicDescriptionSize = sizeof(AudioStreamBasicDescription);;
     
-    AudioComponentDescription description = {0};
-    description.componentType = kAudioUnitType_Output;
-    description.componentManufacturer = kAudioUnitManufacturer_Apple;
+    self.outputContext = (SGAudioOutputContext *)malloc(sizeof(SGAudioOutputContext));
+    memset(self.outputContext, 0, sizeof(SGAudioOutputContext));
     
-#if SGPLATFORM_TARGET_OS_MAC
-    description.componentSubType = kAudioUnitSubType_DefaultOutput;
-#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
-    description.componentSubType = kAudioUnitSubType_RemoteIO;
-#endif
-    
-    AudioComponent component = AudioComponentFindNext(NULL, &description);
-    result = AudioComponentInstanceNew(component, &self->_audioUnit);
-    self.error = checkError(result, @"create audio unit error");
+    result = NewAUGraph(&self.outputContext->graph);
+    self.error = checkError(result, @"create  graph error");
     if (self.error) {
         [self delegateErrorCallback];
         return NO;
     }
     
-    size = sizeof(AudioStreamBasicDescription);
-    result = AudioUnitGetProperty(self->_audioUnit,
+    AudioComponentDescription converterDescription;
+    converterDescription.componentType = kAudioUnitType_FormatConverter;
+    converterDescription.componentSubType = kAudioUnitSubType_AUConverter;
+    converterDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
+    result = AUGraphAddNode(self.outputContext->graph, &converterDescription, &self.outputContext->converterNodeContext.node);
+    self.error = checkError(result, @"graph add converter node error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    AudioComponentDescription mixerDescription;
+    mixerDescription.componentType = kAudioUnitType_Mixer;
+    mixerDescription.componentSubType = kAudioUnitSubType_MultiChannelMixer;
+    mixerDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
+    result = AUGraphAddNode(self.outputContext->graph, &mixerDescription, &self.outputContext->mixerNodeContext.node);
+    self.error = checkError(result, @"graph add mixer node error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    AudioComponentDescription outputDescription;
+    outputDescription.componentType = kAudioUnitType_Output;
+#if SGPLATFORM_TARGET_OS_MAC 
+    outputDescription.componentSubType = kAudioUnitSubType_HALOutput;
+#elif SGPLATFORM_TARGET_OS_IPHONE_OR_TV
+    outputDescription.componentSubType = kAudioUnitSubType_RemoteIO;
+#endif
+    outputDescription.componentManufacturer = kAudioUnitManufacturer_Apple;
+    result = AUGraphAddNode(self.outputContext->graph, &outputDescription, &self.outputContext->outputNodeContext.node);
+    self.error = checkError(result, @"graph add output node error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AUGraphOpen(self.outputContext->graph);
+    self.error = checkError(result, @"open graph error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AUGraphConnectNodeInput(self.outputContext->graph,
+                            self.outputContext->converterNodeContext.node,
+                            0,
+                            self.outputContext->mixerNodeContext.node,
+                            0);
+    self.error = checkError(result, @"graph connect converter and mixer error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AUGraphConnectNodeInput(self.outputContext->graph,
+                                     self.outputContext->mixerNodeContext.node,
+                                     0,
+                                     self.outputContext->outputNodeContext.node,
+                                     0);
+    self.error = checkError(result, @"graph connect converter and mixer error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AUGraphNodeInfo(self.outputContext->graph,
+                             self.outputContext->converterNodeContext.node,
+                             &converterDescription,
+                             &self.outputContext->converterNodeContext.audioUnit);
+    self.error = checkError(result, @"graph get converter audio unit error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AUGraphNodeInfo(self.outputContext->graph,
+                             self.outputContext->mixerNodeContext.node,
+                             &mixerDescription,
+                             &self.outputContext->mixerNodeContext.audioUnit);
+    self.error = checkError(result, @"graph get minxer audio unit error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AUGraphNodeInfo(self.outputContext->graph,
+                             self.outputContext->outputNodeContext.node,
+                             &outputDescription,
+                             &self.outputContext->outputNodeContext.audioUnit);
+    self.error = checkError(result, @"graph get output audio unit error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    AURenderCallbackStruct converterCallback;
+    converterCallback.inputProc = renderCallback;
+    converterCallback.inputProcRefCon = (__bridge void *)(self);
+    result = AUGraphSetNodeInputCallback(self.outputContext->graph,
+                                         self.outputContext->converterNodeContext.node,
+                                         0,
+                                         &converterCallback);
+    self.error = checkError(result, @"graph add converter input callback error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AudioUnitGetProperty(self.outputContext->outputNodeContext.audioUnit,
                                   kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Input, 0,
-                                  &self->_audioOutputFormat,
-                                  &size);
+                                  &self.outputContext->commonFormat,
+                                  &audioStreamBasicDescriptionSize);
     self.warning = checkError(result, @"get hardware output stream format error");
     if (self.warning) {
         [self delegateWarningCallback];
     } else {
-        if (self.audioSession.sampleRate != self->_audioOutputFormat.mSampleRate) {
-            self->_audioOutputFormat.mSampleRate = self.audioSession.sampleRate;
-            result = AudioUnitSetProperty(self->_audioUnit,
+        if (self.audioSession.sampleRate != self.outputContext->commonFormat.mSampleRate) {
+            self.outputContext->commonFormat.mSampleRate = self.audioSession.sampleRate;
+            result = AudioUnitSetProperty(self.outputContext->outputNodeContext.audioUnit,
                                           kAudioUnitProperty_StreamFormat,
                                           kAudioUnitScope_Input,
                                           0,
-                                          &self->_audioOutputFormat,
-                                          size);
+                                          &self.outputContext->commonFormat,
+                                          audioStreamBasicDescriptionSize);
             self.warning = checkError(result, @"set hardware output stream format error");
             if (self.warning) {
                 [self delegateWarningCallback];
@@ -220,24 +338,68 @@ static OSStatus renderCallback (void * inRefCon,
         }
     }
     
-    AURenderCallbackStruct callbackStruct;
-    callbackStruct.inputProc = renderCallback;
-    callbackStruct.inputProcRefCon = (__bridge void *)(self);
-    
-    result = AudioUnitSetProperty(self->_audioUnit,
-                                  kAudioUnitProperty_SetRenderCallback,
+    result = AudioUnitSetProperty(self.outputContext->converterNodeContext.audioUnit,
+                                  kAudioUnitProperty_StreamFormat,
                                   kAudioUnitScope_Input,
                                   0,
-                                  &callbackStruct,
-                                  sizeof(callbackStruct));
-    self.error = checkError(result, @"set audio unit render callback error");
+                                  &self.outputContext->commonFormat,
+                                  audioStreamBasicDescriptionSize);
+    self.error = checkError(result, @"graph set converter input format error");
     if (self.error) {
         [self delegateErrorCallback];
         return NO;
     }
     
-    result = AudioUnitInitialize(self->_audioUnit);
-    self.error = checkError(result, @"initialize the audio unit error");
+    result = AudioUnitSetProperty(self.outputContext->converterNodeContext.audioUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Output,
+                                  0,
+                                  &self.outputContext->commonFormat,
+                                  audioStreamBasicDescriptionSize);
+    self.error = checkError(result, @"graph set converter output format error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AudioUnitSetProperty(self.outputContext->mixerNodeContext.audioUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Input,
+                                  0,
+                                  &self.outputContext->commonFormat,
+                                  audioStreamBasicDescriptionSize);
+    self.error = checkError(result, @"graph set converter input format error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AudioUnitSetProperty(self.outputContext->mixerNodeContext.audioUnit,
+                                  kAudioUnitProperty_StreamFormat,
+                                  kAudioUnitScope_Output,
+                                  0,
+                                  &self.outputContext->commonFormat,
+                                  audioStreamBasicDescriptionSize);
+    self.error = checkError(result, @"graph set converter output format error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AudioUnitSetProperty(self.outputContext->mixerNodeContext.audioUnit,
+                                  kAudioUnitProperty_MaximumFramesPerSlice,
+                                  kAudioUnitScope_Global,
+                                  0,
+                                  &max_frame_size,
+                                  sizeof(max_frame_size));
+    self.error = checkError(result, @"graph set mixer max frames per slice size error");
+    if (self.error) {
+        [self delegateErrorCallback];
+        return NO;
+    }
+    
+    result = AUGraphInitialize(self.outputContext->graph);
+    self.error = checkError(result, @"graph initialize error");
     if (self.error) {
         [self delegateErrorCallback];
         return NO;
@@ -256,7 +418,7 @@ static OSStatus renderCallback (void * inRefCon,
     {
         [self.delegate audioManager:self outputData:self->_outData numberOfFrames:numberOfFrames numberOfChannels:self.numberOfChannels];
         
-        UInt32 numBytesPerSample = self->_audioOutputFormat.mBitsPerChannel / 8;
+        UInt32 numBytesPerSample = self.outputContext->commonFormat.mBitsPerChannel / 8;
         if (numBytesPerSample == 4) {
             float zero = 0.0;
             for (int iBuffer = 0; iBuffer < ioData->mNumberBuffers; iBuffer++) {
@@ -302,8 +464,8 @@ static OSStatus renderCallback (void * inRefCon,
 {
     if (!self->_playing) {
         if ([self registerAudioSession]) {
-            OSStatus result = AudioOutputUnitStart(self->_audioUnit);
-            self.error = checkError(result, @"start output unit error");
+            OSStatus result = AUGraphStart(self.outputContext->graph);
+            self.error = checkError(result, @"graph start error");
             if (self.error) {
                 [self delegateErrorCallback];
             } else {
@@ -311,13 +473,17 @@ static OSStatus renderCallback (void * inRefCon,
             }
         }
     }
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        
+    });
 }
 
 - (void)pause
 {
     if (self->_playing) {
-        OSStatus result = AudioOutputUnitStop(self->_audioUnit);
-        self.error = checkError(result, @"stop output unit error");
+        OSStatus result = AUGraphStop(self.outputContext->graph);
+        self.error = checkError(result, @"graph stop error");
         if (self.error) {
             [self delegateErrorCallback];
         }
@@ -325,9 +491,44 @@ static OSStatus renderCallback (void * inRefCon,
     }
 }
 
+- (float)volume
+{
+    if (self.registered) {
+        AudioUnitParameterValue volume;
+        OSStatus result = AudioUnitGetParameter(self.outputContext->mixerNodeContext.audioUnit,
+                                                kMultiChannelMixerParam_Volume,
+                                                kAudioUnitScope_Input,
+                                                0,
+                                                &volume);
+        self.warning = checkError(result, @"graph get mixer volum error");
+        if (self.warning) {
+            [self delegateWarningCallback];
+        } else {
+            return volume;
+        }
+    }
+    return 1.f;
+}
+
+- (void)setVolume:(float)volume
+{
+    if (self.registered) {
+        OSStatus result =AudioUnitSetParameter(self.outputContext->mixerNodeContext.audioUnit,
+                                               kMultiChannelMixerParam_Volume,
+                                               kAudioUnitScope_Input,
+                                               0,
+                                               0.0f,
+                                               0);
+        self.warning = checkError(result, @"graph set mixer volum error");
+        if (self.warning) {
+            [self delegateWarningCallback];
+        }
+    }
+}
+
 - (Float64)samplingRate
 {
-    Float64 number = self->_audioOutputFormat.mSampleRate;
+    Float64 number = self.outputContext->commonFormat.mSampleRate;
     if (number > 0) {
         return number;
     }
@@ -336,7 +537,7 @@ static OSStatus renderCallback (void * inRefCon,
 
 - (UInt32)numberOfChannels
 {
-    UInt32 number = self->_audioOutputFormat.mChannelsPerFrame;
+    UInt32 number = self.outputContext->commonFormat.mChannelsPerFrame;
     if (number > 0) {
         return number;
     }
@@ -367,8 +568,6 @@ static OSStatus renderCallback (void * inRefCon,
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-@end
-
 static NSError * checkError(OSStatus result, NSString * domain)
 {
     if (result == noErr) return nil;
@@ -376,13 +575,15 @@ static NSError * checkError(OSStatus result, NSString * domain)
     return error;
 }
 
-static OSStatus renderCallback (void						*inRefCon,
-                                AudioUnitRenderActionFlags	* ioActionFlags,
-                                const AudioTimeStamp 		* inTimeStamp,
-                                UInt32						inOutputBusNumber,
-                                UInt32						inNumberFrames,
-                                AudioBufferList				* ioData)
+static OSStatus renderCallback(void * inRefCon,
+                               AudioUnitRenderActionFlags * ioActionFlags,
+                               const AudioTimeStamp * inTimeStamp,
+                               UInt32 inOutputBusNumber,
+                               UInt32 inNumberFrames,
+                               AudioBufferList * ioData)
 {
     SGAudioManager * manager = (__bridge SGAudioManager *)inRefCon;
     return [manager renderFrames:inNumberFrames ioData:ioData];
 }
+
+@end

@@ -64,7 +64,6 @@
 @property (nonatomic, assign, readonly) NSTimeInterval bufferedDuration;
 
 @property (nonatomic, assign) NSTimeInterval minBufferedDruation;
-@property (nonatomic, assign) CGFloat volume;
 @property (nonatomic, assign) BOOL hardwareDecoderEnable;       // default is YES;
 
 @property (nonatomic, assign, readonly) BOOL buffering;

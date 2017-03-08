@@ -196,7 +196,7 @@
 
 - (void)reloadVolume
 {
-    self.decoder.volume = self.abstractPlayer.volume;
+    self.audioManager.volume = self.abstractPlayer.volume;
 }
 
 - (void)reloadPlayableBufferInterval

@@ -38,6 +38,8 @@ typedef void (^SGAudioManagerRouteChangeHandler)(id handlerTarget, SGAudioManage
 
 + (instancetype)manager;
 
+@property (nonatomic, assign) float volume;
+
 @property (nonatomic, weak, readonly) id <SGAudioManagerDelegate> delegate;
 @property (nonatomic, assign, readonly) BOOL playing;
 
