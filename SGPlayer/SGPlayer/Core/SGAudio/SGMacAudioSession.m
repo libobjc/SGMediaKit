@@ -75,6 +75,7 @@
         device.UID = [self UIDPropertyForDeviceID:deviceID];
         device.inputChannelCount = [self channelCountForScope:kAudioObjectPropertyScopeInput forDeviceID:deviceID];
         device.outputChannelCount = [self channelCountForScope:kAudioObjectPropertyScopeOutput forDeviceID:deviceID];
+        [devices addObject:device];
     }
     
     free(deviceIDs);
