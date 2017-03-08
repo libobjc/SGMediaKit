@@ -392,10 +392,9 @@ SGAudioOutputContext;
                                   0,
                                   &max_frame_size,
                                   sizeof(max_frame_size));
-    self.error = checkError(result, @"graph set mixer max frames per slice size error");
-    if (self.error) {
-        [self delegateErrorCallback];
-        return NO;
+    self.warning = checkError(result, @"graph set mixer max frames per slice size error");
+    if (self.warning) {
+        [self delegateWarningCallback];
     }
     
     result = AUGraphInitialize(self.outputContext->graph);
@@ -473,10 +472,6 @@ SGAudioOutputContext;
             }
         }
     }
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        
-    });
 }
 
 - (void)pause
@@ -513,12 +508,12 @@ SGAudioOutputContext;
 - (void)setVolume:(float)volume
 {
     if (self.registered) {
-        OSStatus result =AudioUnitSetParameter(self.outputContext->mixerNodeContext.audioUnit,
-                                               kMultiChannelMixerParam_Volume,
-                                               kAudioUnitScope_Input,
-                                               0,
-                                               0.0f,
-                                               0);
+        OSStatus result = AudioUnitSetParameter(self.outputContext->mixerNodeContext.audioUnit,
+                                                kMultiChannelMixerParam_Volume,
+                                                kAudioUnitScope_Input,
+                                                0,
+                                                volume,
+                                                0);
         self.warning = checkError(result, @"graph set mixer volum error");
         if (self.warning) {
             [self delegateWarningCallback];
