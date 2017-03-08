@@ -6,7 +6,7 @@
 //  Copyright © 2017 single. All rights reserved.
 //
 
-#import <SGMediaKit/SGMediaKit.h>
+#import "SGPlayer.h"
 #import "SGDisplayView.h"
 
 @interface SGPlayer (DisplayView)
