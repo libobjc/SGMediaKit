@@ -1,0 +1,9 @@
+[submodule "Vendors/SGPlayer"]
+	path = Vendors/SGPlayer
+	url = git@github.com:0x010101/SGPlayer.git
+[submodule "Vendors/SGPlatform"]
+	path = Vendors/SGPlatform
+	url = git@github.com:0x010101/SGPlatform.git
+[submodule "Vendors/GPUImage"]
+	path = Vendors/GPUImage
+	url = git@github.com:BradLarson/GPUImage.git
