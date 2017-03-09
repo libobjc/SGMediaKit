@@ -15,4 +15,4 @@ DerivedData
 *.ipa
 *.xcuserstate
 .DS_Store
-SGPlayer/SGPlayer/Core/SGFFPlayer/ffmpeg/
+Vendors/*

@@ -6,7 +6,7 @@
 //  Copyright © 2016 single. All rights reserved.
 //
 
-#import "SGPLFObject.h"
+#import <SGPlatform/SGPlatform.h>
 
 typedef NS_ENUM(NSUInteger, SGVideoQuality) {
     SGVideoQualityLow,

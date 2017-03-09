@@ -8,21 +8,21 @@
 
 #import <Foundation/Foundation.h>
 
-FOUNDATION_EXPORT double SGMediaKitVersionNumber;       // version number
-FOUNDATION_EXPORT const unsigned char SGMediaKitVersionString[];        // version string
+FOUNDATION_EXPORT double SGMediaKitVersionNumber;
+FOUNDATION_EXPORT const unsigned char SGMediaKitVersionString[];
 
-// SGPlatform
-#import <SGMediaKit/SGPLFObject.h>
+
+// Platform
+#import <SGPlatform/SGPlatform.h>
 
 // SGPlayer
-#import <SGMediaKit/SGPlayer.h>
-#import <SGMediaKit/SGPlayerTrack.h>
-#import <SGMediaKit/SGPlayerAction.h>
-#import <SGMediaKit/SGPlayerDecoder.h>
+#import <SGPlayer/SGPlayer.h>
+
 
 // SGCapture
 #import <SGMediaKit/SGVideoCapture.h>
 #import <SGMediaKit/SGVideoConfiguration.h>
+
 
 // SGFormat
 #import <SGMediaKit/SGFormatFactory.h>

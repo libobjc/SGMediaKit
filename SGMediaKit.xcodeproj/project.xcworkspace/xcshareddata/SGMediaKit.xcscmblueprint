@@ -1,0 +1,44 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "CF383D2DAF0F8C326FD8A1E2F87C8927F654718F",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "CF383D2DAF0F8C326FD8A1E2F87C8927F654718F" : 9223372036854775807,
+    "F23AFB690725856BF6A8F7C02C736922AA443A58" : 9223372036854775807,
+    "CF9A9AD861EDA5D4368DC40F74298A8979BAE8C8" : 9223372036854775807,
+    "E609DD15689CC93D8F4D219EB393F30F9F726178" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "180AE7D7-6578-4C92-B84B-75322643B34D",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "CF383D2DAF0F8C326FD8A1E2F87C8927F654718F" : "SGMediaKit\/",
+    "F23AFB690725856BF6A8F7C02C736922AA443A58" : "SGMediaKit\/Vendors\/SGPlayer\/",
+    "CF9A9AD861EDA5D4368DC40F74298A8979BAE8C8" : "SGMediaKit\/Vendors\/SGPlayer\/Vendors\/SGPlatform\/",
+    "E609DD15689CC93D8F4D219EB393F30F9F726178" : "SGMediaKit\/Vendors\/GPUImage\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "SGMediaKit",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "SGMediaKit.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "git.coding.net:0x010101\/SGMediaKit.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "CF383D2DAF0F8C326FD8A1E2F87C8927F654718F"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:0x010101\/SGPlatform.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "CF9A9AD861EDA5D4368DC40F74298A8979BAE8C8"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:BradLarson\/GPUImage.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "E609DD15689CC93D8F4D219EB393F30F9F726178"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:0x010101\/SGPlayer.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "F23AFB690725856BF6A8F7C02C736922AA443A58"
+    }
+  ]
+}
