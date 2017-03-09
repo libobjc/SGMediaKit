@@ -15,4 +15,6 @@ DerivedData
 *.ipa
 *.xcuserstate
 .DS_Store
-Vendors/
+Vendors/GPUImage/*
+Vendors/SGPlatform/*
+Vendors/SGPlayer/*
